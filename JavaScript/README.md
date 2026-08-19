@@ -336,10 +336,121 @@ Global Execution Context
 
 
 
-
+-Objects, Prototypes & this
 - this keyword
+this is a special JavaScript keyword whose value is determined by the function's invocation context. In regular functions, it depends on how the function is called. In object methods, it usually refers to the object calling the method. Arrow functions don't have their own this; they inherit it from their lexical surrounding scope.
+ 
+ before learning prototype
+what is the output 
+```javascript
+let numberArr = [10, 20, 30];
+console.log(numberArr.length); // 3
+console.log(numberArr.push); // [Function :push]
+console.log(numberArr.map); // [Function :map]
+
+```
+come from? did we write them ?
+no then who creted them ?
+```javascript
+let userObj = {
+name: "PRiti",
+};
+console.log(userObj.toString); // [Function: toString
+
+```
+did we write toString(); ? no
+then where did it come from
 - call, apply, bind
-- Prototype & Prototype Chain
+```javascript
+function demo() {}
+console.log(demo.bind);
+console.log(demo.call);
+console.log(demo.apply);
+```
+ ```javascript has a mechanism called Prototype  -everything starts from prototype.```
+first understand Object
+when you create
+```javascript
+let user = {
+name: "Priti",
+};
+```
+user created in memory -> user={name:"Priti"}
+now looks
+user.name
+js ask ?
+does user have "name"?
+answer ? yess
+```javascript
+return Priti
+```
+```javascript
+user.toString()
+```
+there is no toString() inside user
+then why does this work ?
+
+javascript search process
+js does not stop
+instead it ask's 
+current Object (user) ?Found ? no
+Then -->   Go to prototype  & search again
+That hidden link is called [[prototype]] or __proto__
+thats why "user.toString()" works
+```javascript
+Object.prototype
+toString()
+hasOwnProperty()
+valueOf()
+```
+
+The object doesn't own those methods.  It borrows them
+```javascript
+Array.prototype
+push()
+pop()
+map()
+filter()
+reduce()
+sort()
+```
+All array methods live inside
+ ```javascript
+ Array.prototype 
+ ```
+ every array points to the same prototype
+Every Type Has Its Own Prototype
+Value Prototype
+Array Array.prototype
+Function Function.prototype
+Object Object.prototype
+String String.prototype
+Number Number.prototype
+Boolean Boolean.prototype
+
+- Prototype & Prototype Chain ?
+```javascript
+let = arr = [1, 2, 3];
+console.log(arr.xyz);
+```
+javscript search in arr  ? Found ? No Then it check Array.prototype ? Found ? No  --> it check Object.prototype ?Found ? No   -- return Null  and stop . 
+this is called prototype chain
+```javascript
+let ar = [];
+console.log(ar.__proto__ == Array.prototype); // true
+// because ever arrays prototype points to Array.prototype
+console.log(Array.prototype.__proto__ === Object.prototype); // true
+
+// Because Array.prototype
+// Object.prototyp
+console.log(Object.prototype.proto);//null undefined
+// Because the prototype chain ends there
+```
+![JavaScript Prototype Chain](././images/prototype chain.png)
+![JavaScript Prototype Chain](././images/prototype.png)
+
+
+
 - == vs ===
 - Type Coercion
 - Pass by values pass by reference 
