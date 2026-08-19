@@ -6,8 +6,8 @@
 ## Fundamentals
 
 - What is Node.js?
-- Node.js runtime kya hai?
-- Node.js aur JavaScript mein kya difference hai?
+- What is Node.js runtime ?
+- What is difference between  Node.js and  JavaScript   ?
 - Node.js browser ke bahar JavaScript kaise run karta hai?
 - Node.js single-threaded kyun kaha jata hai?
 - Node.js ke main features kya hain?

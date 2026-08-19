@@ -1,14 +1,342 @@
 # JavaScript Interview Question Collection
+-What is JavaScript? 
+JavaScript is a high-level, dynamically typed programming language mainly used to add behavior and interactivity to web applications. It runs in browsers using JavaScript engines like V8, and with Node.js it can also run on the server.
+```javascript
+const name = "Priti";
+console.log(`Hello ${name}`);
+```
 
----
+-What are the <pre><code>var vs let vs const</code></pre>
+var, let, and const are used to declare variables in JavaScript, but they differ mainly in scope, redeclaration, reassignment, and hoisting behavior.
 
-- JavaScript Collection---->>>>
-<pre><code>var vs let vs const</code></pre>
-- Hoisting
-- Temporal Dead Zone
-- Scope & Lexical Scope
+var is a JavaScript keyword used to declare a variable that is function-scoped and can be redeclared and reassigned.
+```javascript
+var name = "Priti";
+name = "Vipin"; // ✅
+var name = "Amit"; // ✅
+```
+let is a JavaScript keyword used to declare a variable that is block-scoped and can be reassigned but not redeclared in the same scope.
+```javascript
+let age = 25;
+age = 26; // ✅
+// let age = 27; // ❌
+```
+const is a JavaScript keyword used to declare a block-scoped variable whose binding cannot be reassigned after initialization.
+```javascript
+const country = "India";
+// country = "USA"; // ❌
+```
+
+
+- What is Hoisting ?
+Hoisting is the behavior in JavaScript where declarations are processed before execution. var is initialized with undefined, while let and const are hoisted but remain in the TDZ until initialization. Function declarations can be called before their declaration.
+var       → Hoisted + initialized as undefined
+let       → Hoisted + TDZ
+const     → Hoisted + TDZ
+function  → Hoisted with function definition
+```javascript
+console.log(a);
+var a = 10; // undefined
+
+Conceptually, JavaScript behaves like:
+var a;
+console.log(a); // undefined
+a = 10;
+
+with let & const
+console.log(a); // ReferenceError
+let a = 10; 
+
+// function 
+sayHello();
+function sayHello() {
+  console.log("Hello");
+}
+```
+
+
+
+
+- What is Temporal Dead Zone? 
+Temporal Dead Zone is the period between entering a block and the point where a let or const variable is initialized. During this period, accessing the variable causes a ReferenceError.
+Why does TDZ exist?
+
+It prevents you from accidentally using a variable before it has been initialized.
+```javascript
+{
+    // TDZ starts
+    console.log(age); // ❌ ReferenceError
+    let age = 25;
+
+    // TDZ ends
+    console.log(age); // ✅ 25
+}
+```
+```javascript 
+var
+ ↓
+Hoisted
+ ↓
+Initialized with undefined
+ ↓
+Can access before declaration
+
+
+let / const
+ ↓
+Hoisted
+ ↓
+TDZ
+ ↓
+Cannot access
+ ↓
+Initialization
+ ↓
+Can access
+```
+
+
+
+-Scope & Lexical Scope
+Scope in JavaScript defines where a variable can be accessed or used within a program. It controls the visibility and lifetime of variables across different parts of the code.
+
+Types of Scope->
+
+```javascript
+Global Scope
+    ↓
+Function Scope
+    ↓
+Block Scope/Lexical
+    ↓
+Module Scope
+```
+Global Scope
+A global variable refers to a variable that is declared outside any function or block {}, so it can be used anywhere in the program, both inside functions and in the main code. 
+```javascript
+let globalVar = "I am global";
+function test() {
+    console.log(globalVar); // Accessible here
+}
+```
+
+Local Scope
+A local variable is a variable declared within a function, making it accessible only inside that function. It cannot be used outside the function. When you put a let or const variable inside any curly braces {}—like an if statement or a for loop—it becomes local to that specific block
+```javascript
+if (true) {
+    let localToBlock = "Secret";
+    // This variable only exists inside these braces
+}
+console.log(localToBlock); // ReferenceError: Not defined outside!
+```
+Function Scope
+Each function creates its own scope. Variables declared inside a function (whether using var, let, or const) Any variable declared inside a function is local to that function. Nothing leaks out are only visible inside that specific function
+```javascript 
+function myFunction() {
+    var x = 1;
+    let y = 2;
+}
+console.log(x); // Error! (Function scope protected it)
+```
+
+Block Scope/Lexical scope
+Block scope in JavaScript means variables declared with let or const inside { } are accessible only within that block, and accessing them before declaration (TDZ) causes a ReferenceError.
+
+```Variables declared with var do not have block scope. If declared inside a function, they are accessible throughout that function regardless of blocks such as if statements or loops. In classic scripts, a var declared outside any function becomes globally scoped. In ES modules, top-level var is module-scoped.```
+
+```javascript
+if (true) {
+    let blockVar = "I am trapped in this block";
+    var notBlocked = "I escape block scope"; 
+}
+console.log(notBlocked); // Works fine!
+console.log(blockVar);   // ReferenceError: blockVar is not defined
+
+function outer(){
+    let x= 10 ; // Local variable 
+    {
+        let y=20;
+        console.log(y)// block scope
+    }
+    function inner(){
+        console.log(x)//Lexical scope
+    }
+    inner()
+}
+outer()
+```
+
+Module scope
+When working with JavaScript modules (type="module"), variables declared at the top level of a file are private to that file unless they are explicitly exported
+
+
+
 - Closures
+A closure is created when an inner function remembers and can access variables from its outer function's lexical scope even after the outer function has finished executing.
+```javascript
+function outer() {
+  let count = 0;
+  function inner() {
+    count++;
+    console.log(count);
+  }
+  return inner;
+}
+const counter = outer();
+counter(); // 1
+counter(); // 2
+counter(); // 3
+```
+-why is a closure?
+Closures exist because sometimes a function needs to remember and access data from its outer scope even after the outer function has finished executing.
+Closure gives a function “memory”.
+```javascript
+without clousre;
+function outer(){
+    let count =0
+}
+outer() //outer finish you can't directly access count;
+with clousre
+function outer() {
+  let count = 0;
+
+  return function () {
+    count++;
+    console.log(count);
+  };
+}
+
+const counter = outer();
+
+counter(); // 1
+counter(); // 2
+counter(); // 3
+Why is this useful?
+
+Because counter remembers count.
+```
+
+
+-Why does Closure preserve variables?
+Because the inner function still has a reference to the lexical environment where those variables were created.
+
+
 - How does JavaScript execute code?
+When JavaScript code runs, the JavaScript engine creates an execution context. During the creation phase, it sets up variables, functions, and the lexical environment. During the execution phase, the code is executed. Function calls are managed through the call stack. For asynchronous operations, the event loop coordinates callbacks and queues with the call stack..
+```javascript 
+             JavaScript Code
+                    ↓
+             JavaScript Engine
+                    ↓
+          Create Execution Context
+                    ↓
+             Creation Phase
+          ┌─────────┴─────┐
+          ↓                              ↓
+     Hoisting          Lexical Environment
+          │
+          ↓
+             Execution Phase
+                    ↓
+               Call Stack
+                    ↓
+          Synchronous Execution
+                    ↓
+       Async work → Event Loop
+                    ↓
+               Final Output
+```
+Execution Context
+JavaScript creates an Execution Context to execute code.
+There are mainly:
+
+Global Execution Context
+Function Execution Context
+Eval Execution Context
+
+Creation Phase
+
+Before executing the statements, JavaScript prepares the execution context.
+
+For example:
+```javascript
+var x = 10;
+
+
+function test() {
+  console.log("Hello");
+}
+
+Conceptually:
+
+Creation Phase
+│
+├── x → undefined
+│
+└── test → function definition
+```
+This is related to hoisting.
+
+Execution Phase
+
+Now JavaScript executes the code.
+```javascript
+var x = 10;
+console.log(x);
+
+Conceptually:
+
+Creation Phase
+     ↓
+x → undefined
+     ↓
+Execution Phase
+     ↓
+x → 10
+     ↓
+console.log(x)
+     ↓
+10
+```
+```
+Execution Context
+│
+├── Creation Phase
+│   ├── Memory setup
+│   ├── Variables setup
+│   ├── Function declarations setup
+│   └── Lexical Environment setup
+│
+└── Execution Phase
+    ├── Code line-by-line execute 
+    ├── Variables ko values milti hain
+    └── Functions execute hote hain
+```
+
+Creation phase and execution phase are two phases of an execution context. First, JavaScript creates the execution context and prepares its environment; then it executes the code.
+
+Global Execution Context
+        │
+        ├── Creation Phase
+        │      ↓
+        │   x → undefined
+        │   test → function
+        │
+        └── Execution Phase
+               ↓
+             x = 10
+               ↓
+             test()
+               ↓
+          Function Execution Context
+               │
+               ├── Creation Phase
+               └── Execution Phase
+
+
+
+
+
 - this keyword
 - call, apply, bind
 - Prototype & Prototype Chain
