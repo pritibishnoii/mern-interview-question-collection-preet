@@ -298,7 +298,7 @@ console.log(x)
      ↓
 10
 ```
-```
+```javascript
 Execution Context
 │
 ├── Creation Phase
@@ -314,7 +314,7 @@ Execution Context
 ```
 
 Creation phase and execution phase are two phases of an execution context. First, JavaScript creates the execution context and prepares its environment; then it executes the code.
-
+```javascript
 Global Execution Context
         │
         ├── Creation Phase
@@ -332,13 +332,51 @@ Global Execution Context
                │
                ├── Creation Phase
                └── Execution Phase
-
+```
 
 
 
 -Objects, Prototypes & this
-- this keyword
+- this keyword-
+
 this is a special JavaScript keyword whose value is determined by the function's invocation context. In regular functions, it depends on how the function is called. In object methods, it usually refers to the object calling the method. Arrow functions don't have their own this; they inherit it from their lexical surrounding scope.
+
+```javascript
+"use strict"
+function showMe(){
+    console.log(this)//undefined
+}
+showMe();
+
+// this==window;
+
+```
+```javascript
+let person={
+    name:"vipin",
+    age:25,
+    greet(){
+        console.log(this.name)//vipin 
+    }
+}
+//Current this Who called?
+person.greet()/
+//  therefor this person 
+
+// nested function 
+
+let user = {
+    name:"priti",
+    show(){
+        function inner(){
+            console.log(this)//this inside inner() is NOT user  --global object
+        }
+        inner()//is a normal function call. noboody owns it  Therefore  this  Global (non-strict) or undefined (strict/)
+     }
+}
+user.show()
+//
+```
  
  before learning prototype
 what is the output 
@@ -448,13 +486,197 @@ console.log(Object.prototype.proto);//null undefined
 ```
 ![JavaScript Prototype Chain](././images/prototype.png)
 ![JavaScript Prototype Chain](././images/prototypechain.png)
+## H2 — Why Prototype? 
+ ```javascript 
+let arr1=[]
+let arr2=[]
+let arr3=[]
+ ```
+ if Every array stroes its own -
+
+ ```javascript
+    push()
+    map()
+    filter()
+    reduce()
+```
+memory would explode , instead, javascript stroes them once 
+
+## H2 —  __proto__ vs Prototype? 
+these are the same ? No 
+```javascript
+function Person(){}
+console.log(Person.prototype)//{}
+console.log(Person.__proto__)// [Function(anonymous)]Object
+
+```
+
+```javascript 
+when you create
+ function Person(){} 
+javascript creates a function object 
+
+Person
+├── name
+├── length
+├── prototype 
+└── proto****
+A fucntion has both prototype and __proto__ but they mean different things 
+Every normal function automatically gets a property called  prototype
+
+function Person(){}//
+console.log(Person.prototype)// { constructor:Person}
+
+initialy its only contains constructor 
+
+```
+## H3 — Why does it exist? 
+because later when someone writes 
+```javascript
+new Person();
+```
+javascript needs somewhere to stored methods, that place is .Person.prototype
+```javascript
+function Person(name){
+    this.name=name;
+}
+Person.prototype.sayHello=function(){
+    console.log(`hello ${this.name}`)
+}
+
+let p = new Person("vipin");
+
+p.sayHello()//
+// memory -- Person --> prototype-->{sayHello}
+Person
+  │
+  └── prototype
+        │
+        ▼
+   ┌───────────────┐
+   │ Person.prototype     
+                      │
+   │ sayHello: function() 
+   └───────────────┘
+
+   Object.getPrototypeOf(p) === Person.prototype//true
+
+p
+├── name: "vipin"
+└── ❌ sayHello nahi
+// But internally JavaScript performs 4 steps
+// function Person(name) {
+// this.name = name;
+// }
+// let p = new Person("vipin);//   this becomes p={name:"vipin"}
+// step 1  
+// js creates empty {}  when  sees new Person("vipin)
+// step 2 
+// object.__proto__=Person.prototype (connect the prototype)
+// step 3 
+// Person.call(Object,"vipin")
+```
+# H-4🧬 Prototype Chain
+p object  does not  contain  directly sayHello inside it .
+When new Person() creates p, the new object's internal [[Prototype]] is set to Person.prototype. The sayHello method is stored on Person.prototype, not on every instance. When we call p.sayHello(), JavaScript first searches p, doesn't find the method, and then searches its prototype Person.prototype, where it finds and executes sayHello.
+
+
+Person is itself a function object.
+All functions inherit from  Function.prototype
 
 
 
+# H-2 Call() Apply(), Bind ()
+call, apply, and bind are used to explicitly set this for a function. call invokes the function immediately with arguments passed individually, apply invokes it immediately with arguments passed as an array, and bind returns a new function with this bound, which can be called later
+
+call() immediately invokes the function and allows us to specify this.
+```javascript
+function greet(city) {
+  console.log(`Hello ${this.name} from ${city}`);
+}
+const user = {
+  name: "Priti"
+};
+greet.call(user, "Indore"); // Hello fro m  indore
+
+greet.call(user, "Indore")
+       ↓
+   this = user
+       ↓
+   execute now
+```
+apply()
+
+apply() works almost exactly like call(), but arguments are passed as an array/array-like object
+```javascript
+function greet(city, country) {
+  console.log(this.name, city, country);
+}
+const user = {
+  name: "Priti"
+};
+greet.apply(user, ["Indore", "India"]);
+```
+
+bind()
+bind() does not execute the function immediately.It returns a new function with this permanently bound to the provided object.
+```javascript
+function greet() {
+  console.log(`Hello ${this.name}`);
+}
+const user = {
+  name: "Priti"
+};
+const newGreet = greet.bind(user);
+newGreet();//Hello Priti
+```
 
 
-- == vs ===
-- Type Coercion
+# H-3 == vs ===
+== performs loose equality comparison and can convert types before comparing. === performs strict equality comparison, so both the type and value must match. In modern JavaScript, === is generally preferred because it avoids unexpected type coercion.
+
+==  → value comparison + type coercion
+=== → value + type comparison
+```javascript
+[]==false// true  because == performs type coercion but
+[]===false// fasle --   []-object and false- boolean     different types   
+10 == 10       // true
+10 === 10      // true
+
+10 == "10"     // true
+10 === "10"    // false
+
+true == 1      // true
+true === 1     // false
+
+false == 0     // true
+false === 0    // false
+
+null == undefined   // true
+null === undefined  // false
+```
+
+
+
+# H-2- Type Coercion
+Type coercion is the automatic or implicit conversion of a value from one data type to another by JavaScript.
+```javascript
+console.log("5" + 2);
+// "5" --> String
+//  + 
+// 2-- Number
+// js coverts 2-"2"
+// "5"+"2"
+// "52"
+console.log("5" - 2);//3 
+//"5" becomes Number 5 
+//5-2=3
+5=="5// true 
+// 5--converted to "5"   5==5
+5==="5"//false --because === doesn't perform this coercion.
+```
+
+
 - Pass by values pass by reference 
 - NaN
 - Shallow vs Deep Copy
