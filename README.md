@@ -30,32 +30,6 @@ A structured interview-preparation repository for developers preparing for **Jav
 - 📕 [PDF Handbook](./PDF/MERN_Interview_Question_Collection.pdf)
 
 > The Excel workbook and PDF handbook links are ready for the repository structure shown above. Add the corresponding files when they are available.
-
----
-
-## 🗂️ Repository Structure
-
-```text
-MERN-Interview-Question-Collection/
-│
-├── README.md
-│
-├── JavaScript/
-│   └── README.md
-│
-├── React/
-│   └── README.md
-│
-├── Node.js/
-│   └── README.md
-│
-├── Excel/
-│   └── MERN_Interview_Question_Collection.xlsx
-│
-└── PDF/
-    └── MERN_Interview_Question_Collection.pdf
-```
-
 ---
 
 ## 🧭 What This Collection Covers
