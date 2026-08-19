@@ -446,8 +446,10 @@ console.log(Array.prototype.__proto__ === Object.prototype); // true
 console.log(Object.prototype.proto);//null undefined
 // Because the prototype chain ends there
 ```
-![JavaScript Prototype Chain](././images/prototype chain.png)
 ![JavaScript Prototype Chain](././images/prototype.png)
+![JavaScript Prototype Chain](././images/prototypechain.png)
+
+
 
 
 
