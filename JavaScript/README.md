@@ -577,7 +577,7 @@ p
 // Person.call(Object,"vipin")
 ```
 # H-4🧬 Prototype Chain
-p object  does not  contain  directly sayHello inside it .
+"p" object  does not  contain  directly sayHello inside it .
 When new Person() creates p, the new object's internal [[Prototype]] is set to Person.prototype. The sayHello method is stored on Person.prototype, not on every instance. When we call p.sayHello(), JavaScript first searches p, doesn't find the method, and then searches its prototype Person.prototype, where it finds and executes sayHello.
 
 
@@ -676,8 +676,190 @@ console.log("5" - 2);//3
 5==="5"//false --because === doesn't perform this coercion.
 ```
 
+# H-2 Pass by values pass by reference
+Pass by value means a copy of the value is passed to a function, so changing the parameter does not change the original variable.
 
-- Pass by values pass by reference 
+Pass by reference means the reference to the same object is passed, so changes can affect the original object.
+
+
+# H-2 Is JavaScript pass-by-reference?
+JavaScript uses pass-by-value. For objects, the value passed to a function is a reference to the object. Therefore,
+mutating the object's properties inside the function affects the original object, but reassigning the parameter does
+not change the caller's variable.
+
+
+```javascript 
+// #Pass by Value
+let a= 10 ;
+let b= a;
+b= 20;
+console.log(a)//10
+console.log(b)//20
+```
+```javascript
+// function Example
+let a = 10;
+function change(x) {
+  x = 20;// here X gets a copy of  a 10  changing x does not change a
+}
+change(a);
+console.log(a); // 10
+```
+Pass by Reference  ->
+```javascript
+const Person={
+    name:"priti"
+}
+//there is one object two variable hold a reference to that object ,this will chnage the orignal object too
+function changeName(user){
+    user.name="Vipin";
+}
+changeName(Person)
+console.log(Person.name)// vipin  
+```
+
+why? 
+Before function call: 
+```javascript
+Person={name:priti}
+Then :
+changeName(Person) 
+
+The Function recieves the value stored in Person object  
+For an Object ,that value is a reference to the object.inside
+function changeName(userData){}
+Now :
+person ──────┐
+                       │
+                       ▼
+                   Object
+                       ▲
+                       │
+user ────────    
+
+Both points the same object
+```
+```javascript 
+ # Mutation 
+inside the  fucntion  :
+user.name="vipin"
+We are modifying the shared object
+Person ──────┐
+                       │
+                       ▼
+┌───────────────┐
+│ name: Vipin            │
+└───────────────┘
+                        ▲
+                        │
+user ────────┘
+Therefore: 
+console.log(Person.name)//vipin
+
+this is call by reference ?Object are passed by reference
+javascript passes the value .
+For an object,that value happens to be a reference.
+javascript pass by value  ,   Object's value= reference
+```
+
+Mutaion happens,
+but now 
+```javascript
+function changeName(user){
+    user={
+        name:"vipin"
+    };//Reassignment
+}
+const Person={
+    name:"priti",
+}
+changeName(Person);
+console.log(Person.name)//priti
+```
+why? 
+# H-4 Mutation vs Reassignment
+initially :
+```javascript
+person ───────┐
+                         ▼
+                    Object A
+                    name:Priti
+user ─────────┘
+
+inside function
+user={name:"priti"}// 
+Now user is Reassigned
+person ─────────────► Object A 
+                                                 name: Priti
+
+user ────────────────► Object B 
+                                                name: Vipin
+
+
+The Orignal Person still points to object A so 
+console.log(Person.name);//returns priti
+
+
+
+#Mutation 
+user.name="vipin"   chnages the orignal object
+
+#Reassignment
+user={name:"vipin"}
+ Only changes what the local paramenter variable points to
+
+Mutation
+↓
+Shared object changes
+but----------->
+Reassignment
+↓
+Local variable gets new reference
+```
+
+
+# H-3 Primitive 
+```javascript
+function change(x){
+    // x gets its own copy of the value
+    x=20;// then x=20 only changes x 
+}
+let a= 10;
+change(a);
+console.log(a)//10  
+
+                               JavaScript
+                                     │
+                            Pass by Value
+                                     │
+               ┌──────────┴────────┐
+               ↓
+            Primitive                              ↓
+                 │                               Object
+                 │                                   ↓
+                 │
+                 ↓
+            Value copied
+
+                                    Reference value copied
+                                                │
+                            ┌─────────┴─────────┐
+                            ↓                                      ↓
+                        Mutation                       Reassignment
+                            │                                        ↓
+                            ↓                                 Only local
+                                                               parameter changes
+                            ↓                                    
+                    Original object
+                        changes
+                            
+                            
+
+```
+
+
+
+
 - NaN
 - Shallow vs Deep Copy
 - Spread vs Rest
