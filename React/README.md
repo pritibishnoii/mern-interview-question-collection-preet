@@ -349,7 +349,7 @@ function Child({ name }) {
                 Parent Re-renders
                         ↓
                 New Prop
-                name = "Rahul"
+                name = "Vipin"
                         ↓
                 Child receives new props
                         ↓
