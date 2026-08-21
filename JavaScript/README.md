@@ -1,12 +1,35 @@
+## 📚  Questions
+
+1. [What is JavaScript?](#what-is-javascript)
+2. [What are the <pre><code>var vs let vs const</code></pre>](#what-are-the-var-vs-let-vs-const)
+3. [What is Hoisting ?](#what-is-hoisting)
+4. [How does JavaScript execute code?](#how-does-javascript-execute-code)
+5. [this keyword-](#this-keyword-)
+6. [call, apply, bind](#call-apply-bind)
+7. [Prototype & Prototype Chain ?](#prototype-prototype-chain)
+8. [Call Stack](#call-stack)
+9. [Web APIs (browser/node APIs)](#web-apis-browsernode-apis)
+10. [Callback Queue](#callback-queue)
+11. [MicroTask Queue - (Microtask vs Macrotask)](#microtask-queue-microtask-vs-macrotask)
+12. [Event Loop](#event-loop)
+13. [Read HTML elements](#read-html-elements)
+14. [Change content](#change-content)
+15. [Change styles](#change-styles)
+16. [Add/remove elements](#addremove-elements)
+17. [Handle user events](#handle-user-events)
+18. [Modify attributes](#modify-attributes)
+
+
+
 # JavaScript Interview Question Collection
--What is JavaScript? 
+# 1-What is JavaScript? 
 JavaScript is a high-level, dynamically typed programming language mainly used to add behavior and interactivity to web applications. It runs in browsers using JavaScript engines like V8, and with Node.js it can also run on the server.
 ```javascript
 const name = "Priti";
 console.log(`Hello ${name}`);
 ```
 
--What are the <pre><code>var vs let vs const</code></pre>
+# What are the <pre><code>var vs let vs const</code></pre>
 var, let, and const are used to declare variables in JavaScript, but they differ mainly in scope, redeclaration, reassignment, and hoisting behavior.
 
 var is a JavaScript keyword used to declare a variable that is function-scoped and can be redeclared and reassigned.
@@ -28,7 +51,7 @@ const country = "India";
 ```
 
 
-- What is Hoisting ?
+# What is Hoisting ?
 Hoisting is the behavior in JavaScript where declarations are processed before execution. var is initialized with undefined, while let and const are hoisted but remain in the TDZ until initialization. Function declarations can be called before their declaration.
 var       → Hoisted + initialized as undefined
 let       → Hoisted + TDZ
@@ -53,11 +76,7 @@ function sayHello() {
   console.log("Hello");
 }
 ```
-
-
-
-
-# H-2 What is Temporal Dead Zone? 
+#  What is Temporal Dead Zone? 
 Temporal Dead Zone is the period between entering a block and the point where a let or const variable is initialized. During this period, accessing the variable causes a ReferenceError.
 Why does TDZ exist?
 
@@ -97,7 +116,7 @@ Can access
 
 
 
-# H-2 Scope & Lexical Scope
+# Scope & Lexical Scope
 Scope in JavaScript defines where a variable can be accessed or used within a program. It controls the visibility and lifetime of variables across different parts of the code.
 
 Types of Scope->
@@ -171,7 +190,7 @@ When working with JavaScript modules (type="module"), variables declared at the 
 
 
 
-# H-2 Closures
+#  Closures
 A closure is created when an inner function remembers and can access variables from its outer function's lexical scope even after the outer function has finished executing.
 ```javascript
 function outer() {
@@ -187,7 +206,7 @@ counter(); // 1
 counter(); // 2
 counter(); // 3
 ```
-# H-2 why is a closure?
+#  why is a closure?
 Closures exist because sometimes a function needs to remember and access data from its outer scope even after the outer function has finished executing.
 Closure gives a function “memory”.
 ```javascript
@@ -246,7 +265,7 @@ When JavaScript code runs, the JavaScript engine creates an execution context. D
                     ↓
                Final Output
 ```
-# H-2 Execution Context
+#  Execution Context
 JavaScript creates an Execution Context to execute code.
 There are mainly:
 
@@ -335,7 +354,7 @@ Global Execution Context
 ```
 
 
-# H-2 What is the Lexical Environment?
+# What is the Lexical Environment?
 A Lexical Environment is a specification-level structure that stores identifier bindings and maintains a reference to its outer environment, allowing JavaScript to resolve variables through the scope chain."
 
 ```javascript
@@ -371,7 +390,7 @@ it doesn't find name in its own environment, so it follows the outer environment
 This is the basis of the scope chain.
 ```
 
-# H-2 What is the Variable Environment?
+# What is the Variable Environment?
 A Variable Environment is the execution-context component used for variable and function declarations, traditionally associated with var and function declarations.
 
 ```javascript
@@ -404,7 +423,7 @@ Function Execution Context
       └── ...
 ```
 
-# H-2 Objects, Prototypes & this
+# Objects, Prototypes & this
 - this keyword-
 
 this is a special JavaScript keyword whose value is determined by the function's invocation context. In regular functions, it depends on how the function is called. In object methods, it usually refers to the object calling the method. Arrow functions don't have their own this; they inherit it from their lexical surrounding scope.
@@ -554,7 +573,7 @@ console.log(Object.prototype.proto);//null undefined
 ```
 ![JavaScript Prototype Chain](././images/prototype.png)
 ![JavaScript Prototype Chain](././images/prototypechain.png)
-## H2 — Why Prototype? 
+# Why Prototype? 
  ```javascript 
 let arr1=[]
 let arr2=[]
@@ -570,7 +589,7 @@ let arr3=[]
 ```
 memory would explode , instead, javascript stroes them once 
 
-## H2 —  __proto__ vs Prototype? 
+# Prototype  vs  __proto__ ? 
 these are the same ? No 
 ```javascript
 function Person(){}
@@ -598,7 +617,7 @@ console.log(Person.prototype)// { constructor:Person}
 initialy its only contains constructor 
 
 ```
-## H3 — Why does it exist? 
+# Why does it exist? 
 because later when someone writes 
 ```javascript
 new Person();
@@ -644,7 +663,7 @@ p
 // step 3 
 // Person.call(Object,"vipin")
 ```
-# H-4🧬 Prototype Chain
+# 🧬 Prototype Chain
 "p" object  does not  contain  directly sayHello inside it .
 When new Person() creates p, the new object's internal [[Prototype]] is set to Person.prototype. The sayHello method is stored on Person.prototype, not on every instance. When we call p.sayHello(), JavaScript first searches p, doesn't find the method, and then searches its prototype Person.prototype, where it finds and executes sayHello.
 
@@ -653,7 +672,7 @@ Person is itself a function object.
 All functions inherit from  Function.prototype
 
 
-# H-2 Difference between __proto__ and prototype?
+#  Difference between __proto__ and prototype?
 prototype belongs to functions. __proto__ belongs to objects.
 
 prototype is a property of constructor functions that is used as the prototype object for instances created with new.
@@ -701,7 +720,7 @@ Object.getPrototypeOf(p1) === Person.prototype;
 Object.setPrototypeOf(obj, prototype);
 ```
 
-# H-2 Constructor function vs Class?
+#  Constructor function vs Class?
 Constructor functions are the traditional way of creating objects and implementing inheritance in JavaScript using functions and prototypes. ES6 classes provide a cleaner syntax for the same prototype-based object model. Classes have stricter behavior, require new, and provide cleaner inheritance using extends and super. Internally, class methods are still stored on the prototype.
 
 ```javascript
@@ -802,7 +821,7 @@ const user = User("Priti");//TypeError: Class constructor User cannot be invoked
 // Class constructor ko new ke saath hi call karna padta hai.
 ```
 
-# H-2 What is Object.create()?
+#  What is Object.create()?
 Object.create(proto) creates a new object whose internal [[Prototype]] points to the object passed as proto.
 
 ```javascript
@@ -817,7 +836,7 @@ console.log(user.name); // Priti
 user.greet(); // Hello!
 ```
 
-# H-2 Object.create() vs {}
+#  Object.create() vs {}
 ```javascript
 const user = {};
 ```
@@ -849,7 +868,7 @@ dictionary.toString  //undefined
 // because toString() normally comes from Object.prototype.
 ```
 
-# H-2 Object.create() vs new?
+#  Object.create() vs new?
 Object.create() is a JavaScript method used to create a new object with a specified prototype. It does not execute a constructor; it simply creates the object and sets its internal [[Prototype]] to the supplied object.
 ```javascript
 function User(name) {
@@ -891,7 +910,7 @@ Object.getPrototypeOf(child)
 Object.setPrototypeOf(child, parent)
 ```
 
-# H-2 What happens when a property doesn't exist on an object?
+# What happens when a property doesn't exist on an object?
 When a property doesn't exist directly on an object, JavaScript searches for that property in the object's prototype chain. If it finds the property, it returns its value. If the property isn't found anywhere in the prototype chain and the chain reaches null, JavaScript returns undefined.
 ```javascript
 const user = {
@@ -901,7 +920,7 @@ const user = {
 console.log(user.age);
 ```
 
-# H-2 Property Lookup Process How does property lookup work?
+# Property Lookup Process How does property lookup work?
 ```javascript
 const parent = {
   age: 25
@@ -933,7 +952,7 @@ console.log(child.age);
 ```
 
 
-# H-2 Object.freeze() vs Object.seal()?
+# Object.freeze() vs Object.seal()?
 Object.seal() prevents adding and deleting properties, but allows modification of existing property values. Object.freeze() goes one step further and also prevents modification of existing properties. Both are shallow operations.
 
 ```javascript
@@ -973,7 +992,7 @@ user.name = "Vipin";
 // but  can change 
 user.address.city = "Delhi";
 ```
-# H-2 Object.preventExtensions()?
+# Object.preventExtensions()?
 Object.preventExtensions() is a static JavaScript method that prevents new properties from ever being added to an object.It stops the object from growing, but it does not protect existing properties from being deleted or modified.
 Blocks additions: Any attempt to add new properties will fail (silently in non-strict mode, or throw a TypeError in strict mode).
 Allows deletions: Existing properties can still be completely removed.
@@ -993,7 +1012,7 @@ delete user.name;
 
 ```
 
-# H-2 How do getters and setters work?
+# How do getters and setters work?
 Getters and setters are special methods that let you control how a property is read and updated.
 
 Getters and setters are accessor properties in JavaScript. A getter is automatically executed when a property is read, while a setter is automatically executed when a property is assigned a value. They are commonly used for computed properties, validation, transformation, and controlling access to internal data.
@@ -1038,7 +1057,7 @@ user.age = 25;
 console.log(user.age);
 ```
 
-# H-2 What is a Proxy?
+#  What is a Proxy?
 A Proxy is a JavaScript object that wraps another object or function and allows us to intercept and customize operations such as property access, assignment, deletion, and function calls using traps like get, set, deleteProperty, and apply.
 ```javascript
 const proxy = new Proxy(target, handler);
@@ -1103,7 +1122,7 @@ const proxyUser = new Proxy(user, {
 // get 
 console.log(proxyUser.name);
 
-                                                                                    proxyUser.name
+                                                                                    proxyUser.       name
                                                                                             ↓
                                                                                         get()
                                                                                             ↓
@@ -1126,9 +1145,7 @@ delete proxyUser.role;
 console.log("role" in proxyUser);
 
 ```
-
-
-# H-2 Call() Apply(), Bind ()
+#  Call() Apply(), Bind ()
 call, apply, and bind are used to explicitly set this for a function. call invokes the function immediately with arguments passed individually, apply invokes it immediately with arguments passed as an array, and bind returns a new function with this bound, which can be called later
 
 call() immediately invokes the function and allows us to specify this.
@@ -1172,9 +1189,7 @@ const user = {
 const newGreet = greet.bind(user);
 newGreet();//Hello Priti
 ```
-
-
-# H-3 == vs ===
+# == vs ===
 == performs loose equality comparison and can convert types before comparing. === performs strict equality comparison, so both the type and value must match. In modern JavaScript, === is generally preferred because it avoids unexpected type coercion.
 
 ==  → value comparison + type coercion
@@ -1197,10 +1212,7 @@ false === 0    // false
 null == undefined   // true
 null === undefined  // false
 ```
-
-
-
-# H-2- Type Coercion
+#  Type Coercion
 Type coercion is the automatic or implicit conversion of a value from one data type to another by JavaScript.
 ```javascript
 console.log("5" + 2);
@@ -1218,13 +1230,40 @@ console.log("5" - 2);//3
 5==="5"//false --because === doesn't perform this coercion.
 ```
 
-# H-2 Pass by values pass by reference
+# Difference between Type Conversion and Type Coercion 
+
+Type conversion is the explicit conversion of a value from one type to another by the developer, while type coercion is the implicit conversion automatically performed by JavaScript during certain operations.
+
+```JS
+// Type conversion is when the developer intentionally converts a value from one data type to another.
+const value = "100";
+const number = Number(value);
+console.log(number);        // 100
+console.log(typeof number); // "number"
+String(100);
+// "100"
+Number("50");
+// 50
+Boolean(1);
+// true
+Boolean(0);
+// false
+
+// Type Coercion
+
+// Type coercion is when JavaScript automatically converts a value from one type to another during an operation.
+
+console.log("5" - 2);
+console.log(5 == "5");
+```
+
+# Pass by values pass by reference
 Pass by value means a copy of the value is passed to a function, so changing the parameter does not change the original variable.
 
 Pass by reference means the reference to the same object is passed, so changes can affect the original object.
 
 
-# H-2 Is JavaScript pass-by-reference?
+# Is JavaScript pass-by-reference?
 JavaScript uses pass-by-value. For objects, the value passed to a function is a reference to the object. Therefore,
 mutating the object's properties inside the function affects the original object, but reassigning the parameter does
 not change the caller's variable.
@@ -1319,7 +1358,7 @@ changeName(Person);
 console.log(Person.name)//priti
 ```
 why? 
-# H-4 Mutation vs Reassignment
+# Mutation vs Reassignment (Object  Reference type)
 initially :
 ```javascript
 person ───────┐
@@ -1360,7 +1399,7 @@ Local variable gets new reference
 ```
 
 
-# H-3 Primitive 
+# Primitive  
 ```javascript
 function change(x){
     // x gets its own copy of the value
@@ -1400,7 +1439,7 @@ JavaScript is pass-by-value. For primitive values, the actual value is copied. F
 ```
 
 
-# H-2 NaN
+#  NaN
 NaN stands for Not-a-Number. It is a special value of the JavaScript number type that represents an invalid or undefined numeric result. Interestingly, NaN is not equal to itself, so we use Number.isNaN() to check for it.
 NaN is actually of type number.
 ```javascript
@@ -1424,7 +1463,7 @@ Number.isNaN(10);
 ```
 
 
-# H-2 Shallow vs Deep Copy
+#  Shallow vs Deep Copy
 A shallow copy creates a new top-level object, but nested objects still share the same references. A deep copy recursively creates independent copies of nested objects, so changes to the copied object's nested data don't affect the original.
 
 ```javascript 
@@ -1440,7 +1479,7 @@ const user2=user1;// same object ,two labels
 user2.name= "vipin";
 console.log(user1.name)// vipin--  They were never sesparte object
 ```
-# Shallow Copy -- creates a new object, but nested objects are still shared between the original and copied object.
+##  Shallow Copy -- creates a new object, but nested objects are still shared between the original and copied object.
 ```javascript
 const user1= {
     name:"priti",
@@ -1458,7 +1497,8 @@ console.log(user1.address.city)// Mumbai" — leaked! nested object is shared
 
 ```
 
-# Deeep Copy --  creates a completely independent copy, including nested objects.
+# Deeep Copy
+## --  creates a completely independent copy, including nested objects.
 ```javascript
 const user2 = JSON.parse(JSON.stringify(user1));
 // But JSON.parse(JSON.stringify(...)) has limitations and should not be treated as a general-purpose deep-copy solution.
@@ -1486,10 +1526,7 @@ address:{ // we are assigning  a new  object   to address properties (reassign/r
     city:"mumbai"// override city  update city
 }})
 ```
-
-
-
-# H-2 Spread vs Rest
+# Spread vs Rest
 
 ```Spread and Rest both use the ... syntax, but   their purpose is opposite .Spread expands or unpacks elements from an array or properties from an object, while Rest collects multiple values or remaining properties into a single array or object.```
 ```javascript
@@ -1532,10 +1569,7 @@ console.log(name);
 console.log(otherDetails);
 // { age: 25, city: "Mumbai" }
 ```
-
-
-
-# H-2 Destructuring
+# Destructuring
 ```Destructuring is an ES6 feature that allows us to extract values from arrays or properties from objects and assign them to variables using a concise syntax. Array destructuring works based on position, while object destructuring works based on property names..```
 ```javascript
 // without destructuring
@@ -1585,7 +1619,7 @@ console.log(third); // 30
 ```
 
 
-# H-2 Higher-Order Functions
+#  Higher-Order Functions
 ```A Higher-Order Function is a function that takes one or more functions as arguments or returns a function. Common examples in JavaScript are map, filter, and reduce. Higher-order functions are useful for abstraction, code reuse, and functional programming.```
 
 ```javascript 
@@ -1615,8 +1649,7 @@ const result = numbers.map(function (num) {
 console.log(result);
 // [2, 4, 6]
 ```
-
-# H-2 Callback
+# Callback
 
 ```A callback is a function that is passed as an argument to another function and is called by that function at a later time or when a specific operation is completed```
 ```javascript 
@@ -1640,9 +1673,7 @@ function showUser(user) {
 getUser(showUser);
 
 ```
-
-
-# H-2 Callback Hell
+#  Callback Hell
 ```Callback Hell occurs when multiple asynchronous operations are (nested inside each other) handled through deeply nested callbacks. It makes code difficult to read, maintain, debug, and handle errors. Promises and async/await help flatten this structure and make asynchronous code easier to manage.```
 
 ```javascript
@@ -1732,7 +1763,7 @@ loginUser((user) => {
 ````Here each asynchronous operation depends on the result of the previous operation. Because each callback is nested inside the previous callback, the code becomes deeply nested and difficult to maintain. This is called callback hell.```
 
 
-# H-2 Promise
+# Promises
 ```A Promise represent future result```
 A Promise is an object representing the eventual completion or failure of an asynchronous operation. It has three
 states: pending, fulfilled, and rejected. resolve() fulfills the Promise, reject() rejects it, and .then(), .catch(),
@@ -1784,7 +1815,7 @@ loginUser()
     console.log("Error:", error);
   });
 ```
-# H-2 Pomise Chain
+# Pomise Chain
 ```Promise chaining is the process of connecting multiple .then() handlers so that the result of one asynchronous operation is passed to the next operation in sequence.```
 
 ```javascript
@@ -1900,7 +1931,7 @@ Promise.reject("Something went wrong")
   .catch((error) => console.log(error));
 ```
 
-# H-2 async/await
+# async/await
 ```async/await is Promise-based syntax that makes asynchronous code easier to read. An async function always returns a Promise, and await pauses that async function until the Promise settles and gives access to its fulfilled value. Errors are commonly handled using try/catch.```
 
 ```javascript
@@ -1946,7 +1977,7 @@ main();
 //3
 ```
 
-# H-2 Asynchronous JavaScript
+# Asynchronous JavaScript
 ```javascript is single threaded what does it mean? ```
 Javascript can execute only One Piece of Code at a time .
 
@@ -1967,7 +1998,7 @@ There are 6 important parts
          -MicroTask Queue - (Microtask vs Macrotask)
          -Event Loop
 
-# H-2 Call Stack
+# Call Stack
 ```The Call Stack is a LIFO data structure used by JavaScript to manage function execution. Whenever a function is called, its execution context is pushed onto the stack, and when it finishes, it is popped from the stack. JavaScript executes the function at the top of the stack```
 
 ```javascript 
@@ -2022,15 +2053,15 @@ await
      // it only Pauses one async function, While the rest of JS keep Running.
 ```
 
-# H-2 Event Loop
+#  Event Loop
 ```The Event Loop is the mechanism that allows JavaScript to handle asynchronous operations while JavaScript itself executes code on a single main thread. It continuously checks whether the Call Stack is empty and then moves eligible callbacks from queues to the Call Stack for execution.```
 
 ```Microtask Queue and Macrotask Queue are queues used by the JavaScript runtime to schedule asynchronous callbacks. After the Call Stack becomes empty, the Event Loop prioritizes microtasks before moving to the next macrotask.```
 
-#  H-2 (Microtask vs Macrotask)
+#  Microtask vs Macrotask
 ```Microtasks and macrotasks are different categories of asynchronous work. Promise callbacks such as .then() go into the microtask queue, while timer callbacks such as setTimeout are tasks. After the current JavaScript execution completes, the event loop processes pending microtasks before moving to the next task```
 
-# H-2 Debouncing
+# Debouncing
 Both are performance optimization techniques used when an event fires many times, such as:
 input
 scroll
@@ -2057,7 +2088,7 @@ function debounce(callback, delay) {
 const handleSearch = debounce(searchAPI, 500);
 ```
 
-# H-2  Throttling
+# Throttling
 ```Throttling ensures that a function executes at most once within a specified time interval, even if the event keeps firing```
 
  ```javascript
@@ -2079,7 +2110,7 @@ function throttle(callback, delay) {
 }
 const handleScrollThrottled = throttle(handleScroll, 1000);
   ```
-# H-2 Event Propagation
+# Event Propagation
 
 Event propagation is the process by which an event travels through the DOM from the target element to other elements in the DOM hierarchy.
 Event propagation has 3 phases:
@@ -2090,7 +2121,7 @@ Event propagation has 3 phases:
             3. Bubbling Phase
 ```Event propagation is the mechanism through which an event travels through the DOM. It has three phases: capturing, where the event travels from the root toward the target; target phase, where it reaches the target element; and bubbling, where it travels back from the target toward the root. By default, most event listeners handle events during the bubbling phase.```
 
-# H-2  Event Bubbling/Capturing
+# Event Bubbling/Capturing
 
 Event Bubbling is the process in which an event starts from the target element and propagates upward through its parent elements.
 ```javascript
@@ -2144,7 +2175,7 @@ parent.addEventListener(
 //Parent
 //Button
 ```
-# H-2 stopPropagation() vs stopImmediatePropagation()
+# stopPropagation() vs stopImmediatePropagation()
 stopPropagation() stops the event from propagating to other elements in the capturing or bubbling phase, but it does not stop other event listeners on the same element.
 
 ```javascript
@@ -2191,7 +2222,7 @@ button
 ```
 
 
-# H-2  Event Delegation
+#  Event Delegation
  
  Event Delegation is a technique where we attach a single event listener to a parent element instead of attaching separate listeners to each child element, and use event bubbling to determine which child triggered the event.
 
@@ -2237,7 +2268,7 @@ users.addEventListener("click", (event) => {
 parent listener
 
  ```
-# H-2  Currying
+# Currying
 
 Currying is a technique of transforming a function that takes multiple arguments into a sequence of functions, where each function takes one argument.
 
@@ -2335,8 +2366,8 @@ apiRequest("/api/orders");
 apiRequest("/api/products");
 ```
 
-# H-2 Array Methods
-# H-2  map, filter, reduce
+# Array Methods
+# map, filter, reduce
  # map()
  map() is an array method used to transform each element of an array and return a new array of the transformed
 values. Internally, JavaScript creates a new array, iterates over the original array once, calls the provided callback
@@ -2687,8 +2718,52 @@ console.log(Array.isArray(100));//false
 console.log(Array.isArray(true));//false
 
 ```
+# Map() Data Structure
 
-# H-2  Map vs Object
+Map is a built-in JavaScript data structure used to store key-value pairs.    Unlike regular objects, Map allows keys of any data type and provides methods such as set, get, has, delete, and clear. It is commonly used for frequency counting, caching, lookup tables, and DSA problems such as Two Sum."
+```JS
+const map = new Map();
+// Map keys can be ANY type.
+map.set("name", "Priti");
+map.set("age", 25);
+
+map.set(100, "Hundred");
+map.set(true, "Boolean");
+
+const objKey = { id: 1 };
+
+map.set(objKey, "Object Key");
+
+console.log(map.get(objKey)); // Object Key
+console.log(map.get("name")); // Priti
+console.log(map.get("age"));  // 25
+has()   // Checks whether a key exists.
+console.log(map.has("name"));
+// true
+
+console.log(map.has("city"));
+// false
+map.delete("age");//Removes a key-value pair.
+console.log(map.size);//Returns the number of entries.
+map.clear();//Removes everything.
+
+                                      Key        Value
+                                      ↓           ↓
+                                      "name"  →  "Priti"
+                                      "age"   →  25
+
+const users = new Map();
+
+users.set("user1", "Priti");
+users.set("user2", "Rahul");
+
+for (const [key, value] of users) {
+  console.log(key, value);
+}
+```
+
+
+#  Map vs Object
 Both Map and Object can store key-value pairs, but Map is specifically designed as a key-value collection, while Object is primarily used to represent structured data.
 A Map can use any value as a key:
 
@@ -2750,7 +2825,7 @@ console.log(map.get(objKey)); //User Data
 
 ```
 
-# H-2  Set
+#  Set
 Set is a built-in JavaScript collection that stores unique values. It is useful when we need uniqueness, such as removing duplicate IDs, checking whether a value already exists, or tracking unique users. Common methods are add(), has(), delete(), and clear()."
 ```javascript
 const productIds = [
@@ -2781,7 +2856,7 @@ console.log(loggedInUsers.has(102));
 // false
 ```
 
-# H-2  Memoization
+# Memoization
 Memoization is a performance optimization technique where we cache the result of a function based on its inputs. When the function is called again with the same input, we return the cached result instead of recalculating it. It is useful for expensive, repeated, and preferably pure computations.
 
 ```javascript
@@ -2825,7 +2900,7 @@ console.log(memoizedSquare(10));
 console.log(memoizedSquare(5));
 ```
 
-# H-2 Generator Functions
+# Generator Functions
 A Generator Function is a special JavaScript function that can pause its execution using yield and resume later. It is declared using function* and returns a Generator object when called.
 
 ```javascript
@@ -2865,7 +2940,7 @@ console.log(generator.next().value);
 console.log(generator.next().value);
 ```
 
-# H-2  Iterators
+# Iterators
 An iterator is an object that follows the iterator protocol by providing a next() method. Each call to next() returns an object containing value and done. Iterators are used by constructs such as for...of to consume iterable data one value at a time.
 ```javascript
 const users = ["Priti", "Vipin", "Ram"];
@@ -2884,7 +2959,7 @@ console.log(iterator.next());
 
 ```
 
-# H-2  Modules
+#  Modules
 A module is a self-contained unit of JavaScript code that encapsulates related functionality. Modules allow us to organize applications into separate files and explicitly share functionality using mechanisms such as ES module export and import. This improves maintainability, reusability, and encapsulation.
 
 ```javascript
@@ -2911,13 +2986,13 @@ export async function register(req, res) {
 ```
 
 
-# H-2 How does the JavaScript engine manage memory?
+# How does the JavaScript engine manage memory?
 JavaScript uses automatic memory management. The engine allocates memory for variables, objects, and execution contexts, typically using stack and heap areas. A garbage collector periodically identifies objects that are no longer reachable from the program's roots and reclaims their memory. Memory leaks can still occur when unnecessary objects remain reachable through references such as globals, event listeners, timers, or closures."
 
 
 
 
-# H-2  What causes Stack Overflow?
+# What causes Stack Overflow?
 Stack Overflow occurs when the Call Stack exceeds its maximum capacity. The most common cause in JavaScript is infinite or excessively deep recursion, where new function calls keep being added to the stack without enough calls returning.
 ```javascript
 // Infinite Recursion
@@ -2954,7 +3029,7 @@ function countdown(n) {
 countdown(5);
 ```
 
- # H-2 Regular function vs arrow function?
+ # Regular function vs arrow function?
 A regular function has its own this, arguments, and prototype, and it can be used as a constructor with new. An arrow function has a shorter syntax and does not have its own this, arguments, or prototype. Its this is lexically inherited from the surrounding scope. Arrow functions are especially useful for callbacks, while regular functions are often preferred when a function needs its own dynamic this.
 
 ```javascript
@@ -2976,7 +3051,7 @@ greet("Priti");
 
 
 
-# H-2 DOM 
+# DOM 
 he DOM (Document Object Model) is a tree-like, in-memory object representation of the HTML document, built by the browser's parser. JavaScript reads/modifies this object model — not the original HTML file.
 
 # 1. What is DOM?
@@ -3514,7 +3589,7 @@ button.removeEventListener("click", handleClick);
 
 ------------------------------------------------------------------------
 
-# 12. Event Object
+# Event Object
 
 ## Definition
 
@@ -3740,7 +3815,7 @@ console.log(button.closest(".card"));
 
 ------------------------------------------------------------------------
 
-# 20. DOMContentLoaded vs load
+# DOMContentLoaded vs load
 
 ## `DOMContentLoaded`
 
@@ -3786,7 +3861,7 @@ DOM + images + CSS + other resources loaded
 
 ------------------------------------------------------------------------
 
-# 21. Reflow vs Repaint
+# Reflow vs Repaint
 
 These are important browser performance concepts.
 
@@ -3856,7 +3931,7 @@ up-to-date layout.
 
 ------------------------------------------------------------------------
 
-# 22. DocumentFragment
+# DocumentFragment
 
 ## Definition
 
@@ -3916,7 +3991,7 @@ DOM. The fragment itself does not become a visible DOM element.
 
 ------------------------------------------------------------------------
 
-# 23. Real DOM vs Virtual DOM
+# Real DOM vs Virtual DOM
 
 ## Real DOM
 
@@ -4010,7 +4085,7 @@ manage UI updates.
 ------------------------------------------------------------------------
 
 
-# H-2 Stack vs Heap?'
+#  Stack vs Heap?'
 The Stack stores fixed-size primitive values and execution frames, while the Heap stores dynamic, complex reference types (objects, arrays, functions).
 
 ```javascript
