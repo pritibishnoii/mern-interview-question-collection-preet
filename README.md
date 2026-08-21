@@ -8,44 +8,31 @@
 [![Interview Prep](https://img.shields.io/badge/Focus-Interview%20Preparation-7C3AED)](#-how-to-use-this-repository)
 
 A structured interview-preparation repository for developers preparing for **JavaScript, React, Node.js, MERN Stack, and Full Stack Developer interviews**. The collection moves from fundamentals to internals, advanced concepts, practical architecture, security, performance, and coding-oriented interview questions.
-
-> **Source fidelity:** The category READMEs retain the supplied interview-question wording and organization. No question has been intentionally removed, merged, renamed, or replaced with an invented question.
-
 ---
 
 ## 📚 Collection Overview
 
-| Technology | Level | Focus |
-|------------|-------|-------|
+***Technology  | Focus****
+
 | JavaScript | Basic → Advanced | Core JS, internals, async, prototypes, coding |
 | React | Basic → Advanced | Internals, hooks, rendering, performance, architecture |
 | Node.js | Basic → Advanced | Runtime, APIs, async, architecture, security |
 
-### Quick Navigation
+### Quick Questions
 
 - 📘 [JavaScript Interview Questions](./JavaScript/README.md)
 - ⚛️ [React Interview Questions](./React/README.md)
 - 🟢 [Node.js Interview Questions](./Node.js/README.md)
-- 📊 [Complete Excel Workbook](./Excel/MERN_Interview_Question_Collection.xlsx)
 - 📕 [PDF Handbook](./PDF/MERN_Interview_Question_Collection.pdf)
 
-> The Excel workbook and PDF handbook links are ready for the repository structure shown above. Add the corresponding files when they are available.
 ---
 
 ## 🧭 What This Collection Covers
 
-### 🟨 JavaScript
-
 # JavaScript Interview Question Collection
 👉 **[Open the complete JavaScript question bank →](./JavaScript/README.md)**
-
-
-
 # ⚛️ React Interview Question Collection
 👉 **[Open the complete React question bank →](./React/README.md)**
----
-
-
 # ⚛️ Node js Interview Question Collection
 👉 **[Open the complete React question bank →](./Node.js/README.md)**
 
