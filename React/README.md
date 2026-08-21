@@ -1,48 +1,45 @@
 # React Interview Question Collection
 
----
 
-- React Collection--->>>>>>>>>>>>>>>>>>>>>
-- What is React?
+#  React Collection
+# What is React?
+
 - JSX
 - Virtual DOM
-- Reconciliation
-- React Fiber
-- Components
-- Props vs State
-- State batching
-- Controlled vs Uncontrolled Components
-- useState
-- useEffect
-- useLayoutEffect
-- useRef
-- useMemo
-- useCallback
-- useReducer
-- Context API
-- Prop Drilling
-- Custom Hooks
-- Component Lifecycle
-- Re-rendering
-- Keys in React
-- React.memo
-- Lazy Loading
-- Code Splitting
-- Suspense
-- Error Boundaries
-- Forms
-- Performance Optimization
-- React Server Components
-- Server vs Client Components
-- React 19
-- useTransition
-- useDeferredValue
-## React Internals ⭐⭐⭐
+# Reconciliation
+# React Fiber
+# Components in React
+# Props vs State
+# State batching
+# Controlled vs Uncontrolled Components
+## HOOKS 
+# useState
+# useEffect
+# useLayoutEffect
+# useRef
+# useMemo
+# useCallback
+# useReducer
+# Context API
+# Prop Drilling
+# Custom Hooks
+# Component Lifecycle
+# Re-rendering
+# Keys in React
+# React.memo
+# Lazy Loading
+# Code Splitting
+# Suspense
+# Error Boundaries
+# Forms
+# Performance Optimization
+# React Server Components
+# Server vs Client Components
+# React 19
+# useTransition
+# useDeferredValue
+# How Virtual DOM Work ?
 
-- React internally kaise work karta hai?
-- What is Virtual DOM?
-- Virtual DOM actually kya store karta hai?
-- What is Reconciliation?
 - React reconciliation algorithm kaise decide karta hai ki kya update karna hai?
 - What is React Fiber?
 - Fiber ki need kyun padi?
@@ -58,14 +55,13 @@
 - React rendering ko interrupt kaise karta hai?
 - What is Cooperative Scheduling?
 ## Rendering & Re-rendering ⭐⭐⭐
-
-- React component kab re-render hota hai?
-- Parent re-render hone par child automatically re-render kyun hota hai?
-- State update hone par React exactly kya karta hai?
-- Kya setState() immediately state change karta hai?
-- React batching kya hai?
-- React 18 automatic batching kya hai?
-- Multiple setState() calls kaise process hote hain?
+# When React component  re-render?
+# Parent re-render hone par child automatically re-render kyun hota hai?
+# State update hone par React exactly kya karta hai?
+# Kya setState() immediately state change karta hai?
+# React batching kya hai?
+# React 18 automatic batching kya hai?
+# Multiple setState() calls kaise process hote hain?
 <pre><code>setCount(count + 1);</code></pre>
 <pre><code>setCount(count + 1);</code></pre>
 <pre><code>setCount(count + 1);</code></pre>
@@ -77,7 +73,7 @@
 - What is stale state?
 - What is stale closure?
 - React mein stale closure kaise solve karoge?
-## 3. Reconciliation & Keys ⭐⭐⭐
+# Reconciliation & Keys
 
 - React ko kaise pata chalta hai ki element change hua?
 - Same type vs different type element reconciliation?
@@ -229,17 +225,17 @@
 - Compound Components pattern kya hai?
 - Render Props pattern?
 - Higher-Order Component kya hai?
-- HOC vs Custom Hook?
-- Composition vs Inheritance?
-- React mein composition preferred kyun hai?
-- Compound component pattern implement karo.
+# HOC vs Custom Hook?
+# Composition vs Inheritance?
+# React mein composition preferred kyun hai?
+# Compound component pattern implement karo.
 - Feature-based folder architecture kya hai?
 - Large React application ko scalable kaise design karoge?
 ## React Security
 
-- React mein XSS kaise prevent hota hai?
+#  How React prevent   XSS    ?
 - dangerouslySetInnerHTML dangerous kyun hai?
-- User-generated HTML safely render kaise karoge?
-- JWT ko React application mein kaha store karna chahiye?
-- CSRF vs XSS?
-- React frontend mein sensitive API keys kyun nahi rakhni chahiye?
+# User-generated HTML safely render kaise karoge?
+# How To use JWT in  React application ?
+# CSRF vs XSS?
+

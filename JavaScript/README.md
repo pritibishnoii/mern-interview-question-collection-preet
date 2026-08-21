@@ -1,9 +1,9 @@
 ## 📚  Questions
 ## 📚 Table of Contents
  
-1. [1-What is JavaScript?](#1-what-is-javascript)
+1. [What is JavaScript?](#what-is-javascript)
 2. [What are the var vs let vs const](#what-are-the-var-vs-let-vs-const)
-3. [What is Hoisting ?](#what-is-hoisting)
+3. [What is Hoisting](#what-is-hoisting-)
 4. [What is Temporal Dead Zone?](#what-is-temporal-dead-zone)
 5. [Scope & Lexical Scope](#scope-lexical-scope)
 6. [Closures](#closures)
@@ -151,7 +151,7 @@
 
 
 # JavaScript Interview Question Collection
-# 1-What is JavaScript? 
+# What is JavaScript? 
 JavaScript is a high-level, dynamically typed programming language mainly used to add behavior and interactivity to web applications. It runs in browsers using JavaScript engines like V8, and with Node.js it can also run on the server.
 ```JS
 const name = "Priti";
@@ -180,7 +180,7 @@ const country = "India";
 ```
 
 
-# What is Hoisting ?
+# What is hoisting ?
 Hoisting is the behavior in JavaScript where declarations are processed before execution. var is initialized with undefined, while let and const are hoisted but remain in the TDZ until initialization. Function declarations can be called before their declaration.
 var       → Hoisted + initialized as undefined
 let       → Hoisted + TDZ
