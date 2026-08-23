@@ -3690,23 +3690,23 @@ Server 1
                                 Client
                                   │
                                   ▼
-                              NGINX/Reverse proxy
+                        NGINX/Reverse proxy
                           Load Balancer
                                   │
-          ┌───────────┼───────────┐
-          ▼                      ▼                       ▼
-       Node 1              Node 2             Node 3
-       :3001                  :3002                :3003
+                      ┌───────────┼───────────┐
+                      ▼           ▼           ▼
+                   Node 1       Node 2       Node 3
+                   :3001        :3002         :3003
 ```
 
 # What is Vertical scaling?
 Vertical scaling means increasing the CPU, RAM, storage, or other resources of an existing server.
 ```js
-                  Before                              After
+                  Before                After
                 ┌─────────┐        ┌─────────────┐
-                │ Server        │   →   │   Server             │
-                │ 4 CPU         │        │  16 CPU              │
-                │ 8 GB          │        │  32 GB RAM        │
+                │ Server      →      Server             
+                │ 4 CPU               16 CPU              
+                │ 8 GB                32 GB RAM        
                 └─────────┘        └─────────────┘
 ```
 
