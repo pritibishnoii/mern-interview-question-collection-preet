@@ -60,6 +60,21 @@ React is a JavaScript library developed by Meta for building interactive user in
 
 
 # What is JSX
+JSX stands for JavaScript XML. It is a syntax extension for JavaScript that allows you to write HTML-like markup directly inside a JavaScript file
+JSX returns  a React element, which is fundamentally a plain JavaScript object.it converted  into JavaScript using Babel
+```js
+const element = <h1 className="welcome">Hello, world!</h1>;
+
+//it is same like this
+const element = React.createElement(
+  'h1',
+  { className: 'welcome' },
+  'Hello, world!'
+);
+
+
+```
+
 # What is Declarative/Imperative  Syntax 
 Declarative UI means we describe what the UI should look like based on the current state, while the framework handles the necessary updates. Imperative UI means we explicitly write the steps for how the UI or DOM should be changed. React primarily follows a declarative approach.
 
