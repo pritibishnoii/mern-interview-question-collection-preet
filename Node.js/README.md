@@ -1762,56 +1762,2245 @@ console.log(process.argv);
 // console.log(process.exit());
 ```
 
-- Role-based authorization?
-- Permission-based authorization?
-- Password hashing kya hai?
-- bcrypt kaise work karta hai?
-- Salt kya hota hai?
-- Password ko plain text mein store kyun nahi karna chahiye?
 
-- Node.js mein errors ke types?
-- Operational vs programmer errors?
-- Global error handler?
-- Unhandled Promise rejection kya hai?
-- uncaughtException kya hai?
-- Process crash hone par kya karna chahiye?
-- Graceful shutdown kya hai?
+# What is Password hashing ?
+Password hashing is the process of converting a plain-text password into a one-way, irreversible hash value so that the original password does not need to be stored in the database.
+```js
+const bcrypt = require("bcrypt");
+
+const password = "mypassword";
+
+const hash = await bcrypt.hash(password, 10);
+
+console.log(hash);//$2b$10$N9qo8uLOickgx2ZMRZoMye...
+
+// Compare password
+const isMatch = await bcrypt.compare(
+  "mypassword",
+  hash
+);
+
+console.log(isMatch);//true
+```
+
+# What is  bcrypt ? 
+bcrypt is a password-hashing algorithm designed to securely hash passwords using a computational cost factor and a unique salt.
+
+# What is Salt ?
+A salt is a unique, randomly generated value added to a password before hashing to make password hashes harder to crack and prevent identical passwords from producing identical hashes.
 
 
 
+# What are  types of Errors in Node.js  ?
+Common Node.js errors include syntax errors, runtime errors, logical errors, and operational errors. Syntax errors prevent code from being parsed, runtime errors occur during execution, logical errors produce incorrect results, and operational errors arise from expected external/runtime conditions.
+
+Node.js Errors
+│
+├── Syntax Error
+│      → Code syntax wrong
+│
+├── Runtime Error
+│      → Execution ke time error
+│
+├── Logical Error
+│      → Code runs, result wrong
+│
+└── Operational Error
+       → External/runtime condition problem
+
+
+# Operational vs programmer errors?
+An operational error is an expected runtime problem caused by external conditions, not necessarily by a bug in the program's logic.
+Database connection failed
+File not found
+Network timeout
+Invalid user input
+API unavailable
+Port already in use
+
+```js
+fs.readFile("data.txt", (err, data) => {
+  if (err) {
+    console.log("File not found");
+    return;
+  }
+});
+```
+A programmer error is a bug caused by incorrect code, logic, assumptions, or misuse of an API.
+```js
+const user = null;
+
+console.log(user.name);
+// TypeError
+```
+
+# How do you handle errors in express 
+In a production Express application, I use custom AppError for operational errors, an asyncHandler to forward rejected promises, JWT middleware for authentication, a 404 middleware for unknown routes, and a centralized global error handler to return consistent error responses.
+
+# Global error handler?
+A global error handler is a centralized Express error-handling middleware that catches errors from across the application, processes them consistently, and sends an appropriate response to the client.
+
+```js
+const express = require("express");
+
+const app = express();
+
+app.get("/users", (req, res, next) => {
+  try {
+    //  const users = await User.find();
+    throw new Error("Database failed");
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Global Error Handler
+app.use((err, req, res, next) => {
+  console.error(err);
+
+  res.status(500).json({
+    success: false,
+    message: "Something went wrong"
+  });
+});
+
+app.listen(3000);
+```
+
+
+#  AppError class
+Custom operational errors
+```js
+// utils/AppError.js
+
+class AppError extends Error {
+  constructor(message, statusCode) {
+    super(message);
+
+    this.statusCode = statusCode;
+    this.status = `${statusCode}`.startsWith("4")
+      ? "fail"
+      : "error";
+
+    this.isOperational = true;
+
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
+
+module.exports = AppError;
+
+// use it later
+throw new AppError("User not found", 404);
+// or  404 Handler
+const AppError = require("./utils/AppError");
+
+app.use((req, res, next) => {
+  next(
+    new AppError(
+      `Route ${req.originalUrl} not found`,
+      404
+    )
+  );
+});
+```
+```js
+const errorMiddleware = (
+  err,
+  req,
+  res,
+  next
+) => {
+
+  console.error(err);
+
+  if (err.isOperational) {
+    return res.status(err.statusCode).json({
+      success: false,
+      message: err.message
+    });
+  }
+
+  return res.status(500).json({
+    success: false,
+    message: "Internal Server Error"
+  });
+};
+
+module.exports = errorMiddleware;
+```
+
+```js
+const express = require("express");
+
+const AppError = require("./utils/AppError");
+const errorMiddleware = require("./middleware/errorMiddleware");
+
+const userRoutes = require("./routes/userRoutes");
+
+const app = express();
+
+app.use(express.json());
+
+
+// Routes
+app.use("/api/users", userRoutes);
+
+
+// 404 Handler
+app.use((req, res, next) => {
+
+  next(
+    new AppError(
+      `Route ${req.originalUrl} not found`,
+      404
+    )
+  );
+
+});
+
+// Global Error Handler
+app.use(errorMiddleware);
+
+app.listen(3000, () => {
+  console.log("Server running on port 3000");
+});
+```
+
+
+A production-style global error handling system in Express typically uses a custom error class for operational errors, forwards errors with next(error), handles unknown errors centrally, and returns consistent responses without exposing sensitive implementation details.
 
 
 
+# asyncHandler.js
+instead of writing again and again 
+```js
+try {
+   ...
+} catch(error) {
+   next(error);
+}
+```
+```js
+const asyncHandler = (fn) => {
+  return (req, res, next) => {
+    Promise
+      .resolve(fn(req, res, next))
+      .catch(next);
+  };
+};
+
+module.exports = asyncHandler;
+
+// use like this 👇
+// controller
+const getUsers = asyncHandler(async (req, res) => {
+
+  const users = await User.find();
+
+  res.json({
+    success: true,
+    users
+  });
+
+});
+
+// Promise rejection
+//       ↓
+// .catch(next)
+//       ↓
+// Global Error Handler
+```
 
 
+#  Role-based authorization?
+Role-Based Authorization (RBAC) is an access-control mechanism where permissions are assigned to roles, and users gain access to resources based on their assigned roles.
+```js
+// user jwt payload 
+{
+  userId: 101,
+  role: "admin"
+}
+const authorize = (...allowedRoles) => {
+  return (req, res, next) => {
+
+    if (!allowedRoles.includes(req.user.role)) {
+      return res.status(403).json({
+        message: "Access denied"
+      });
+    }
+
+    next();
+  };
+};
+
+// use 
+app.delete(
+  "/users/:id",
+  authMiddleware,
+  authorize("admin"),
+  deleteUser
+);
+
+```
+# 🔐 Permission-Based Authorization
+Permission-based authorization is an access-control mechanism where access is granted based on specific permissions assigned to a user or role, rather than only checking the user's role.
+
+```js
+// A user might have:
+
+{
+  name: "Priti",
+  permissions: [
+    "user:read",
+    "user:update"
+  ]
+}
+
+// middleware
+const authorizePermission = (permission) => {
+  return (req, res, next) => {
+    if (!req.user.permissions.includes(permission)) {
+      return res.status(403).json({
+        message: "Permission denied"
+      });
+    }
+
+    next();
+  };
+};
+
+// use:
+app.delete(
+  "/users/:id",
+  authMiddleware,
+  authorizePermission("user:delete"),
+  deleteUser
+);
+```
+
+**Permissions based**
+                      User
+                      ↓
+                      Permissions
+                      ├── user:read     ✅
+                      ├── user:update   ✅
+                      └── user:delete   ❌
+
+**Role-Based**
+ Admin
+ ↓
+Can delete users
+
+
+# Unhandled Promise rejection ?
+An unhandled Promise rejection is a rejected Promise for which no rejection handler has been attached, such as .catch() or an appropriate try...catch around await.
+```js
+app.get("/users", async (req, res) => {
+  const users = await User.find();
+
+  res.json(users);
+});
+```
+Better:
+Handle by async/await + try...catch
+```js
+app.get("/users", async (req, res, next) => {
+  try {
+    const users = await User.find();
+
+    res.json(users);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Then  
+app.use((err, req, res, next) => {
+  res.status(500).json({
+    message: "Something went wrong"
+  });
+});
+```
+
+# uncaughtException vs unhandledRejection ?
+uncaughtException is an event emitted by Node.js when an exception is thrown and remains uncaught within the event loop, potentially causing the Node.js process to terminate.
+
+uncaughtException handles uncaught synchronous exceptions, while unhandledRejection refers to rejected Promises that have no rejection handler.
+
+
+# what  should do when  Process crash ?
+When a Node.js process crashes, we should log the root cause, gracefully shut down the process and release resources, then use a process manager or container orchestrator to automatically restart it. Unexpected errors such as uncaughtException and unhandledRejection should not be silently ignored.
+1. Error  log 
+2. Graceful shutdown  (Server ko suddenly kill karne ke bajay existing connections/cleanup complete karne do:)
+3. Use Process Manager (PM2)  (pm2 start server.js)
+                          Node.js Process
+                                ↓
+                              Crash ❌
+                                ↓
+                              PM2 detects
+                                ↓
+                            Restart 🔄
+                                ↓
+                          Node.js Process
+4. Health monitoring
+```js
+// GET/health
+app.get("/health", (req, res) => {
+  res.json({
+    status: "ok"
+  });
+});
+```
+
+# What is Graceful shutdown ?
+
+Graceful shutdown is the process of safely stopping a Node.js application by finishing or allowing existing requests to complete and closing resources such as database connections, servers, and Redis connections before the process exits.
+
+```js
+const express = require("express");
+
+const app = express();
+
+const server = app.listen(3000, () => {
+  console.log("Server running");
+});
+
+// Server ko suddenly kill karne ke bajay existing connections/cleanup complete karne do:
+const shutdown = () => {
+  console.log("Shutting down...");
+
+  server.close(() => {
+    console.log("Server closed");
+
+    // DB connection close
+    // Redis connection close
+    // Other cleanup
+
+    process.exit(0);
+  });
+};
+
+process.on("SIGTERM", shutdown);
+process.on("SIGINT", shutdown);
+```
+
+# SIGTERM vs SIGINT
+SIGTERM (Signal Terminate) is a signal sent to a process requesting it to terminate gracefully, allowing the application to perform cleanup before exiting.
+
+Common use: Docker, Kubernetes, PM2, or process managers.
+
+SIGINT (Signal Interrupt) is a signal sent to a process to interrupt its execution, commonly generated when the user presses Ctrl + C in the terminal.
+
+Common use: Manually stopping a Node.js application during development.
+```js
+// code.js
+  process.on("SIGTERM", () => {
+  console.log("SIGTERM received");
+  // graceful shutdown
+});
+
+process.on("SIGINT", () => {
+  console.log("SIGINT received");
+  // graceful shutdown
+});
+```
 
 
 ## Database & Node.js
 
-- Node.js MongoDB ke saath kaise communicate karta hai?
-- Mongoose kya hai?
-- Mongoose schema kya hai?
-- Model kya hai?
-- populate() kya karta hai?
-- MongoDB indexing kya hai?
-- Connection pooling kya hai?
-- Database connection pool kyun important hai?
-- Transaction kya hai?
-- N+1 query problem kya hai?
-## Caching & Redis
+# How Node.js  communicate with MongoDB ?
+Node.js communicates with MongoDB through the MongoDB Node.js Driver or an ODM such as Mongoose, which manages the connection and sends database operations over the MongoDB protocol.
 
-- Caching kya hai?
-- Redis kya hai?
-- Node.js mein Redis kyun use karte hain?
-- Cache-aside pattern?
-- Cache invalidation kya hai?
-- TTL kya hai?
-- Redis vs MongoDB?
-- Session storage using Redis?
+In Node.js, MongoDB communication is handled through the official MongoDB Node.js Driver, which provides MongoClient to establish a connection and methods to perform CRUD operations on MongoDB databases and collections.
+
+```js
+// MongoDB Driver install
+// 1. Import MongoDB Driver
+
+const { MongoClient } = require("mongodb");
+// 2. MongoDB Connection URI
+
+// Local MongoDB server
+// 27017 = MongoDB  default port
+
+const uri = "mongodb://127.0.0.1:27017";
+
+// 3. Create MongoDB Client
+
+const client = new MongoClient(uri);
+
+// 4. Connect to MongoDB
+async function connectDB() {
+
+  try {
+    // Connect Node.js → MongoDB
+    await client.connect();
+
+    console.log("MongoDB connected successfully");
+
+    // 5. Select Database
+    const db = client.db("myapp");
+
+    // 6. Select Collection
+    const users = db.collection("users");
+
+    // 7. CREATE / INSERT
+    const insertResult = await users.insertOne({
+      name: "Priti",
+      age: 25,
+    });
+
+    console.log("Inserted:", insertResult);
+
+    // 8. READ / FIND
+    const data = await users
+      .find()
+      .toArray();
+
+    console.log("Users:", data);
+
+    // 9. UPDATE
+    const updateResult = await users.updateOne(
+      {
+        name: "Priti",
+      },
+      {
+        $set: {
+          age: 26,
+        },
+      }
+    );
+    console.log("Updated:", updateResult);
+
+    // 10. DELETE
+    const deleteResult = await users.deleteOne({
+      name: "Priti",
+    });
+    console.log("Deleted:", deleteResult);
+  } catch (error) {
+    // 11. Error Handling
+    console.error("MongoDB Error:", error);
+
+  } finally {
+    // 12. Close Connection
+    await client.close();
+    console.log("MongoDB connection closed");
+  }
+}
+connectDB();
+```
+
+# CRUD in Node js 
+```js
+// IMPORT MODULES
+const http = require("http");
+const { MongoClient, ObjectId } = require("mongodb");
+
+// MONGODB CONFIGURATION
+const uri = "mongodb://127.0.0.1:27017";
+
+const client = new MongoClient(uri);
+
+// SERVER CONFIGURATION
+
+const PORT = 3000;
+// DATABASE CONNECTION
+
+let todosCollection;
+
+// HELPER: SEND JSON RESPONSE
+
+function sendResponse(res, statusCode, data) {
+  res.writeHead(statusCode, {
+    "Content-Type": "application/json",
+  });
+  res.end(JSON.stringify(data));
+}
+
+// HELPER: READ REQUEST BODY
+
+function getRequestBody(req) {
+  return new Promise((resolve, reject) => {
+    let body = "";
+
+    // Request body chunks mein aa sakti hai
+    req.on("data", (chunk) => {
+      body += chunk.toString();
+    });
+
+    // Jab complete body aa jaye
+    req.on("end", () => {
+      try {
+        const data = body ? JSON.parse(body) : {};
+        resolve(data);
+      } catch (error) {
+        reject(error);
+      }
+    });
+    req.on("error", (error) => {
+      reject(error);
+    });
+  });
+}
+
+// CREATE TODO
+// POST /todos
+
+async function createTodo(req, res) {
+  try {
+    const body = await getRequestBody(req);
+    const { title } = body;
+
+    // Validation
+    if (!title) {
+      return sendResponse(res, 400, {
+        message: "Title is required",
+      });
+    }
+
+    // Todo object
+    const todo = {
+      title,
+      completed: false,
+      createdAt: new Date(),
+    };
+
+    // MongoDB mein insert
+    const result = await todosCollection.insertOne(todo);
+    sendResponse(res, 201, {
+      message: "Todo created",
+      todo: {
+        _id: result.insertedId,
+        ...todo,
+      },
+    });
+
+  } catch (error) {
+    console.error(error);
+    sendResponse(res, 500, {
+      message: "Failed to create todo",
+    });
+  }
+}
+
+// GET ALL TODOS
+// GET /todos
+
+async function getTodos(req, res) {
+  try {
+    const todos = await todosCollection
+      .find()
+      .toArray();
+    sendResponse(res, 200, {
+      todos,
+    });
+  } catch (error) {
+    console.error(error);
+    sendResponse(res, 500, {
+      message: "Failed to fetch todos",
+    });
+  }
+}
+
+// GET SINGLE TODO
+// GET /todos/:id
+
+async function getTodo(req, res, id) {
+  try {
+    // String ID ko MongoDB ObjectId mein convert
+    const todoId = new ObjectId(id);
+    const todo = await todosCollection.findOne({
+      _id: todoId,
+    });
+
+    if (!todo) {
+      return sendResponse(res, 404, {
+        message: "Todo not found",
+      });
+    }
+    sendResponse(res, 200, {
+      todo,
+    });
+  } catch (error) {
+    console.error(error);
+    sendResponse(res, 400, {
+      message: "Invalid todo ID",
+    });
+  }
+}
+
+// UPDATE TODO
+// PATCH /todos/:id
+
+async function updateTodo(req, res, id) {
+  try {
+    const body = await getRequestBody(req);
+    const todoId = new ObjectId(id);
+    const updateData = {};
+
+    // Agar title diya gaya hai
+    if (body.title !== undefined) {
+      updateData.title = body.title;
+    }
+
+    // Agar completed diya gaya hai
+    if (body.completed !== undefined) {
+      updateData.completed = body.completed;
+    }
+
+    // MongoDB update
+    const result = await todosCollection.updateOne(
+      {
+        _id: todoId,
+      },
+      {
+        $set: updateData,
+      }
+    );
+    if (result.matchedCount === 0) {
+      return sendResponse(res, 404, {
+        message: "Todo not found",
+      });
+    }
+    sendResponse(res, 200, {
+      message: "Todo updated",
+    });
+  } catch (error) {
+    console.error(error);
+    sendResponse(res, 400, {
+      message: "Invalid todo ID",
+    });
+  }
+}
+
+// DELETE TODO
+// DELETE /todos/:id
+
+async function deleteTodo(req, res, id) {
+  try {
+    const todoId = new ObjectId(id);
+    const result = await todosCollection.deleteOne({
+      _id: todoId,
+    });
+    if (result.deletedCount === 0) {
+      return sendResponse(res, 404, {
+        message: "Todo not found",
+      });
+    }
+    sendResponse(res, 200, {
+      message: "Todo deleted",
+    });
+
+  } catch (error) {
+    console.error(error);
+    sendResponse(res, 400, {
+      message: "Invalid todo ID",
+    });
+  }
+}
+
+// HTTP SERVER
+const server = http.createServer(async (req, res) => {
+  const method = req.method;
+  // Example:
+  // /todos
+  // /todos/65abc123...
+
+  const url = new URL(
+    req.url,
+    `http://${req.headers.host}`
+  );
+  const pathname = url.pathname;
+  console.log(method, pathname);
+
+  // POST /todos
+  if (
+    method === "POST" &&
+    pathname === "/todos"
+  ) {
+    return createTodo(req, res);
+  }
+
+  // GET /todos
+  if (
+    method === "GET" &&
+    pathname === "/todos"
+  ) {
+    return getTodos(req, res);
+  }
+
+  // /todos/:id
+  if (pathname.startsWith("/todos/")) {
+    const id = pathname.split("/")[2];
+
+    // GET /todos/:id
+    if (method === "GET") {
+      return getTodo(req, res, id);
+    }
+
+    // PATCH /todos/:id
+    if (method === "PATCH") {
+      return updateTodo(req, res, id);
+    }
+
+    // DELETE /todos/:id
+    if (method === "DELETE") {
+      return deleteTodo(req, res, id);
+    }
+  }
+
+  // ROUTE NOT FOUND
+  sendResponse(res, 404, {
+    message: "Route not found",
+  });
+});
+
+// START DATABASE + SERVER
+async function startServer() {
+  try {
+    // MongoDB connection
+    await client.connect();
+    console.log("MongoDB connected");
+
+    // Database select
+    const db = client.db("todoApp");
+
+    // Collection select
+    todosCollection = db.collection("todos");
+
+    // Start HTTP server
+    server.listen(PORT, () => {
+      console.log(
+        `Server running at http://localhost:${PORT}`
+      );
+    });
+  } catch (error) {
+    console.error(
+      "Failed to start server:",
+      error
+    );
+    process.exit(1);
+  }
+}
+startServer();
+```
+
+# What is Mongoose kya hai?
+Mongoose is an ODM (Object Data Modeling) library for Node.js and MongoDB that provides schemas, models, validation, and convenient methods for interacting with MongoDB.
+```js
+const mongoose = require("mongoose");
+
+// Schema
+const userSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true
+  },
+
+  age: {
+    type: Number
+  }
+});
+
+// Model
+const User = mongoose.model("User", userSchema);
+
+// Create user
+const user = await User.create({
+  name: "Priti",
+  age: 25
+});
+```
+
+# What is Mongoose schema ?
+A Mongoose Schema is a blueprint that defines the structure, types, validation rules, and other behavior of documents managed by a Mongoose model.
+```js
+const mongoose = require("mongoose");
+
+const userSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true
+  },
+
+  email: {
+    type: String,
+    required: true,
+    unique: true
+  },
+
+  age: {
+    type: Number,
+    min: 18
+  }
+});
+```
+
+# What is Model?
+A Mongoose Model is a JavaScript object created from a Schema that provides an interface to interact with a MongoDB collection and perform database operations like create, read, update, and delete (querying documents).
+```js
+// Schema
+const userSchema = new mongoose.Schema({
+  name: String,
+  age: Number
+});
+
+// Model
+const User = mongoose.model("User", userSchema);
+
+// Model already registered error
+const User=  mongoose.models.User ||
+  mongoose.model("User", userSchema);
+
+// operations 
+// 1. Create Methods
+              Model.create()//mongoose
+              Model.insertMany()//mongoose 
+              Model.insertOne()//mongodb
+// 2. Read Methods
+                  Model.find()
+                  Model.findOne()
+                  Model.findById()
+                  Model.exists()
+                  Model.countDocuments()
+                  Model.distinct()
+// 3. Update Methods
+                  Model.updateOne()
+                  Model.updateMany()
+                  Model.findByIdAndUpdate()
+                  Model.findOneAndUpdate()
+// 4. Delete Methods
+                  Model.deleteOne()
+                  Model.deleteMany()
+                  Model.findByIdAndDelete()
+                  Model.findOneAndDelete()
+
+// 5. Query / Advanced Methods/method chaining 
+                  Model.bulkWrite()
+                            find()
+                            sort()
+                            skip()
+                            limit()
+                            select()
+                            populate()
+                            lean()
+```
+
+- # What is populate() in Mongoose?
+populate() is a Mongoose method used to replace referenced MongoDB ObjectIds with the corresponding (actual data ) documents from another collection.
+
+Populate chaining is used to populate multiple references in a query, while nested populate is used when a referenced document itself contains another reference that also needs to be populated.
+```js
+const postSchema = new mongoose.Schema({
+  title: String,
+  author: {
+    type: mongoose.Schema.Types.ObjectId,// this store reference id of User 
+    ref: "User"
+  }
+});
+// Without populate
+const post = await Post.findOne();
+console.log(post);
+{
+  "title": "Learn Node.js",
+  "author": "64abc123"// Without populate we gets ref id only ,Not actual Data
+}
+
+// With populate()
+const post = await Post.findOne().populate("author")
+console.log(post);// gets  exact data 
+
+{
+  "title": "Learn Node.js",
+  "author": {                         // gets  exact data 
+    "_id": "64abc123",
+    "name": "Priti",
+    "email": "priti@gmail.com"
+  }
+}
+
+// Specific fields bhi le sakte ho
+const post = await Post
+  .findOne()
+  .populate("author", "name email");// this time we didn't get id 
+
+  {
+  "title": "Learn Node.js",
+  "author": {
+    "name": "Priti",
+    "email": "priti@gmail.com"
+  }
+}
+
+// Suppose  have 
+// 1. User Schema
+const userSchema = new mongoose.Schema({
+  name: String,
+  email: String
+});
+// 2. Category Schema
+const categorySchema = new mongoose.Schema({
+  name: String
+});
+// 3. Comment Schema
+const commentSchema = new mongoose.Schema({
+  text: String,
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User"
+  }
+});
+// 4. Post Schema
+const postSchema = new mongoose.Schema({
+  title: String,
+
+  content: String,
+
+  author: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User"
+  },
+
+  category: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Category"
+  },
+
+  comments: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Comment"
+    }
+  ]
+});
+
+// we gets data like this without populate
+{
+  "_id": "post101",
+  "title": "Learn Node.js",
+  "content": "Node.js is a runtime...",
+  "author": "user101",
+  "category": "cat101",
+  "comments": [
+    "comment101",
+    "comment102"
+  ]
+}
+
+// Multiple fields populate
+// → Same document ke multiple references
+const post = await Post
+  .findById(postId)
+  .populate("author")
+  .populate("category");
+  .populate("comments");
+
+// Now getting 
+{
+  "title": "Learn Node.js",
+  "author": {
+    "name": "Priti"
+  },
+  "category": {
+    "name": "Programming"
+  },
+  "comments": [
+    {
+      "_id": "comment101",
+      "text": "Very useful!"
+    },
+    {
+      "_id": "comment102",
+      "text": "Nice explanation!"
+    }
+  ]
+}
+
+// Nested populate
+// → Populated document ke andar ka reference
+const post = await Post
+  .findById(postId)
+  .populate("author")
+  .populate("category")
+  .populate({
+    path: "comments",
+    populate: {
+      path: "user"
+    }
+  });
+//
+  {
+  "title": "Learn Node.js",
+  "author": {
+    "name": "Priti"
+  },
+  "category": {
+    "name": "Programming"
+  },
+  "comments": [
+    {
+      "text": "Very useful!",
+      "user": {
+        "name": "Rahul",
+        "email": "rahul@gmail.com"
+      }
+    },
+    {
+      "text": "Nice explanation!",
+      "user": {
+        "name": "Amit",
+        "email": "amit@gmail.com"
+      }
+    }
+  ]
+}
+```
+
+# What is MongoDB indexing?
+MongoDB indexing is a data-optimization technique that creates indexes on fields to speed up query operations by avoiding unnecessary full collection scans.
+
+```js
+db.users.find({
+  email: "priti@gmail.com"
+});// this scan whole document one by one 
+
+//✅ With Index (mongodb)
+
+db.users.createIndex({
+  email: 1
+});
+
+// mongoose index 
+const userSchema = new mongoose.Schema({
+  name: String,
+  email: {
+    type: String,
+    index: true// adding
+  }
+});
+// or  use this 
+userSchema.index({
+  email: 1
+});
+              // 1  → Ascending
+              // -1 → Descending
+
+
+// Compound Index
+// Multiple fields par ek index:
+db.users.createIndex({
+  age: 1,
+  city: 1
+});
+//usefull query 
+db.users.find({
+  age: 25,
+  city: "Delhi"
+});
+
+// Unique Index
+db.user.createIndex({
+  {email:1},
+  {unique:true}
+})
+```
+
+
+# find() vs findOne()
+find() returns an array containing all matching documents or [] if no document matches, whereas findOne() returns the first matching document or null if no document matches.
+
+```js
+Collection
+│
+├── Priti   age: 25  ← match
+├── Vipin   age: 25  ← match
+├── Amit    age: 25  ← match
+└── Neha    age: 30
+
+const users = await User.find();// return array of doc
+
+[
+  {name:"Priti",age:25},
+  {name:"Vipin",age:25},
+  {name:"Amit",age:25},
+  {name:"Neha",age:30},
+]
+
+
+const users = await User.find({ age: 25 })// 
+[
+  {name:"Priti",age:25},
+  {name:"Vipin",age:25},
+  {name:"Amit",age:25},
+]
+
+//first matching document
+const users= await User.findOne({age:25});//priti
+//Priti  
+
+// const user = await User.findOne({
+//   email: "priti@gmail.com"
+// });
+
+```
+
+# findById()
+findById() returns the document matching the specified _id, or null if no matching document exists.
+```js
+User.findById(req.params.id)
+// __id
+const user = await User.findById("64abc123...");
+```
+
+# insertOne() vs insertMany()   in MongoDB?
+insertOne() inserts a single document into a MongoDB collection and returns an InsertOneResult containing the ID of the inserted document.
+
+```js
+const result = await db.collection("users").insertOne({
+  name: "Priti",
+  age: 25
+});
+console.log(result);
+// Returns 
+{
+  acknowledged: true,
+  insertedId: ObjectId("...")
+}
+```
+
+insertMany() inserts multiple documents into a MongoDB collection and returns an InsertManyResult containing the IDs of the inserted documents.
+```js
+const result = await db.collection("users").insertMany([
+  {
+    name: "Priti",
+    age: 25
+  },
+  {
+    name: "Rahul",
+    age: 30
+  }
+]);
+
+console.log(result);
+
+// Returns 
+{
+  acknowledged: true,
+  insertedIds: {
+    0: ObjectId("..."),
+    1: ObjectId("...")
+  }
+}
+```
+
+
+
+# what is Model.create()  insertMany() in mongoose ?
+**Model.create()**
+Creates one or more documents through a Mongoose model and returns the created document(s).
+```js
+const user = await User.create({
+  name: "Priti",
+  age: 25
+});
+
+console.log(user);
+
+//   Returns: created Mongoose document
+{
+  _id: "...",
+  name: "Priti",
+  age: 25
+}
+```
+**Model.insertMany()**
+Inserts multiple documents into a MongoDB collection through Mongoose and returns the inserted documents as an array.
+```js
+const users = await User.insertMany([
+  {
+    name: "Priti",
+    age: 25
+  },
+  {
+    name: "Rahul",
+    age: 30
+  }
+]);
+
+console.log(users);
+// Returns  Array of inserted documents
+[
+  {
+    _id: "...",
+    name: "Priti",
+    age: 25
+  },
+  {
+    _id: "...",
+    name: "Rahul",
+    age: 30
+  }
+]
+```
+
+
+# Model.updateOne()  , Model.updateMany()
+updateOne() updates the first document that matches the filter and returns an update result, not the updated document itself.
+```js
+const result = await User.updateOne(
+  { name: "Priti" },
+  {
+    $set: {
+      age: 26
+    }
+  }
+);
+
+console.log(result);
+
+// Returns 
+{
+  acknowledged: true,
+  matchedCount: 1, (kitne documents match hue)
+  modifiedCount: 1  (kitne actually update hue)
+}
+```
+updateMany() updates all documents that match the filter and returns an update result.
+
+```js
+[
+  { name: "Priti", age: 25 },
+  { name: "Vipin", age: 25 },
+  { name: "Divy", age: 30 }
+]
+const result = await User.updateMany(
+  { age: 25 },
+  {
+    $set: {
+      verified: true
+    }
+  }
+);
+console.log(result);
+// Returns
+{
+  acknowledged: true,
+  matchedCount: 2,
+  modifiedCount: 2
+}
+```
+
+# Model.findByIdAndUpdate()   VS Model.findOneAndUpdate()
+findByIdAndUpdate() finds a document by its _id, updates it, and can return the document.
+```js
+const user = await User.findByIdAndUpdate(
+  userId,
+  {
+    $set: {
+      age: 26
+    }
+  },
+  {
+    new: true
+  }
+);
+console.log(user);
+
+// Return With 
+{
+  new: true// it returns the updated document:
+}
+// result 
+{
+  _id: "...",
+  name: "Priti",
+  age: 26
+}
+
+// With out new:true by default it returns the document before the update.
+```
+
+findOneAndUpdate() finds the first document matching a specified condition, updates it, and can return the document.
+
+```js
+// PUT is used to completely replace an existing resource with a new representation.
+// PATCH is used to partially modify an existing resource by changing only the specified fields.
+
+const user = await User.findOneAndUpdate(
+  {
+    email: "priti@gmail.com"
+  },
+  {
+    // A partial update means modifying only specific fields of an existing document without replacing the entire document.
+    $set: {// partial update
+      age: 26
+    }
+  },
+  {
+    new: true
+  }
+);
+
+console.log(user);
+//Returns 
+{
+  _id: "...",
+  name: "Priti",
+  email: "priti@gmail.com",
+  age: 26
+}
+```
+
+
+# Model.deleteOne() VS   Model.deleteMany()
+deleteOne() deletes the first document that matches the specified filter and returns a delete result. instead of returning deleted record deleteOne() and deleteMany() always return a result object (deletedCount tells whether anything was deleted),
+
+```js
+const result = await User.deleteOne({
+  email: "priti@gmail.com"
+});
+// return result 
+{
+  acknowledged: true,
+  deletedCount: 1
+}
+``` 
+
+deleteMany() deletes all documents that match the specified filter and returns a delete result. instead of returning deleted records 
+
+```js
+const result = await User.deleteMany({
+  age: 25
+});
+// Returns 
+{
+  acknowledged: true,
+  deletedCount: 3
+}
+```
+
+# Model.findByIdAndDelete()    VS Model.findOneAndDelete()
+findByIdAndDelete() finds a document by its _id, deletes it, and returns the deleted document. or null if  no match found
+
+```js
+const user = await User.findByIdAndDelete(userId);
+// Returns 
+{
+  _id: "...",
+  name: "Priti",
+  age: 25
+}
+```
+findOneAndDelete() finds the first document matching the specified filter, deletes it, and returns the deleted document. or null if no match found
+
+```js
+const user = await User.findOneAndDelete({
+  email: "priti@gmail.com"
+});
+
+// Returns
+{
+  _id: "...",
+  name: "Priti",
+  email: "priti@gmail.com",
+  age: 25
+}
+```
+
+
+deleteOne() and deleteMany() always return a result object (deletedCount tells whether anything was deleted), whereas findByIdAndDelete() and findOneAndDelete() return the deleted document, or null if no matching document exists.
+
+# What is Projection?
+Projection is used to include only the required fields or exclude unnecessary fields from MongoDB query results. It improves data security, reduces response size, and can improve query efficiency.
+**USEFULL**
+1. 🔐 Sensitive data hide
+2. 📦 Reduce Response size
+3. ⚡ Performance improve
+4. 🧹 Clean API response
+```js
+{
+  name: "Priti",
+  email: "priti@gmail.com",
+  age: 25,
+  password: "123456",
+  city: "Delhi"
+}
+// Need Only name and  email
+const users = await User.find()
+  .select("name email");
+  //Returns
+  {
+  name: "Priti",
+  email: "priti@gmail.com"
+}
+// Password exclude
+const users = await User.find()
+  .select("-password");// excluded password 
+
+                                                                  1 → Include ✅
+                                                                  0 → Exclude ❌
+
+User.find(
+  { email: "priti@gmail.com" }, // Filter query 
+  { name: 1, email: 1 }         // Projection
+  { password: 0}                   //excluded 
+);
+```
+
+
+# What is Aggregation in mongoDB
+MongoDB Aggregation is a data processing framework that transforms documents through a sequence of pipeline stages such as $match, $group, $sort, $project, and $lookup to produce a computed result.
+
+```js
+// Order collection 
+
+{
+  _id: 1,
+  userId: 101,
+  productId: 501,
+  quantity: 2,
+  price: 500,
+  status: "completed"
+}
+//User collection
+{
+  _id: 101,
+  name: "Priti",
+  city: "Delhi"
+}
+
+const result = await Order.aggregate([
+  // 1. $match
+  // Sirf completed orders lenge
+
+  {
+    $match: {
+      status: "completed"
+    }
+  },
+  // 2. $lookup
+  // orders ko users collection ke saath join karenge
+  {
+    $lookup: {
+      from: "users",
+      localField: "userId",
+      foreignField: "_id",
+      as: "user"
+    }
+  },
+  // 3. $unwind
+  // user array ko object mein convert karega
+  {
+    $unwind: "$user"
+  },
+  // 4. $group
+  // City ke according orders group karenge
+
+  {
+    $group: {
+      _id: "$user.city",
+
+      totalOrders: {
+        $sum: 1
+      },
+
+      totalRevenue: {
+        $sum: {
+          $multiply: [
+            "$quantity",
+            "$price"
+          ]
+        }
+      }
+    }
+  },
+  // 5. $project
+  // Final output ka structure define karenge
+
+  {
+    $project: {
+      _id: 0,
+
+      city: "$_id",
+
+      totalOrders: 1,
+
+      totalRevenue: 1
+    }
+  },
+  // 6. $sort
+  // Highest revenue first
+
+  {
+    $sort: {
+      totalRevenue: -1
+    }
+  },
+  // 7. $skip
+  // First result skip
+
+  {
+    $skip: 0
+  },
+
+  // 8. $limit
+  // Sirf top 10 cities
+  {
+    $limit: 10
+  }
+]);
+
+console.log(result);
+```
+
+
+
+# $lookup in mongodb
+$lookup is a MongoDB aggregation stage used to combine documents from one collection with related documents from another collection, similar to a JOIN in SQL.
+
+```$lookup performs a left outer join between two MongoDB collections by matching a field from the current collection with a field from another collection.```
+
+```js
+{
+  $lookup: {
+    from: "users",          // jis collection se data lana hai
+    localField: "userId",   // current collection ka field
+    foreignField: "_id",    // other collection ka matching field
+    as: "user"              // result kis field mein aayega
+  }
+}
+
+// Order collection
+{
+  _id: 1,
+  userId: 101,
+  product: "Laptop"
+}
+// User collection
+{
+  _id: 101,
+  name: "Priti",
+  email: "priti@gmail.com"
+}
+// $lookup code
+const result = await Order.aggregate([
+  {
+    $lookup: {
+      from: "users",
+      localField: "userId",
+      foreignField: "_id",
+      as: "user"
+    }
+  }
+]);
+
+// Result 
+{
+  _id: 1,
+  userId: 101,
+  product: "Laptop",
+
+  user: [
+    {
+      _id: 101,
+      name: "Priti",
+      email: "priti@gmail.com"
+    }
+  ]
+}
+```
+
+
+# What is Connection pooling  ?
+Connection pooling is a mechanism that maintains a set of reusable database connections and assigns them to requests as needed, reducing the overhead of repeatedly creating and closing connections.
+
+
+
+# What Does Database connection pool ?
+Database connection pooling is important because it reuses a limited number of database connections, reducing connection-creation overhead, improving performance, controlling database resources, and allowing applications to handle concurrent requests efficiently.
+
+1. 🚀 Performance improve
+2. ♻️ Connection reuse
+3. 📈 handle  High traffic
+4. 🧠 Database resources save
+5. ⚡ Connection creation  overhead  Reduce
+
+```js
+// Connection Pool = Create once → Reuse many times → Better performance + scalability
+mongoose.connect(MONGO_URI, {
+  maxPoolSize: 10
+});
+```
+
+# What is  Transaction?
+A transaction is a group of database operations that are treated as one unit of work. Either all operations succeed, or all of them are rolled back if any operation fails.
+
+```js
+Transaction START
+       ↓
+Deduct ₹500
+       ↓
+Add ₹500
+       ↓
+Both successful?
+   ↓            ↓
+  YES        NO
+   ↓            ↓
+COMMIT   ROLLBACK
+   ↓            ↓
+Save         Undo changes
+
+
+COMMIT vs ROLLBACK
+COMMIT-->> All operations successful → changes permanently save.
+ROLLBACK--->> Any operation fails → transaction ke changes undo.
+
+// it use session  
+const session = await mongoose.startSession();
+ session.startTransaction(); 
+ session.commitTransaction();
+ session.abortTransaction();
+ session.endSession();
+```
+# What is Helmet ?
+Helmet is an Express.js middleware that improves application security by setting HTTP response headers that protect against common web vulnerabilities.
+```js
+npm install helmet
+const express = require("express");
+const helmet = require("helmet");
+const app = express();
+app.use(helmet());
+app.get("/", (req, res) => {
+  res.send("Hello");
+});
+app.listen(3000);
+```
+
+# What is sharding ? 
+Sharding is a horizontal scaling technique in which data is distributed across multiple MongoDB servers (shards) using a shard key instead of storing all data on a single server.
+
+Without Sharding
+```js
+                          MongoDB Server
+                                      ↓
+                      ┌─────────────────┐
+                      │   1 TB Data                  │
+                      │   10M Users                │
+                      └─────────────────┘
+```
+With Sharding
+
+```js
+Suppose users collection have 30millian user
+Shard 1 → User 1 - 10 million
+Shard 2 → User 10 - 20 million
+Shard 3 → User 20 - 30 million
+
+                                     MongoDB
+                                            ↓
+                        ┌─────────┼─────────┐
+                        ↓                  ↓                  ↓
+                    Shard 1           Shard 2       Shard 3
+                        ↓                  ↓                  ↓
+                    Users              Users           Users
+                    1-10M              10-20M        20-30M
+                    Data multiple servers par distribute ho jata hai.
+```
+
+# shard key ?
+Shard key is the field or combination of fields MongoDB uses to distribute documents across shards.
+
+```js
+{
+  userId: 101,//userId shard key
+  name: "Priti"
+}
+
+Sharding = Data split across servers
+Replication = Data copied across servers  (Replication = Same data ki multiple copies, multiple servers par.)
+```
+
+# Replication
+Replication is the process of maintaining copies of the same data on multiple MongoDB servers to provide high availability, fault tolerance, and redundancy.
+
+```js
+                            MongoDB Replica Set
+                                        │
+                            ┌─────┴─────┐
+                            ↓                      ↓
+                        Primary             Secondary
+                            │                      │
+                          Read/Write        Copy
+                            │                      │
+                            └─────┬─────┘
+                                        ↓
+                                   Secondary
+                                        │
+                                     Copy
+```
+Primary is the MongoDB replica-set member that normally receives all write operations.
+
+Secondary is a replica-set member that maintains a copy of the Primary's data and can become Primary if the current Primary fails.
+
+# What is Horizontal scaling?
+Horizontal scaling means adding more servers/instances to handle increased traffic.
+```js
+ Client
+    ↓
+Server 1
+// After
+                                Client
+                                  │
+                                  ▼
+                              NGINX/Reverse proxy
+                          Load Balancer
+                                  │
+          ┌───────────┼───────────┐
+          ▼                      ▼                       ▼
+       Node 1              Node 2             Node 3
+       :3001                  :3002                :3003
+```
+
+# What is Vertical scaling?
+Vertical scaling means increasing the CPU, RAM, storage, or other resources of an existing server.
+```js
+                  Before                              After
+                ┌─────────┐        ┌─────────────┐
+                │ Server        │   →   │   Server             │
+                │ 4 CPU         │        │  16 CPU              │
+                │ 8 GB          │        │  32 GB RAM        │
+                └─────────┘        └─────────────┘
+```
+
+# What is  Caching ?
+Caching is a technique of temporarily storing frequently accessed data in a fast storage layer so that future requests can retrieve it faster instead of fetching it again from the original source.
+⚡ Response time improves
+🗄️ Database load reduce 
+📈 High traffic handle
+💰 Database resources bachane 
+
+**cache aside pattern**
+Cache-aside pattern is a caching strategy where the application first checks the cache for data. If the data is found, it returns it; if not, it fetches the data from the database, stores it in the cache, and then returns it.
+
+Without caching
+Client
+  ↓
+Node.js
+  ↓
+MongoDB
+  ↓
+Data
+  ↓
+Node.js
+  ↓
+Client
+```js
+// With caching 
+                      Client
+                        ↓
+                      Node.js
+                        ↓
+                      Redis Cache
+                        │
+                        ├── Data found? → Return immediately ⚡
+                        │
+                        └── Not found?
+                                ↓
+                            MongoDB
+                                ↓
+                            Data (stores )
+                                ↓
+                            Redis
+                                ↓
+                            Client
+            
+            
+const products = await Product.find();
+
+First request:
+Client
+ ↓
+Redis ❌
+ ↓
+MongoDB
+ ↓
+Products
+ ↓
+Redis ✅
+ ↓
+Client
+
+
+Next request:
+Client
+ ↓
+Redis ✅
+ ↓
+Products ⚡
+```
+
+# Cache Hit vs Cache Miss
+A cache hit occurs when the requested data is already available in the cache, so the application can return the data directly from the cache without accessing the original data source.
+```js
+            Client
+              ↓
+            Cache
+              ↓
+            Data found ✅
+              ↓
+            Return data
+        
+const data = await redis.get("users");
+
+if (data) {
+  return JSON.parse(data); // Cache Hit
+}
+```
+A cache miss occurs when the requested data is not available in the cache, so the application must fetch it from the original data source, such as a database, and may store it in the cache for future requests.
+
+```js
+              Client
+                ↓
+              Cache
+                ↓
+              Data not found ❌
+                ↓
+              MongoDB
+                ↓
+              Get data
+                ↓
+              Store in Cache
+                ↓
+              Return data
+```
+```js
+const cachedData = await redis.get("users");
+if (!cachedData) {
+  const users = await User.find();
+  await redis.set(
+    "users",
+    JSON.stringify(users)
+  );
+  return users; // Cache Miss
+}
+```
+
+# What is Redis kya hai?
+Redis (Remote Dictionary Server) is an in-memory database that stores data in RAM instead of disk, making it extremely fast. It is mainly used to cache frequently used data and reduce the load on the main database, which improves system performance and response time.
+
+Stores frequently accessed data so applications can retrieve it quickly without querying the main database, improving performance and response time.
+Used to store user sessions for fast authentication and helps manage queues, leaderboards, and analytics in applications requiring quick updates.
+```js
+const cachedProducts = await redis.get("products");
+
+if (cachedProducts) {
+  return JSON.parse(cachedProducts);
+}
+const products = await Product.find();
+await redis.set(
+  "products",
+  JSON.stringify(products),
+  { EX: 60 }
+);
+
+return products;
+```
+
+```js
+                             Client
+                                ↓
+                              Nginx
+                                ↓
+                          Load Balancer
+                                ↓
+              ┌────────┴────────┐
+              ↓                                  ↓
+          Node Server 1        Node Server 2
+              │                                  │
+              └────────┬────────┘
+                                ↓
+                             Redis
+                                 │
+             ┌─────────┼─────────┐
+             ↓                  ↓                  ↓
+           Cache          Session    Queue
+                                 │
+                                 ↓
+                           MongoDB
+```
+
+# What is  Cache invalidation ?
+Cache invalidation is the process of removing, updating, or marking cached data as stale when the original data changes, so users don't receive outdated information.
+```js
+{
+  name:"Laptop",
+  price:50000
+}
+In mongodb price: 50000 → 45000
+
+In Redis price: 50000 
+
+                          Update MongoDB
+                              ↓
+                          Price = 45000
+                              ↓
+                          Invalidate Redis
+                              ↓
+                          Delete old cache
+                              ↓
+                          Next request
+                              ↓
+                          Cache MISS
+                              ↓
+                          MongoDB
+                              ↓
+                          45000
+                              ↓
+                          Store new value in Redis
+      
+Database changes
+      ↓
+Cache has old data
+      ↓
+Invalidate
+      ↓
+Remove / Update cache
+      ↓
+Fresh data ✅
+```
+```js
+await Product.findByIdAndUpdate(
+  productId,
+  { price: 45000 }
+);
+// Old cached value remove
+await redis.del(`product:${productId}`);
+
+// Next request:
+const cached = await redis.get(`product:${productId}`);
+
+if (cached) {
+  return JSON.parse(cached);
+}
+
+// Cache miss
+const product = await Product.findById(productId);
+
+await redis.set(
+  `product:${productId}`,
+  JSON.stringify(product),
+  { EX: 60 }
+);
+
+return product;
+
+
+//TTL - Cache automatically expire:
+await redis.set(
+  "product:101",
+  JSON.stringify(product),
+  { EX: 60 } //  Cache automatically expire:  After 60 seconds  cache expire 
+);
+```
+
+# What is TTL ?
+TTL (Time To Live) defines how long a piece of data remains valid or stored before it automatically expires.
+```js
+await redis.set(
+  "product:101",
+  JSON.stringify(product),
+  {
+    EX: 60
+  }
+);
+```
+
+# Why we used Redis in   Node.js ?
+Redis is used with Node.js as a high-speed in-memory data store to reduce database load, improve response time, manage sessions, implement rate limiting, and process background jobs through queues.
+1. ⚡ Faster response
+2. 🗄️Reduce  Database load
+3. 🔄 Cache Hit / Miss
+4. 🔐 Session management
+5. 🚦 Rate limiting
+6. 📩 Background jobs / queues
+
+
+
+
+# Load Balancer
+A load balancer distributes incoming requests across multiple servers to prevent overload and improve scalability, performance, and availability.
+Users
+  ↓
+Node.js Server
+
+```js
+                                Client
+                                  │
+                                  ▼
+                              NGINX
+                          Load Balancer
+                                  │
+          ┌───────────┼───────────┐
+          ▼                      ▼                       ▼
+       Node 1              Node 2             Node 3
+       :3001                  :3002                :3003
+
+// 1000
+        1000 Requests
+               ↓
+        Load Balancer
+          ↙   ↓   ↘
+        300   350   350
+        ↓     ↓     ↓
+        S1    S2    S3 
+```
+Scalability → multiple servers use kar sakte hain.
+High availability → ek server fail ho jaye to traffic dusre servers par ja sakta hai.
+Performance → workload distribute hota hai.
+Fault tolerance → unhealthy servers ko traffic se remove kiya ja sakta hai.
+
+# Rate Limiting
+Rate limiting is a mechanism that controls how many requests a client can make to a server or API within a defined time window, helping prevent abuse, brute-force attacks, and excessive server load.
+
+```js
+const express = require("express");
+const rateLimit = require("express-rate-limit");
+const app = express();
+app.use(express.json());
+
+// 1. Login Rate Limiter
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+
+  max: 5, // Maximum 5 requests per IP
+
+  message: {
+    success: false,
+    message: "Too many login attempts. Please try again later."
+  },
+
+  standardHeaders: true,
+  legacyHeaders: false
+});
+// 2. Login API
+app.post(
+  "/api/auth/login",
+  loginLimiter,
+  async (req, res) => {
+    const { email, password } = req.body;
+    console.log("Login attempt:", email);
+
+    // Normally:
+    //
+    // 1. User database se find hoga
+    // 2. Password bcrypt se compare hoga
+    // 3. JWT generate hoga
+
+    res.json({
+      success: true,
+      message: "Login request received"
+    });
+  }
+);
+app.listen(3000, () => {
+  console.log("Server running on port 3000");
+});
+```
+```js
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5
+});
+
+const otpLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 3
+});
+
+const apiLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 100
+});
+
+app.post(
+  "/api/auth/login",
+  loginLimiter,
+  loginController
+);
+
+app.post(
+  "/api/auth/send-otp",
+  otpLimiter,
+  sendOtpController
+);
+
+app.use(
+  "/api",
+  apiLimiter
+);
+```
+In a production Express application, I would apply stricter rate limits to sensitive endpoints such as login, OTP, and password-reset APIs. For a single instance, an in-memory limiter can work, while a distributed deployment with multiple Node.js instances should use a shared store such as Redis so that all instances enforce the same limit.
+
+ # What is  Nginx + Node.js  architecture?
+Client → Nginx → Node.js
+Nginx is a high-performance web server and reverse proxy that forwards client requests to backend servers.
+
+Nginx is a high-performance web server and reverse proxy commonly used to serve static content, route requests to backend servers, load-balance traffic, handle HTTPS, and improve application performance and availability.
+
+# What is Reverse Proxy?
+A reverse proxy is a server that sits between clients and backend servers and forwards client requests to the appropriate backend server.
+Client
+  ↓
+Reverse Proxy = Gatekeeper 🚪
+  ↓
+Backend Server
+
+
+
+# Redis vs MongoDB?
+MongoDB is primarily a persistent NoSQL document database, while Redis is primarily an in-memory data store commonly used for caching, sessions, queues, and fast temporary data.
+```js
+// Mongodb  stores data like this (persistent)
+{
+  _id: 101,
+  name: "Laptop",
+  price: 50000,
+  stock: 20
+}
+
+// Radis stores data   (where  from fast access )
+product:101
+    ↓
+{
+  name: "Laptop",
+  price: 50000
+}
+TTL: 60 seconds
+```
+
+# What is Session storage using Redis?
+Session storage using Redis means storing a user's session data in Redis instead of keeping it inside the Node.js server's memory.
+```js
+app.use(session({
+  store: new RedisStore({
+    client: redisClient
+  }),
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    maxAge: 1000 * 60 * 60
+  }
+}));
+```
+
+
 - Distributed caching kya hai?
 
-- Helmet kya hai?
-- Rate limiting kya hai?
+
 - Brute-force attack?
 - SQL Injection?
 - NoSQL Injection?
@@ -1819,34 +4008,10 @@ console.log(process.argv);
 - TLS ka basic working?
 - Secrets/environment variables safely kaise manage karoge?
 - API security ke best practices?
-## Production & System Design
 
 
-- Reverse Proxy kya hai?
-- Nginx + Node.js ka architecture?
-- Load Balancer kya hai?
-- Horizontal scaling?
-- Vertical scaling?
-- Node.js application ko horizontally scale kaise karoge?
-- Stateless API kya hoti hai?
-- Logging kaise implement karoge?
-- Monitoring kya hai?
-- Health check endpoint kya hota hai?
-- Graceful shutdown kaise implement karoge?
-- Zero-downtime deployment kya hai?
-- Environment-based configuration?
-- Docker ke saath Node.js kaise deploy karoge?
-## Node.js Internals ⭐⭐⭐
 
 
-- Signals kya hote hain?
-- SIGTERM vs SIGKILL?
-- Child Process kya hai?
-- spawn() vs exec() vs fork()?
-- IPC kya hai?
-- Node.js memory heap kya hai?
-- V8 garbage collection?
-- Memory leak detect kaise karoge?
-- Node.js application mein CPU spike debug kaise karoge?
-- Node.js application mein memory leak debug kaise karoge?
+
+
 - ===================================================================================

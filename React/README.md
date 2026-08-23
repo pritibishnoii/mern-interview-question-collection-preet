@@ -50,6 +50,9 @@
 49. [Error Boundaries](#error-boundaries)
 50. [Can Error Boundaries be created using functional components?](#can-error-boundaries-be-created-using-functional-components)
 51. [Higher-Order Component](#higher-order-component)
+52. [What-is-nullish-coalescing-operator-(?? )](#What-is-nullish-coalescing-operator)
+53. [What is Redux](#what-is-redux-)
+53. [What is Redux Components](#what-is-redux-components)
 
 #  React Collection
 # What is React?
@@ -2399,11 +2402,115 @@ const AdminSettings = withAdmin(Settings);
 
 
 
+# What is Nullish Coalescing Operator
+ (?? )vs ? : — Ternary Operator  and || 
+
+?? returns the right-hand value only when the left-hand value is null or undefined.
+```js
+const name = null;
+console.log(name ?? "Guest");
+// Guest
+console.log(0 ?? 100);       // 0
+console.log(false ?? true);  // false
+console.log("" ?? "Hello");  // ""
+```
+|| returns the right-hand value when the left-hand value is falsy.
+
+```js
+const age = 0;
+console.log(age || 18);
+// 18
+console.log(0 || 18); // 18
+console.log(0 ?? 18); // 0
+```
+The ternary operator is a shorthand for an if...else condition.
+```js
+condition ? valueIfTrue : valueIfFalse
+const age = 20;
+const result = age >= 18
+  ? "Adult"
+  : "Minor";
+console.log(result);
+// Adult
+```
 
 
+# What is Redux ?
+React-Redux is a tool that helps you manage the state (data) of your React app in one central place. This makes your app easier to maintain and debug as it grows.
 
+It is based on three fundamental principles:
 
+Single Source of Truth: All app data lives in the store.
+State is Read-Only: You can’t change data directly; you send an action to request a change.
+Changes with Pure Functions: Reducers take the current state and an action, and return the updated state.
 
+# What is Redux  Components
+1. Store
+The store is a central place that holds all the app’s data. It’s the only place where the data can be changed.
+```js
+const store = configureStore({
+  reducer: {
+    user: userReducer,
+    cart: cartReducer
+  }
+});
+```
+2. State
+State is the actual data stored inside the Redux store.
+```js
+{
+  user: {
+    name: "Priti"
+  },
+  cart: {
+    items: []
+  }
+}
+```
+3. Actions
+An action is a simple JavaScript object that tells Redux what change to make. It must have a type and can optionally include a payload with extra information.
+```js
+{
+  type: "cart/add",
+  payload: product
+}
+```
+4. Reducers
+A reducer is a pure function that decides how the state changes when an action is received. It takes the current state and an action, and returns a new state.
+```js
+const cartSlice = createSlice({
+  name: "cart",
+  initialState: {
+    items: []
+  },
+  reducers: {
+    addToCart: (state, action) => {
+      state.items.push(action.payload);
+    }
+  }
+});
+```
+6. Dispatch
+Dispatch is used to send an action to the Redux store. This triggers the reducer to update the state.
+```js
+store.dispatch(addToCart(product));
+```
+6. Selectors
+A selector is a function that is used to get specific data from the Redux store.
+```js
+const cart = useSelector(
+  state => state.cart
+);
+```
+7. Provider
+The Provider component makes the Redux store available to all React components in the app.
+```js
+import { Provider } from 'react-redux';
+
+<Provider store={store}>
+    <App />
+</Provider>;
+```
 
 
 
