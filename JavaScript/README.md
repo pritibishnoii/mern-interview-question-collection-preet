@@ -153,10 +153,28 @@
 # JavaScript Interview Question Collection
 # What is JavaScript? 
 JavaScript is a high-level, dynamically typed programming language mainly used to add behavior and interactivity to web applications. It runs in browsers using JavaScript engines like V8, and with Node.js it can also run on the server.
+
+**Dynamica type**
+JavaScript is dynamically typed because variables don't have a fixed type. The type belongs to the value and is determined at runtime. A variable can hold a number at one point and later hold a string or boolean. JavaScript still has types; the difference is that type checking is dynamic rather than requiring every variable to have a fixed declared type."
+
 ```JS
 const name = "Priti";
 console.log(`Hello ${name}`);
+
+// Dynamic type  
+let x = 10;   // x type is not fix   once it holds a number later it could hold   another type  
+
+console.log(typeof x); // "number"
+
+x = "Hello";   
+
+console.log(typeof x); // "string"
+
+x = true;
+
+console.log(typeof x); // "boolean"
 ```
+
 
 # What are the <pre><code>var vs let vs const</code></pre>
 var, let, and const are used to declare variables in JavaScript, but they differ mainly in scope, redeclaration, reassignment, and hoisting behavior.
