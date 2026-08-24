@@ -3620,10 +3620,10 @@ Sharding is a horizontal scaling technique in which data is distributed across m
 Without Sharding
 ```js
                           MongoDB Server
-                                      ↓
+                              ↓
                       ┌─────────────────┐
-                      │   1 TB Data                  │
-                      │   10M Users                │
+                      │   1 TB Data                  
+                      │   10M Users                
                       └─────────────────┘
 ```
 With Sharding
@@ -3634,14 +3634,14 @@ Shard 1 → User 1 - 10 million
 Shard 2 → User 10 - 20 million
 Shard 3 → User 20 - 30 million
 
-                                     MongoDB
-                                            ↓
-                        ┌─────────┼─────────┐
-                        ↓                  ↓                  ↓
-                    Shard 1           Shard 2       Shard 3
-                        ↓                  ↓                  ↓
-                    Users              Users           Users
-                    1-10M              10-20M        20-30M
+                                               MongoDB
+                                                   ↓
+                                ┌──────────────────┐────────────────┐
+                                ↓                  ↓                 ↓
+                            Shard 1           Shard 2            Shard 3
+                                ↓                 ↓                  ↓
+                            Users              Users                Users
+                            1-10M              10-20M              20-30M
                     Data multiple servers par distribute ho jata hai.
 ```
 
@@ -3662,19 +3662,19 @@ Replication = Data copied across servers  (Replication = Same data ki multiple c
 Replication is the process of maintaining copies of the same data on multiple MongoDB servers to provide high availability, fault tolerance, and redundancy.
 
 ```js
-                            MongoDB Replica Set
-                                        │
-                            ┌─────┴─────┐
-                            ↓                      ↓
-                        Primary             Secondary
+                               MongoDB Replica Set
+                                         │
+                            ┌────────────┘──────────┐
+                            ↓                       ↓
+                        Primary                 Secondary
                             │                      │
-                          Read/Write        Copy
+                          Read/Write             Copy
                             │                      │
-                            └─────┬─────┘
+                            └──────────────────────┘
                                         ↓
                                    Secondary
                                         │
-                                     Copy
+                                      Copy
 ```
 Primary is the MongoDB replica-set member that normally receives all write operations.
 
@@ -3690,23 +3690,23 @@ Server 1
                                 Client
                                   │
                                   ▼
-                              NGINX/Reverse proxy
+                        NGINX/Reverse proxy
                           Load Balancer
                                   │
-          ┌───────────┼───────────┐
-          ▼                      ▼                       ▼
-       Node 1              Node 2             Node 3
-       :3001                  :3002                :3003
+                      ┌───────────┼───────────┐
+                      ▼           ▼           ▼
+                   Node 1       Node 2       Node 3
+                   :3001        :3002         :3003
 ```
 
 # What is Vertical scaling?
 Vertical scaling means increasing the CPU, RAM, storage, or other resources of an existing server.
 ```js
-                  Before                              After
+                  Before                After
                 ┌─────────┐        ┌─────────────┐
-                │ Server        │   →   │   Server             │
-                │ 4 CPU         │        │  16 CPU              │
-                │ 8 GB          │        │  32 GB RAM        │
+                │ Server      →      Server             
+                │ 4 CPU               16 CPU              
+                │ 8 GB                32 GB RAM        
                 └─────────┘        └─────────────┘
 ```
 
@@ -3851,18 +3851,17 @@ return products;
                                 ↓
                           Load Balancer
                                 ↓
-              ┌────────┴────────┐
-              ↓                                  ↓
-          Node Server 1        Node Server 2
-              │                                  │
-              └────────┬────────┘
+              ┌──────────────────────────────────────┐
+              ↓                                      ↓
+          Node Server 1                         Node Server 2
+              │                                       │
+              └───────────────────────────────────────┘
                                 ↓
                              Redis
                                  │
-             ┌─────────┼─────────┐
-             ↓                  ↓                  ↓
-           Cache          Session    Queue
-                                 │
+                       ┌─────────┼─────────┐
+                       ↓         ↓         ↓                 
+                     Cache             Session   Queue
                                  ↓
                            MongoDB
 ```
@@ -3978,10 +3977,10 @@ Node.js Server
                               NGINX
                           Load Balancer
                                   │
-          ┌───────────┼───────────┐
-          ▼                      ▼                       ▼
-       Node 1              Node 2             Node 3
-       :3001                  :3002                :3003
+          ┌───────────────────────┼─────────────────────┐
+          ▼                      ▼                      ▼
+       Node 1              Node 2                  Node 3
+       :3001                :3002                    :3003
 
 // 1000
         1000 Requests
