@@ -4,11 +4,15 @@
 1. [What is JavaScript?](#what-is-javascript)
 2. [What are the var vs let vs const](#what-are-the-var-vs-let-vs-const)
 3. [What is Hoisting](#what-is-hoisting-)
+  [What is variable shadowing?](#what-is-variable-shadowing)
 4. [What is Temporal Dead Zone?](#what-is-temporal-dead-zone)
 5. [Scope & Lexical Scope](#scope-lexical-scope)
-6. [Closures](#closures)
+6. [What is Closures](#what-is-closures)
 7. [why is a closure?](#why-is-a-closure)
+    [Does closure capture a snapshot?](#does-closure-capture-a-snapshot)
 8. [Why does Closure preserve variables?](#why-does-closure-preserve-variables)
+    [What is IIFI](#what-is-iifi)
+    [How does JavaScript execute code](#how-does-javaScript-execute-code)
 9. [Execution Context](#execution-context)
 10. [What is the Lexical Environment?](#what-is-the-lexical-environment)
 11. [What is the Variable Environment?](#what-is-the-variable-environment)
@@ -223,14 +227,305 @@ function sayHello() {
   console.log("Hello");
 }
 ```
+
+## 1. How var Hoisting Works Internally
+Many beginners imagine JavaScript executing it literally from top to bottom:
+But that's not the best mental model.
+```js
+console.log(name); //❓ name doesn't exist yet  
+var name = "Priti";
+console.log(name);
+```
+Think in two stages
+
+JavaScript execution involves a setup/creation phase before the statements execute.
+```js
+                 JavaScript Execution
+                         │
+   ┌──────────┴──────────┐
+   │                                          │
+Creation Phase               Execution Phase
+        │                                     │
+var name → undefined     console.log(name)
+                                               ↓
+                                         undefined
+                                               ↓
+                                      name = "Priti"
+                                            ↓
+                                      console.log(name)
+                                            ↓
+                                          Priti
+      
+```
+```js
+var name;          // declaration
+name = "Priti";    // assignment
+```
+The declaration is hoisted.
+
+The assignment stays exactly where it was.
+
+var is hoisted and initialized with undefined, but its assignment happens during the execution phase at the original line.
+
+
+```js
+var x = 10;
+function test() {
+    console.log(x);//undefined    (hoisted to function scope)    (function-scoped + hoisted)
+    var x = 20;
+    console.log(x); //20
+}
+test();
+// undefined
+// 20
+```
+Because the function has its own local var x.
+
+**Scope diagram**
+```js
+Global Scope
+│
+├── x = 10
+│
+└── test()
+     │
+     └── Function Scope
+          │
+          └── x = undefined
+```
+When JavaScript executes:
+```js
+console.log(x);
+```
+inside test() function
+```js
+Look in local function scope
+        ↓
+Found x
+        ↓
+x = undefined
+```
+It doesn't continue looking at the global x because the local x already exists.
+
+This is an extremely important connection between:
+
+Hoisting + Scope + Shadowing
+
+```js
+var x = 1;
+function foo() {
+    console.log(x);
+    if (true) {
+        var x = 2;
+    }
+    console.log(x);
+}
+foo();
+// undefined
+// 2
+```
+var does not have block scope.
+The function effectively behaves like:
+
+```js
+var x = 1;
+function foo() {
+    var x; // function-scoped + hoisted
+    console.log(x);
+    if (true) {
+        x = 2;
+    }
+    console.log(x);
+}
+foo();
+```
+var ignores block boundaries:
+```js
+if (true) {
+    var x = 10;
+}
+console.log(x); // 10
+```
+But let behaves differently:
+```js
+if (true) {
+    let x = 10;
+}
+console.log(x); // ReferenceError
+```
+# What is hoisting in JavaScript, and what happens when you access a var variable before its declaration?
+
+Hoisting is the behavior where JavaScript processes declarations before executing the code in their scope. For var, the declaration is hoisted to the top of its function scope and the variable is initialized with undefined. The assignment remains at its original position. Therefore, if we access a var variable before its assignment, we get undefined rather than a ReferenceError.
+
+**var Inside Loops**
+```js
+for (var i = 0; i < 3; i++) {
+    setTimeout(() => {
+        console.log(i);
+    }, 1000);
+}
+//3
+// 3
+// 3
+```
+Because var is function-scoped, not block-scoped.
+
+All three callbacks refer to the same i.
+
+By the time the callbacks execute:
+
+Loop finishes
+     ↓
+i = 3
+     ↓
+Callbacks execute
+     ↓
+3
+3
+3
+
+Because let creates block-scoped bindings for the iterations.
+
+**Scope**
+
+Where can I access this variable?
+```js
+function test() {
+    var x = 10;
+}
+console.log(x);// ReferenceError
+```
+Because x belongs to the function scope of test.
+
+**var vs let**
+Both declarations are hoisted in the JavaScript execution model, but their initialization behavior differs.
+```js
+console.log(a);
+var a = 10;//undefined
+
+// let 
+console.log(a);
+let a = 10;//referenceError
+```
+let and const declarations are hoisted in the sense that their bindings are created before execution, but they remain uninitialized in the Temporal Dead Zone until execution reaches the declaration.
+
+
+**Function Declaration vs var**
+
+```js
+foo();// TypeError: foo is not a function
+
+var foo = function () {
+    console.log("Hello"); 
+};
+```
+The var foo declaration is hoisted and initialized to undefined.
+Conceptually:
+```js
+var foo;
+foo(); // undefined()
+```
+Compare that with a function declaration:
+```js
+foo();//Hello
+function foo() {
+    console.log("Hello");
+}
+```
+This works because function declarations are available during the setup of the execution context.
+Because a function declaration is hoisted with its function definition, not merely initialized to undefined.
+
+```js
+Global Execution Context
+│
+├── foo → function foo() { ... }   //foo already points to the actual function.
+│
+└── execution starts
+```
+So when JavaScript reaches:  foo();
+foo already points to the actual function.
+```js
+// Creation phase
+foo = function foo() {
+    console.log("Hello");
+};
+// Execution phase
+foo();
+```
+Function declarations are hoisted with their complete function definition, so they can be called before their declaration. var function expressions only hoist the variable and initialize it to undefined; the function assignment happens later.
+
+**DRY RUN**
+```js
+Step 1 — Identify the scope
+Ask:
+Is this variable global?
+Function-scoped?
+Block-scoped?
+
+Step 2 — Find declarations
+Look for:
+var
+let
+const
+function
+
+Step 3 — Separate declaration from assignment
+Convert mentally:
+                      var x = 20; 
+INTO -->
+          var x;
+          x = 20;
+    
+Step 4 — Execute line by line
+
+var x = 10;
+function test() {
+    console.log(x);
+    var x = 20;
+    console.log(x);
+}
+
+test();
+
+Mental transformation:
+var x = 10;
+
+function test() {
+    var x;
+    console.log(x);//undefined
+    x = 20;
+    console.log(x);//20 
+}
+
+test();
+
+
+THEN:
+First console → undefined
+Assignment    → x = 20
+Second console → 20
+```
+
 #  What is Temporal Dead Zone? 
-Temporal Dead Zone is the period between entering a block and the point where a let or const variable is initialized. During this period, accessing the variable causes a ReferenceError.
+Temporal Dead Zone is the period between entering a scope where a let or const binding exists and the point where its declaration is executed. During this period the binding is uninitialized, so accessing it throws a ReferenceError. let and const are therefore hoisted in the sense that their bindings are created before execution, but unlike var, they are not initialized with undefined.
+
 Why does TDZ exist?
+```js
+It is the period from:
+
+Entering the scope
+
+until:
+
+The declaration is executed
+```
 
 It prevents you from accidentally using a variable before it has been initialized.
+
 ```javascript
 {
-    // TDZ starts
+  // TDZ is the time during which the lexical binding exists but hasn't been initialized.
+    // TDZ starts 
     console.log(age); // ❌ ReferenceError
     let age = 25;
 
@@ -260,13 +555,442 @@ Initialization
  ↓
 Can access
 ```
+let and const declarations are hoisted, but their bindings are not initialized until execution reaches the declaration. The period between entering the scope and reaching the declaration is called the Temporal Dead Zone (TDZ).
+
+Scope starts
+     ↓
+age exists as age binding
+     ↓
+❌ NOT initialized
+     ↓
+     TDZ
+     ↓
+let age = 25
+     ↓
+age becomes initialized
 
 
+So when JavaScript encounters:
+```js
+console.log(age); //it finds the binding, but the binding is still uninitialized.  Therefore: Reference Error
+```
+it finds the binding, but the binding is still uninitialized.
+
+
+This is where scope + TDZ become important.
+```js
+let x = 100;
+
+{
+    console.log(x);  // Reference Error
+
+    let x = 200; //    
+
+    console.log(x);
+}
+```
+You might think:   There is an outer x = 100, so the first console.log(x) should print 100. but  ❌ It doesn't.
+Because the block creates another x:
+```js
+{
+    let x = 200;
+}
+```
+That x belongs to the block.
+
+The local x shadows the outer x.
+Therefore JavaScript does not say:  "Local x isn't initialized, so let's use outer x."
+
+```js
+let x = 10;
+
+function test() {
+    console.log(x);
+
+    let x = 20;
+}
+
+test();
+//Reference Error
+// Because test() creates a new lexical environment.
+Conceptually:
+let x = 10;
+
+function test() {
+
+    let x; // uninitialized
+
+    console.log(x); // ❌ TDZ
+
+    x = 20;
+}
+
+test();
+
+The local x shadows the global x.
+
+Therefore the outer x is not used.
+```
+Yes, let and const declarations are hoisted in the sense that their lexical bindings are created when the scope is initialized. However, unlike var, they are not initialized with undefined. They remain uninitialized until execution reaches their declaration. The period between entering the scope and reaching the declaration is called the Temporal Dead Zone. Accessing the variable during this period results in a ReferenceError.
+```js
+console.log(x);  //ReferenceError
+// The binding exists, but:  x → uninitialized
+// Therefore: ReferenceError
+let x = 10;
+// After:  let x = 10; the binding becomes initialized.
+
+
+console.log(typeof somethingThatDoesNotExist);//  returns:  "undefined"
+
+// BUT
+console.log(typeof x);  //ReferenceError   Because x is in the TDZ.    So don't memorize:
+let x = 10;
+
+
+console.log(typeof abc); // "undefined"
+
+console.log(typeof xyz); // ReferenceError
+
+let xyz = 10;
+```
+
+**const Does NOT Make Objects Immutable**
+```js
+const user = {
+    name: "Priti"
+};
+user.name = "Vipin";// This is allowed.  
+// because const prevents reassignment of the binding, not mutation of the object.
+
+// YOU CON"T DO
+const user = {
+    name: "Priti"
+};
+user = {};// YOU CON"T DO
+
+// BUT YOU CAN DO 
+user.name = "Vipin";//user cannot point to another object, but the existing object can be mutated.
+```
+
+
+**TDZ + Closures**
+```js
+function outer() {
+    let count = 0;   //There is only one count:  No Shadowing
+    return function inner() {
+        count++;
+        console.log(count);
+    };
+}
+const increment = outer();
+increment();
+increment();
+
+
+// INSTEAD OF  
+let count = 100;
+function outer() {
+    let count = 0;   // local count shadows the global count  (a variable declared in an inner scope has the same name as a variable in an outer scope. The inner variable takes precedence within that scope and hides the outer variable.)
+    function inner() {
+        console.log(count);//0
+    }
+    inner();
+}
+outer();
+```
+
+# What is variable shadowing?
+Variable shadowing occurs when a variable declared in an inner scope has the same name as a variable in an outer scope. The inner variable takes precedence within that scope and hides the outer variable.
+
+```js
+let x = 10;
+
+function test() {
+    let x = 20; // LOCAL x 
+    console.log(x); // 20
+}
+test();
+```
+
+# Function Declaration vs Function Expression Hoisting
+Function declarations are fully hoisted — both their name and function body are available before the declaration. Function expressions are not fully hoisted; the variable follows the hoisting rules of var, let, or const.
+
+# Function Declaration vs Function Expression**
+**Function Declaration**
+```js
+// This is a function declaration.
+function greet() {
+    console.log("Hello");
+}
+```
+**Function Expression**
+```js
+// The function is being created as part of an expression and assigned to a variable.
+const greet = function () {
+    console.log("Hello");
+};
+
+// const greet
+//       ↓
+// stores
+//       ↓
+// function
+```
+
+**Arrow Function**
+This is also a function expression.
+The arrow function itself doesn't get special function-declaration hoisting.
+Its availability depends on the variable:
+                                                      const → TDZ
+                                                      let   → TDZ
+                                                      var   → undefined
+```js
+const greet = () => {
+    console.log("Hello");
+};
+```
+
+# Function Declaration Hoisting
+```js
+// Because the function declaration is fully available when the execution context is initialized.
+foo();
+function foo() {
+    console.log("Hello");//hello
+}
+
+// Conceptual setup  in JS EXECUTION PHASE 
+
+foo = function foo() {
+    console.log("Hello");
+};
+
+// Actual execution
+
+foo();
+```
+
+# Function Expression + var
+```js
+foo();
+
+var foo = function () {
+    console.log("Hello");
+};
+
+// This does not work.
+// You get:
+// TypeError: foo is not a function 
+// Because only the var declaration is hoisted.
+
+// CONCEPTUALLY    During the creation phase:  foo =undefined NOT foo → function
+var foo;
+foo(); // ❌ foo is undefined
+
+foo = function () {
+    console.log("Hello");
+};
+```
+
+```js
+var foo = "global";
+function test() {
+    console.log(foo);  //[Function: foo]   Because inside test() there is a function declaration named foo.
+    // The local function declaration is fully hoisted.
+
+    function foo() { //function declaration named foo.
+        console.log("function");
+    }
+}
+test();
+```
+
+# What is the difference between function declaration and function expression in terms of hoisting?
+A function declaration is fully hoisted, meaning both its function name and complete function body are available during the creation phase of the execution context. Therefore, we can call a function declaration before it appears in the source code.
+
+A function expression does not behave the same way. If it is assigned to a var, only the variable declaration is hoisted and initialized to undefined; the function assignment happens during execution. Calling it before the assignment results in a TypeError.
+
+If the function expression is assigned to let or const, the variable is in the Temporal Dead Zone until its declaration is executed, so accessing it before that point results in a ReferenceError.
+
+An arrow function expression doesn't receive function-declaration hoisting. Its availability follows the hoisting behavior of the variable holding it.
+
+```js
+console.log(foo);  // The arrow function itself isn't available yet; foo is merely initialized to undefined.
+var foo = () => {
+    console.log("Hello");
+};
+
+
+// LET 
+console.log(foo);//ReferenceError   Because foo is in TDZ.
+let foo = () => {
+    console.log("Hello");
+};
+
+// CONST 
+console.log(foo);//ReferenceError
+const foo = () => {
+    console.log("Hello");
+};
+```
+Hoisting does not mean "the code physically moves to the top." It describes how JavaScript creates and initializes bindings before executing the code.
 
 # Scope & Lexical Scope
-Scope in JavaScript defines where a variable can be accessed or used within a program. It controls the visibility and lifetime of variables across different parts of the code.
+# What is lexical scope in JavaScript?
+Lexical scope means that the scope of a variable or function is determined by where it is written in the source code, rather than where the function is called. When JavaScript looks up a variable, it starts from the function's current lexical environment and moves outward through its lexical scope chain until it finds the variable or reaches the global scope.
 
-Types of Scope->
+Lexical Scope means scope is determined by where the code is written, not where the function is called.
+
+JavaScript decides variable access by looking at the physical/nested structure of the code.
+```js
+let name = "Priti";
+function greet() {
+    console.log(name);
+}
+greet();
+```
+greet() can access name because greet was written inside the scope where name exists. This is called lexical scope
+
+# How Lexical Scope Works Internally
+```js
+let x = 10;
+function outer() {
+    let y = 20;
+    function inner() {
+        let z = 30;
+        console.log(x);
+        console.log(y);
+        console.log(z);
+    }
+    inner();
+}
+// JS search for x 
+// inner scope X 
+//     ↓
+// not found
+//     ↓
+// outer scope  X 
+//     ↓
+// not found
+//     ↓
+// global scope  X
+//     ↓
+// x found    
+// This is the scope chain.
+```
+# Why Is It Called "Lexical"?
+"Lexical" basically means:  Based on where the code is written.
+Look At:
+```js
+let x = 10;
+function test() {//
+    console.log(x);
+}
+```
+When JavaScript sees the function definition:
+it can determine the surrounding lexical environment from the code structure.
+
+It doesn't matter where you eventually call it.
+
+```js
+let x = 10;
+function test() {
+    console.log(x);//10
+}
+function another() {
+    let x = 100;
+    test();//It doesn't matter where you eventually call it.
+}
+another(); 
+// output is 10 NOT 100
+// Because test was written in the global scope, where x = 10 exists.
+// It was not written inside another().
+```
+The function doesn't need to be called immediately.
+Its lexical scope is determined when the function is defined/written.
+
+**Nested Functions**
+```js
+function outer() {
+    let name = "Priti";
+    function inner() {
+        console.log(name);//priti
+    }
+    inner();
+}
+outer();
+
+// Why can inner() access name?
+// Because inner is written inside outer.
+// This is lexical scope.
+```
+Why can inner() access name?
+Because inner is written inside outer.
+
+**"Where Called" vs "Where Written"**
+Never think:  "A function uses the variables from where it is called."
+
+Instead think:  "A function uses variables according to where it was defined."
+
+```js
+let name = "Global";
+function printName() {
+    console.log(name);
+}
+function test() {
+    let name = "Local";
+    printName();
+}
+test();
+```
+printName was written here
+        ↓
+Global Scope
+        ↓
+name = "Global"
+
+Even though: printName() was called inside test()
+
+# Lexical Scope vs Shadowing
+```js
+let x = 10;
+function outer() {
+    let x = 20;
+    function inner() {
+        console.log(x); //20
+    }
+    inner(); 
+}
+outer();
+
+// inner searches its lexical scope:
+// inner
+//  ↓
+// outer
+//  ↓
+// x = 20
+// It finds the nearest x.
+// The global:  x = 10  is shadowed.
+```
+
+# Lexical Scope vs Closure
+Lexical : Where a function can access variables based on where it was written.
+Closure:When a function retains access to variables from its outer lexical environment even after the outer function has finished executing.
+
+
+# "Is scope the same as lexical scope?"
+No. Scope is the accessibility region of a variable. Lexical scope is the rule JavaScript uses to determine that accessibility based on where variables and functions are written in the source code. JavaScript uses lexical scoping.
+
+SCOPE
+↓
+Where can I access the variable?
+
+LEXICAL SCOPE
+↓
+Where the code is written determines
+which variables it can access.
+
+
+# TYPES OF SCOPS:   ↓
 
 ```javascript
 Global Scope
@@ -335,10 +1059,138 @@ outer()
 Module scope
 When working with JavaScript modules (type="module"), variables declared at the top level of a file are private to that file unless they are explicitly exported
 
+# What is the scope chain in JavaScript?
+Scope Chain = the path JavaScript follows when it tries to find a variable.
 
+If JavaScript cannot find a variable in the current scope, it searches the outer/enclosing lexical scope, then continues outward until the global scope. If it still cannot find it, you get a ReferenceError
 
-#  Closures
-A closure is created when an inner function remembers and can access variables from its outer function's lexical scope even after the outer function has finished executing.
+The chain is determined by lexical structure / where the function is defined, not by where the function is called.
+```js
+let a = 10;
+function outer() {
+    let b = 20;
+    function inner() {
+        let c = 30;
+        console.log(c);
+        console.log(b);
+        console.log(a);
+    }
+    inner();
+}
+outer();
+```
+
+**How It Works Internally**
+When JavaScript creates a function, conceptually the function has a connection to the lexical environment where it was created.
+
+Function
+   │
+   ├── function code
+   │
+   └── outer lexical environment
+                │
+                ▼
+          parent scope
+
+**Scope Chain Is NOT Created When the Function Is Called**
+```js
+let x = 10;
+function foo() {
+    console.log(x);
+}
+function bar() {
+    let x = 20;
+    foo();
+}
+bar();
+
+```
+foo() is called inside bar(), so it should use bar's x  No.
+Because foo was defined in the global scope.
+Its lexical relationship is
+foo
+ ↓
+Global
+ ↓
+x = 10
+
+SO:
+WHERE FUNCTION IS WRITTEN
+             ↓
+      determines scope chain
+
+NOT :
+     WHERE FUNCTION IS CALLED
+
+ ```js
+ function test() {
+    console.log(x);  Reference Error
+}
+
+test();
+Find variable
+        ↓
+Current scope
+        ↓
+    Found?
+ ┌───┴────┐
+YES           NO
+ │               │
+Return        ▼
+value   Outer scope
+                 ↓
+            Found?
+          ┌───┴────┐
+      YES               NO
+       │                  │
+     Return            ▼
+                    Continue
+                      ↓
+                    Global
+                      ↓
+                  Not found
+                      ↓
+                ReferenceError
+ ```
+The scope chain is the chain of lexical environments JavaScript follows when resolving a variable. When a variable is not found in the current scope, JavaScript searches the enclosing lexical scope, then continues outward until it reaches the global scope. If the variable is not found anywhere in the chain, JavaScript throws a ReferenceError. The scope chain is determined by the lexical structure of the code, meaning where a function is defined, not where it is called.
+
+# Scope Chain ≠ Call Stack
+```js
+let x = 10;
+
+function foo() {
+    console.log(x);
+}
+
+function bar() {
+    let x = 20;
+    foo();
+}
+
+bar();
+//The call stack during execution looks roughly like:
+// bar()
+//  ↓
+// foo()
+// But foo's lexical scope chain is:
+// foo
+//  ↓
+// global'
+
+// SO:
+// Call Stack
+// → Where the function was called from
+
+// Scope Chain
+// → Where the function was defined
+```
+🚨 Scope chain follows lexical structure, not the call stack. A function searches the scope where it was defined and its enclosing scopes — not the scope from which it was called.
+
+#  What is Closures
+Lexical Scope → Scope Chain → Functions → Closures → Callbacks → setTimeout → Data Privacy
+
+A closure is created when a function retains access to variables from its outer lexical scope even after the outer function has finished executing. The inner function maintains access to the outer lexical environment rather than simply copying the values. Closures are useful for data privacy, maintaining state between function calls, callbacks, event handlers, and asynchronous code.
+
 ```javascript
 function outer() {
   let count = 0;
@@ -352,9 +1204,13 @@ const counter = outer();
 counter(); // 1
 counter(); // 2
 counter(); // 3
+// JavaScript copies count into inner.
 ```
+The JavaScript engine's garbage collector can reclaim objects/environments that are no longer reachable. But because the returned function still has a reference path to the needed lexical environment, that environment remains reachable.
+
 #  why is a closure?
 Closures exist because sometimes a function needs to remember and access data from its outer scope even after the outer function has finished executing.
+
 Closure gives a function “memory”.
 ```javascript
 without clousre;
@@ -382,12 +1238,207 @@ Why is this useful?
 Because counter remembers count.
 ```
 
+# Closure Captures a Reference, Not a Snapshot
+
+OUTPUT :
+1
+2
+3
+
+Why isn't it:
+1
+1
+1
+
+Because the closure doesn't capture: count = 0  as a frozen snapshot.  It retains access to the same variable binding.
+
+
+***What's happening?**
+
+createCounter() runs once.
+```js
+function createCounter() {
+    let count = 0;
+
+    return function () {
+        count++;
+        return count;
+    };
+}
+
+const counter = createCounter();
+
+console.log(counter());
+console.log(counter());
+console.log(counter());
+```
+createCounter() runs once.
+It creates:  count = 0
+THEN:  returns a function
+NOW : counter() access the same count 
+
 
 # Why does Closure preserve variables?
 Because the inner function still has a reference to the lexical environment where those variables were created.
 
+# Does closure capture a snapshot? 
+No. It retains access to the variable/binding, so changes to that variable can be observed by the closure
+```js
+// Closure Captures Variables, Not Values  (variable/binding  ,, X  not  10  closure does not copies 10 ,,  closure  copies  x)
+function outer() {
+    let x = 10;
+    return function () {
+        console.log(x);//10
+    };
+}
+const fn = outer();
+fn();
+```
+ NOW :
+ ```js
+ function outer() {
+    let x = 10;
+    return {
+        get: function () {
+            return x;
+        },
+        set: function (value) {
+            x = value;
+        }
+    };
+}
+const obj = outer();
+console.log(obj.get());//10
+obj.set(50);
+console.log(obj.get()); //50
 
-- How does JavaScript execute code?
+// Both functions close over the same x binding.
+// Closure value ki frozen copy nahi rakhta; closure variable/binding (X) tak access retain karta hai.
+// Binding = variable name ka kisi stored value/environment ke saath connection.
+// let x= 10 
+// x ─────────► 10
+// ↑
+// binding
+// THEN:
+// x = 50;
+// same binding ke through value change  (X  is Same only Value changed)
+// x ─────────► 50
+```
+
+🚨 A closure doesn't remember "what the value was"; it remembers how to access the variable from its surrounding lexical environment.
+
+
+# What is IIFI 
+IIFE = Immediately Invoked Function Expression
+An IIFE is a function expression that is created and executed immediately.
+IIFE creates a private function scope an immedetly runs it
+
+An IIFE, or Immediately Invoked Function Expression, is a function expression that is executed immediately after it is created. It creates its own function scope, which allows variables declared inside it to remain private and prevents them from polluting the global scope. Before ES6 modules and block-scoped let and const became widely used, IIFEs were commonly used to implement private state and module-like patterns. IIFEs can also create closures when inner functions retain access to variables from the IIFE.
+```js
+(function () {
+    console.log("Hello");
+})();
+
+// The first part creates a function expression.
+// () The second part immediately calls it
+```
+Before ES6 introduced let, const, and ES modules, IIFEs were commonly used to prevent variables from polluting the global scope and to create private state.
+
+**IIFE Creates Private Scope**
+```js
+(function () {
+    let secret = "password123";
+
+    console.log(secret);
+})();
+
+//this works: password123
+//but outside 
+(function () {
+    let secret = "password123";
+})();
+  console.log(secret);// Reference error
+
+
+  // secret belongs to the IIFE's scope.
+  // The global scope cannot directly access it
+```
+Private Variable
+```js
+const counter = (function () {
+    let count = 0;
+    return {
+        increment: function () {
+            count++;
+        },
+
+        getCount: function () {
+            return count;
+        }
+    };
+})();
+console.log(counter.getCount());//0
+counter.increment();//
+counter.increment();
+console.log(counter.getCount());//2
+```
+What's happening?
+
+The IIFE runs immediately:
+```js
+(function () {
+    let count = 0;
+    return {
+        increment() {
+            count++;
+        },
+        getCount() {
+            return count;
+        }
+    };
+})();
+//It returns an object.
+
+// That object is stored in:  const counter
+// But const itself not returned
+// SO :
+// counter
+// │
+// ├── increment()
+// │
+// └── getCount()
+
+// Private:
+// count = 0
+// Both methods close over the count 
+// This gives us:
+
+// IIFE + Closure + Private State
+
+```
+# IIFI with Argument
+```js
+(function (name) {
+    console.log("Hello " + name);
+})("Priti");
+```
+# IIFE Can Return a Value
+```js
+const result = (function () {
+    const a = 10;
+    const b = 20;
+
+    return a + b;
+})();
+
+console.log(result);
+```
+# Why the Parentheses?
+he parentheses essentially tell JavaScript:
+"Treat this function as an expression."
+
+
+# How does JavaScript execute code?
 When JavaScript code runs, the JavaScript engine creates an execution context. During the creation phase, it sets up variables, functions, and the lexical environment. During the execution phase, the code is executed. Function calls are managed through the call stack. For asynchronous operations, the event loop coordinates callbacks and queues with the call stack..
 ```javascript 
              JavaScript Code
@@ -718,8 +1769,7 @@ console.log(Array.prototype.__proto__ === Object.prototype); // true
 console.log(Object.prototype.proto);//null undefined
 // Because the prototype chain ends there
 ```
-![JavaScript Prototype Chain](././images/prototype.png)
-![JavaScript Prototype Chain](././images/prototypechain.png)
+
 # Why Prototype? 
  ```javascript 
 let arr1=[]
@@ -968,6 +2018,374 @@ const user = User("Priti");//TypeError: Class constructor User cannot be invoked
 // Class constructor ko new ke saath hi call karna padta hai.
 ```
 
+# What is default binding of this in JavaScript?
+Default binding is the rule applied when a regular function is invoked as a standalone function, without an explicit receiver or explicit this binding. In non-strict mode, this is bound to the global object, such as window in a browser. In strict mode, this is undefined.
+# JavaScript this — Default Binding
+Default binding applies when a regular function is called as a standalone function.
+
+In non-strict mode → this is the global object (window in browsers).
+In strict mode → this is undefined.
+
+1. First: What is this?
+this is a special value provided when a function executes.
+
+Unlike a normal variable:
+
+let name = "Priti";
+
+you don't determine this simply by looking at where it was declared.
+
+You primarily determine it by looking at how the function was called.
+
+For a normal function call:
+foo();
+JavaScript asks:
+
+"Is this function being called as a method? With new? With call/apply? Or just by itself?"
+
+If it's simply:
+
+foo();
+
+then default binding applies.
+
+2. Simple Default Binding
+```js
+function greet() {
+    console.log(this); //global window in browser 
+}
+
+greet();
+
+// IN STRICT MOOD 
+"use strict";
+
+function greet() {
+    console.log(this);//undefined
+}
+
+greet();
+```
+For a standalone regular-function call, default binding gives the global object in non-strict mode and undefined in strict mode.
+
+# this Inside a Method
+```js
+const user = {
+    name: "Priti",
+    greet: function () {
+        console.log(this.name);
+    }
+};
+user.greet();
+```
+Is this default binding? NO 
+Because this is not  : greet() 
+it is : user.greet();
+This function is being called as a method  So the relevant this is  user.greet()
+user.greet()
+     ↓
+this = user
+
+THEREFORE:  this.name means user.name and gives priti
+
+```js
+const user = {
+    name: "Priti",
+
+    greet: function () {
+        console.log(this.name);
+    }
+};
+
+const greet = user.greet; // Priti  // does not preserve the user receiver.  It simply stores the function in another variable.
+greet()  // undefine
+
+// Now it's a standalone call.
+
+greet()
+ ↓
+default binding
+
+So in non-strict mode:
+
+this → global object
+
+and in strict mode:
+
+this → undefined
+```
+
+3. Passing a Method as a Callback**
+```js
+const user = {
+    name: "Priti",
+
+    greet: function () {
+        console.log(this.name);
+    }
+};
+
+setTimeout(user.greet, 1000); //The callback is eventually invoked without the user receiver.
+// So the original:  user.greet();  relationship has been lost.
+// This is why methods often "lose this" when passed as callbacks.
+```
+
+
+# How bind() Fixes It
+bind() doesn't immediately execute the function.
+
+It returns a new function with this bound.
+```js
+const user = {
+    name: "Priti",
+    greet: function () {
+        console.log(this.name);
+    }
+};
+setTimeout(user.greet.bind(user), 1000);
+//Priti
+
+
+bind(user)
+    ↓
+creates new function
+    ↓
+this permanently bound to user
+    ↓
+callback executes
+    ↓
+this = user
+```
+call() invokes the function immediately.
+```js
+function greet() {
+    console.log(this.name);
+}
+
+const user = {
+    name: "Priti"
+};
+// Explicit binding
+greet.call(user);
+```
+apply() also invokes immediately, but arguments are supplied as an array-like value.
+```js
+function greet(message) {
+    console.log(message, this.name);
+}
+
+const user = {
+    name: "Priti"
+};
+// Explicit binding
+greet.apply(user, ["Hello"]);
+```
+Arrow functions are special.
+
+They do not have their own this binding.
+Arrow functions take this lexically from their surrounding scope.
+```js
+const user = {
+    name: "Priti",
+    greet: () => {
+        console.log(this.name);//name  is found through lexical scope.
+    }
+};
+
+// user.greet();
+
+// Arrow function
+//  ↓
+// doesn't create its own this
+//  ↓
+// inherits lexical this
+```
+
+#  Call() Apply(), Bind ()
+call, apply, and bind are used to explicitly set this for a function. call invokes the function immediately with arguments passed individually, apply invokes it immediately with arguments passed as an array, and bind returns a new function with this bound, which can be called later
+
+call() immediately invokes the function and allows us to specify this.
+```javascript
+function greet(city) {
+  console.log(`Hello ${this.name} from ${city}`);
+}
+const user = {
+  name: "Priti"
+};
+greet.call(user, "Indore"); // Hello fro m  indore
+
+greet.call(user, "Indore")
+       ↓
+   this = user
+       ↓
+   execute now
+```
+apply()
+
+apply() works almost exactly like call(), but arguments are passed as an array/array-like object
+```javascript
+function greet(city, country) {
+  console.log(this.name, city, country);
+}
+const user = {
+  name: "Priti"
+};
+greet.apply(user, ["Indore", "India"]);
+```
+
+bind()
+bind() does not execute the function immediately.It returns a new function with this permanently bound to the provided object.
+```javascript
+function greet() {
+  console.log(`Hello ${this.name}`);
+}
+const user = {
+  name: "Priti"
+};
+const newGreet = greet.bind(user);
+newGreet();//Hello Priti
+```
+
+# What is implicit binding in JavaScript, and what happens when you detach a method from its object?
+Implicit binding occurs when a regular function is called as a method using dot notation, such as obj.method(). In that case, the object before the dot becomes the function's this value. However, if the method is detached and stored in another variable, such as const fn = obj.method, calling fn() becomes a standalone function call, so the original object is no longer the implicit receiver. Default binding rules then apply.
+
+Implicit Binding is the rule used when a regular function is called as an object method.
+
+The core rule is:
+
+When you call obj.method(), this inside method refers to the object immediately before the dot.
+```js
+const user = {
+    name: "Priti",
+    greet() {
+        console.log(this.name);
+    }
+};
+user.greet(); // Priti
+const fn = user.greet;
+fn(); // this is no longer user
+```
+What object is immediately before the dot?
+
+That object becomes this.
+```js
+const user = {
+    name: "Priti",
+    greet() {
+        console.log(this.name);
+    }
+};
+const admin = {
+    name: "Admin"
+};
+admin.greet = user.greet;
+user.greet();
+admin.greet();
+```
+# JavaScript Explicit Binding — call(), apply(), bind()
+Explicit binding means we explicitly tell a regular function what this should be.
+
+```js
+const user = {
+    name: "Priti"
+};
+
+function greet() {
+    console.log(this.name);
+}
+
+greet();//default binding
+```
+If greet() is a standalone call, default binding applies.
+
+But what if we want:
+
+this → user
+
+without writing:
+```js
+user.greet= greet;
+user.greet()  //implicit binding
+```
+We can explicitly provide this:
+```js
+greet.call(user)  //That's explicit binding.
+```
+All three methods can explicitly control the this value of a regular function. call() invokes the function immediately and accepts arguments individually. apply() also invokes the function immediately, but accepts arguments as an array or array-like object. bind() does not invoke the function immediately; it returns a new function with this bound to the provided object, and it can also pre-fill arguments.
+
+# What happens internally when you use new with a constructor function?
+When a constructor function is called with new, JavaScript creates a new object, makes that object the function's this, runs the constructor body, and normally returns that object.
+
+When a constructor function is called with new, JavaScript creates a new object, links that object's internal [[Prototype]] to the constructor's prototype, binds this inside the constructor to the newly created object, and executes the constructor body. Normally the newly created object is returned. However, if the constructor explicitly returns an object, that returned object is used instead. Returning a primitive does not replace the newly created object.
+
+```js
+function User(name) {
+    this.name = name;
+}
+const user = new User("Priti");
+console.log(user.name);
+
+// function User(name) {
+//     this.name = name;
+
+//     this.greet = function () {
+//         console.log(this.name);
+//     };
+// }
+```
+
+1. What exactly happens when we write new User()?
+```js
+const user = new User("Priti");
+
+new User("Priti")
+       │
+       ▼
+1. Create a new empty object  like this   {}
+       │
+       ▼
+2. Link object to User.prototype   
+       │
+       ▼
+3. Set this = new object
+       │
+       ▼
+4. Execute User("Priti")
+       │
+       ▼
+5. Return the new object
+```
+Normally new returns the newly created object.
+
+But there's an important exception:
+
+If the constructor explicitly returns an object, that object becomes the result of the new expression.
+```js
+function User(name) {
+  this.name = name;
+
+  return {
+    name: "Returned Object",
+  };
+}
+
+const user = new User("Priti");
+
+console.log(user.name); //Returned Object
+```
+
+# What If Constructor Returns a Primitive?
+```js
+function User(name) {
+    this.name = name;
+    return 100;// A primitive return does not replace the newly created object.
+}
+
+const user = new User("Priti");
+
+console.log(user.name);//priti  
+```
+
 #  What is Object.create()?
 Object.create(proto) creates a new object whose internal [[Prototype]] points to the object passed as proto.
 
@@ -982,6 +2400,32 @@ user.name = "Priti";
 console.log(user.name); // Priti
 user.greet(); // Hello!
 ```
+
+
+# What is the difference between this in a regular function and an arrow function?
+
+A regular function has its own this, and its value is determined by how the function is invoked. For example, when called as obj.method(), this refers to obj. An arrow function does not have its own this; instead, it lexically inherits this from its surrounding scope where the arrow was created. Therefore, call(), apply(), and bind() cannot change an arrow function's this, and arrow functions cannot be used as constructors with new.
+
+# What is the precedence of this binding rules in JavaScript?
+For regular functions, the common interview priority is new binding first, then explicit binding through call, apply, or bind, then implicit binding through obj.method(), and finally default binding through a standalone function call. Arrow functions are different because they don't have their own this; they lexically inherit it from their surrounding scope, so the normal binding rules don't override it.
+
+Then add:
+
+bind() is special because it creates a bound function. Once a regular function's this is bound, subsequent call() or apply() calls on that bound function don't replace its bound this. However, when a constructable bound function is called with new, construction uses the newly created instance as this.
+```js
+new Foo()
+→ new binding
+
+foo.call(obj)
+→ explicit binding
+
+obj.foo()
+→ implicit binding
+
+foo()
+→ default binding
+```
+
 
 #  Object.create() vs {}
 ```javascript
@@ -1292,50 +2736,7 @@ delete proxyUser.role;
 console.log("role" in proxyUser);
 
 ```
-#  Call() Apply(), Bind ()
-call, apply, and bind are used to explicitly set this for a function. call invokes the function immediately with arguments passed individually, apply invokes it immediately with arguments passed as an array, and bind returns a new function with this bound, which can be called later
 
-call() immediately invokes the function and allows us to specify this.
-```javascript
-function greet(city) {
-  console.log(`Hello ${this.name} from ${city}`);
-}
-const user = {
-  name: "Priti"
-};
-greet.call(user, "Indore"); // Hello fro m  indore
-
-greet.call(user, "Indore")
-       ↓
-   this = user
-       ↓
-   execute now
-```
-apply()
-
-apply() works almost exactly like call(), but arguments are passed as an array/array-like object
-```javascript
-function greet(city, country) {
-  console.log(this.name, city, country);
-}
-const user = {
-  name: "Priti"
-};
-greet.apply(user, ["Indore", "India"]);
-```
-
-bind()
-bind() does not execute the function immediately.It returns a new function with this permanently bound to the provided object.
-```javascript
-function greet() {
-  console.log(`Hello ${this.name}`);
-}
-const user = {
-  name: "Priti"
-};
-const newGreet = greet.bind(user);
-newGreet();//Hello Priti
-```
 # == vs ===
 == performs loose equality comparison and can convert types before comparing. === performs strict equality comparison, so both the type and value must match. In modern JavaScript, === is generally preferred because it avoids unexpected type coercion.
 
