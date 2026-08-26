@@ -1065,6 +1065,8 @@ Scope Chain = the path JavaScript follows when it tries to find a variable.
 If JavaScript cannot find a variable in the current scope, it searches the outer/enclosing lexical scope, then continues outward until the global scope. If it still cannot find it, you get a ReferenceError
 
 The chain is determined by lexical structure / where the function is defined, not by where the function is called.
+
+The scope chain is the chain of lexical environments JavaScript follows when resolving a variable. When a variable is not found in the current scope, JavaScript searches the enclosing lexical scope, then continues outward until it reaches the global scope. If the variable is not found anywhere in the chain, JavaScript throws a ReferenceError. The scope chain is determined by the lexical structure of the code, meaning where a function is defined, not where it is called.
 ```js
 let a = 10;
 function outer() {
@@ -1438,6 +1440,10 @@ he parentheses essentially tell JavaScript:
 "Treat this function as an expression."
 
 
+
+
+
+
 # How does JavaScript execute code?
 When JavaScript code runs, the JavaScript engine creates an execution context. During the creation phase, it sets up variables, functions, and the lexical environment. During the execution phase, the code is executed. Function calls are managed through the call stack. For asynchronous operations, the event loop coordinates callbacks and queues with the call stack..
 ```javascript 
@@ -1463,6 +1469,10 @@ When JavaScript code runs, the JavaScript engine creates an execution context. D
                     ↓
                Final Output
 ```
+
+
+
+
 #  Execution Context
 JavaScript creates an Execution Context to execute code.
 There are mainly:
@@ -1622,47 +1632,75 @@ Function Execution Context
 ```
 
 # Objects, Prototypes & this
-- this keyword-
 
-this is a special JavaScript keyword whose value is determined by the function's invocation context. In regular functions, it depends on how the function is called. In object methods, it usually refers to the object calling the method. Arrow functions don't have their own this; they inherit it from their lexical surrounding scope.
+# What is [[Prototype]]? 
+Every ordinary JavaScript object internally has a special internal slot called:[[Prototype]] It contains either another object or null
 
-```javascript
-"use strict"
-function showMe(){
-    console.log(this)//undefined
-}
-showMe();
+[[Prototype]] is an internal slot present on JavaScript objects that points to another object or null. It forms the prototype chain. When a property or method isn't found directly on an object, JavaScript follows its [[Prototype]] and continues searching up the chain until it finds the property or reaches null. Object.getPrototypeOf() can be used to inspect this relationship.
 
-// this==window;
+object
+   |
+   | [[Prototype]]
+   ↓
+another object
+   |
+   | [[Prototype]]
+   ↓
+another object
+   |
+   ↓
+null
 
+This is the foundation of prototype chain
+
+you can not do 👇 
+obj.[[Prototype]]
+
+Instead, JavaScript provides ways to access/manipulate it, such as:
+```js
+Object.getPrototypeOf(obj)
+// and historically:
+obj.__proto__
+
+const obj = {};
+
+console.log(Object.getPrototypeOf(obj));
+// gives:👇
+
+Object.prototype
 ```
-```javascript
-let person={
-    name:"vipin",
-    age:25,
-    greet(){
-        console.log(this.name)//vipin 
-    }
-}
-//Current this Who called?
-person.greet()/
-//  therefor this person 
 
-// nested function 
+```js
 
-let user = {
-    name:"priti",
-    show(){
-        function inner(){
-            console.log(this)//this inside inner() is NOT user  --global object
-        }
-        inner()//is a normal function call. noboody owns it  Therefore  this  Global (non-strict) or undefined (strict/)
-     }
-}
-user.show()
-//
+person
+┌────────────┐
+│ name: "Priti"   
+│                 │
+│ [[Prototype]] ───────┐
+└────────────┘      
+                                   ↓
+                  Object.prototype
+                  ┌──────────┐
+                  │ toString: fn     
+                  │ hasOwnProperty   
+                  │ valueOf          
+                  │ ...              
+                  │                  
+                  │ [[Prototype]] ─────→ null
+                  └──────────┘
+```
+
+```js
+console.log(Person.prototype);
+console.log(Object.getPrototypeOf(person));
+
+// They refer to the same object:
+Person.prototype === Object.getPrototypeOf(person)//true
 ```
  
+ # Why does [[Prototype]] exist?
+ The main purpose is property and method inheritance.
+
  before learning prototype
 what is the output 
 ```javascript
@@ -1770,7 +1808,7 @@ console.log(Object.prototype.proto);//null undefined
 // Because the prototype chain ends there
 ```
 
-# Why Prototype? 
+
  ```javascript 
 let arr1=[]
 let arr2=[]
@@ -1860,6 +1898,7 @@ p
 // step 3 
 // Person.call(Object,"vipin")
 ```
+
 # 🧬 Prototype Chain
 "p" object  does not  contain  directly sayHello inside it .
 When new Person() creates p, the new object's internal [[Prototype]] is set to Person.prototype. The sayHello method is stored on Person.prototype, not on every instance. When we call p.sayHello(), JavaScript first searches p, doesn't find the method, and then searches its prototype Person.prototype, where it finds and executes sayHello.
@@ -1869,11 +1908,130 @@ Person is itself a function object.
 All functions inherit from  Function.prototype
 
 
+```js
+const parent = {
+    greet() {
+        console.log("Hello from parent");
+    }
+};
+
+const child = {};
+
+Object.setPrototypeOf(child, parent);
+
+child.greet();
+
+console.log(Object.getPrototypeOf(child) === parent);  //true   returns the object stored in: child.[[Prototype]]
+
+// Hello from parent
+
+child
+  |
+  | [[Prototype]]
+  ↓
+parent
+
+// When JavaScript sees:
+child.greet()
+
+// it checks:
+
+child.greet
+
+// Not found.
+
+// Then:
+
+child.[[Prototype]]
+
+// which is:  parent
+
+// Then:
+
+parent.greet
+// Found!  Returns  Hello from parent
+```
+
+```js
+const animal = {
+    eats: true
+};
+
+const dog = Object.create(animal);
+
+dog.barks = true;
+
+console.log(dog.barks);
+console.log(dog.eats);
+
+dog
+│
+├── barks: true       ← own property
+│
+└── [[Prototype]]
+        ↓
+      animal
+        │
+        ├── eats: true       ← inherited property
+        │
+        └── [[Prototype]]
+                ↓
+          Object.prototype
+                │
+                ↓
+               null
+
+
+dog
+ ↓
+Does dog have eats?
+NO
+ ↓
+animal
+ ↓
+Does animal have eats?
+YES ✅
+
+
+// STOP AT FIRST MATCH:
+const  animal={
+    sound: "Animal sound"
+};
+
+const dog = Object.create(animal);
+
+dog.sound = "Bark";
+console.log(dog.sound);//Bark   
+```
+# What happens internally when you access obj.property?
+When JavaScript evaluates obj.property, it first checks whether the property exists as an own property of obj. If it exists, JavaScript returns that value immediately. If it doesn't, JavaScript follows the object's internal [[Prototype]] link and checks the prototype. It continues traversing the prototype chain until it finds the property or reaches null. If the property is not found anywhere in the chain, the result is undefined.
+```js
+const grandParent = {
+    country: "India"
+};
+
+const parent = Object.create(grandParent);
+
+const child = Object.create(parent);
+
+console.log(child.country);
+
+```
+
 #  Difference between __proto__ and prototype?
+Every JavaScript object can have an internal link to another object called its prototype.
+
 prototype belongs to functions. __proto__ belongs to objects.
 
 prototype is a property of constructor functions that is used as the prototype object for instances created with new.
-`
+
+__proto__ represents the prototype relationship of an object. It allows us to access the object's internal [[Prototype]]. On the other hand, .prototype is a property that constructor functions have. When we create an object using new Constructor(), the new object's [[Prototype]] is set to Constructor.prototype.
+
+For example, if const user = new User(), then Object.getPrototypeOf(user) === User.prototype.
+
+The prototype chain is then used for property lookup: if a property isn't found directly on the object, JavaScript searches its prototype, then that prototype's prototype, and so on until it reaches null.
+
+
 ```javascript
 function Person(name) {
   this.name = name;
@@ -1915,6 +2073,58 @@ Object.getPrototypeOf(p1) === Person.prototype;
 // true
 // To set a prototype:
 Object.setPrototypeOf(obj, prototype);
+```
+
+__proto__ is the prototype link of an object. .prototype is a property on constructor functions, and that object becomes the prototype of instances created with new.
+```js
+Object instance
+    │
+    └── __proto__ ──→ prototype object
+
+Constructor function
+    │
+    └── .prototype ──→ prototype object
+
+
+    // RELATION:
+  Person.prototype
+       ↑
+       │ becomes
+       │
+person.__proto__
+
+```
+#  Explain constructor functions and prototypes."
+A constructor function is a regular function intended to be called with new. new creates a new object, sets its internal [[Prototype]] to the constructor's .prototype, calls the constructor with this referring to that object, and returns the object. Properties assigned through this become own properties, while methods placed on Constructor.prototype are shared by all instances through the prototype chain
+
+```js
+function Person(name) {
+    this.name = name;
+}
+
+Person.prototype.sayHello = function () {
+    console.log(`Hello ${this.name}`);
+};
+
+function Developer(name, language) {
+    Person.call(this, name);
+    this.language = language;
+}
+
+Developer.prototype = Object.create(Person.prototype);
+
+Developer.prototype.constructor = Developer;
+
+Developer.prototype.code = function () {
+    console.log(`${this.name} codes in ${this.language}`);
+};
+
+const dev = new Developer("Priti", "JavaScript");
+
+console.log(dev.constructor === Developer);//true
+
+
+// ````A constructor function is a regular JavaScript function that is called with new. The new keyword creates a new object, connects that object to the constructor's .prototype, binds this to the new object, and returns the object.````
 ```
 
 #  Constructor function vs Class?
@@ -2017,9 +2227,110 @@ class User {
 const user = User("Priti");//TypeError: Class constructor User cannot be invoked without 'new'
 // Class constructor ko new ke saath hi call karna padta hai.
 ```
+# Is an ES6 class really different from constructor functions and prototypes? Explain how classes work internally.
+JavaScript classes are built on top of the existing prototype-based object model. A class declaration defines a constructor and methods, but the methods defined in the class body are placed on the class's prototype rather than copied onto every instance. When we create an object using new, the object's internal [[Prototype]] is linked to ClassName.prototype. Therefore, property lookup can traverse from the instance to the class prototype and then further up the prototype chain.
+
+With extends, JavaScript establishes prototype inheritance so that Child.prototype inherits from Parent.prototype. This allows child instances to access methods defined on the parent prototype.
+
+So classes provide cleaner syntax and additional class semantics, but they still fundamentally use JavaScript's prototype-based inheritance model.
+
+
+Class methods are not own properties :
+```js
+class User {
+    greet() {
+        console.log("Hello");
+    }
+}
+
+const user = new User();
+
+console.log(user.hasOwnProperty("greet"));//false
+console.log(User.prototype.hasOwnProperty("greet")); //true
+
+// Because 
+user
+ └── [[Prototype]]
+          ↓
+     User.prototype
+          └── greet
+
+```
+
+# Why Does .prototype Exist?
+# "Why don't we simply put methods inside the constructor?"
+```js
+function Person(name) {
+    this.name = name;
+
+    this.sayHello = function () {
+        console.log(`Hello ${this.name}`);
+    };
+}
+
+const objP1= Person("Preeti");  // Each object gets its own function: objP1 → sayHello function A
+const objP2= Person("Vipin");  // Each object gets its own function: objP2 → sayHello function B
+const objP3=Person("priti");  //Each object gets its own function: objP2 → sayHello function A
+```
+Instead of : 👇
+```js
+function Person(name) {
+    this.name = name;
+}
+
+Person.prototype.sayHello = function () {
+    console.log(`Hello ${this.name}`);
+};
+
+p1 ───┐
+          │
+p2 ───┼──→ Person.prototype
+           │        │
+p3 ───┘         └── sayHello()
+
+// The method can be shared.
+
+// This is one reason prototype-based inheritance is useful.
+```
+Changing .prototype after creating instances
+```js
+function Person() {}
+
+const p1 = new Person();
+
+Person.prototype.sayHello = function () {
+    console.log("Hello");
+};
+
+p1.sayHello();  //This works.  Because p1 already points to the same prototype object:👇 
+p1
+ ↓
+Person.prototype
+
+// When you add a property to that object:   p1 can see it.
+
+
+
+// But this is different:👇 
+function Person() {}
+const p1 = new Person();
+Person.prototype = {
+    sayHello() {
+        console.log("Hello");
+    }
+};
+const p2 = new Person();
+console.log(p1.sayHello);   // p1.sayHello → undefined
+console.log(p2.sayHello);  // p2.sayHello → function
+
+// Because p1 already has its [[Prototype]] pointing to the old object.
+
+// Changing:  Person.prototype = newObject;     doesn't magically change the prototype of existing instances.
+```
 
 # What is default binding of this in JavaScript?
 Default binding is the rule applied when a regular function is invoked as a standalone function, without an explicit receiver or explicit this binding. In non-strict mode, this is bound to the global object, such as window in a browser. In strict mode, this is undefined.
+
 # JavaScript this — Default Binding
 Default binding applies when a regular function is called as a standalone function.
 
@@ -2313,6 +2624,7 @@ greet.call(user)  //That's explicit binding.
 ```
 All three methods can explicitly control the this value of a regular function. call() invokes the function immediately and accepts arguments individually. apply() also invokes the function immediately, but accepts arguments as an array or array-like object. bind() does not invoke the function immediately; it returns a new function with this bound to the provided object, and it can also pre-fill arguments.
 
+
 # What happens internally when you use new with a constructor function?
 When a constructor function is called with new, JavaScript creates a new object, makes that object the function's this, runs the constructor body, and normally returns that object.
 
@@ -2426,10 +2738,423 @@ foo()
 → default binding
 ```
 
+# Why does this get lost when a class method is passed as a callback, and how do you fix it?
+A class method is not automatically bound to its instance. When the method is called as instance.method(), implicit binding makes this equal to the instance. But when the method is passed as a callback, such as setTimeout(instance.method, 1000), it is later invoked without the original instance as its receiver. Since class bodies run in strict mode, this becomes undefined. We can preserve the instance context by binding the method with bind(this) in the constructor or by using an arrow class field, which lexically captures this.
+
+this in Classes
+Core rule: In a normal class method, this refers to the instance when the method is called through that instance.
+```js
+class User{
+  constructor(name){
+    this.name=name;
+  }
+  greet(){
+    console.log(`Hello ${this.name}`)//priti
+  }
+}
+const user = new User("priti");
+user.greet()//
+```
+user.greet()
+     ↓
+method call
+     ↓
+this = user
+
+BUT :
+```js
+const fn = user.greet;
+fn()
+```
+Now the method is detached from user, so the original this is lost.
+
+1. How this Works Internally in a Class
+When you execute:
+```js
+const user = new User("priti")//new create instance
+
+// new creates an instance
+        User.prototype
+                   │
+                   │
+             ┌──▼────┐
+             │   user    │
+             │              │
+             │ name:    │
+             │ "Priti"     │
+             └───────┘
+```
+The greet() method is associated with the class prototype.
+
+2. Class Methods Are NOT Automatically Bound
+
+Because greet() is inside a class, this is permanently connected to the instance.  NO 
+This works:
+```js
+// This works:
+user.greet()
+
+// because of implicit binding:
+// user.greet()
+//      ↓
+// implicit binding
+//      ↓
+// this = user
+
+
+// BUT 
+const fn = user.greet;
+
+fn();
+// is now a standalone function call.
+
+// The user receiver is gone.
+
+
+// fn()
+//  ↓
+// standalone call
+//  ↓
+// user is no longer receiver
+```
+3. Why Is this undefined?
+Class bodies automatically run in strict mode.
+```js
+"use strict"
+```
+inside a class
+So when a normal class  method is  detached: like this 👇
+```js
+const fn= user.greet;
+fn()
+```
+the standalon call uses strict mood behavior:
+```js
+this=undefined
+
+// Therefore :
+this.name
+
+// is effectivelly trying to do :
+
+undefined.name
+
+// which produces a TypeError
+```
+
+**Callback Problem**
+```js
+class User {
+    constructor(name) {
+        this.name = name;
+    }
+    greet() {
+        console.log("Hello " + this.name);
+    }
+}
+const user = new User("Priti");
+// You're passing the function itself:👇
+setTimeout(user.greet, 1000);
+```
+You're passing the function itself:
+```js
+setTimeout(user.greet, 1000);
+
+Later, the callback is invoked without:👇
+user.greet()
+
+So the original receiver is lost.
+
+Because class methods are strict:
+
+this = undefined  
+// AND 
+this.name   causes a TypeError.
+```
+
+6. Fix #1 — bind(this) in Constructor
+
+```js
+class User {
+    constructor(name) {
+        this.name = name;
+
+        this.greet = this.greet.bind(this);
+    }
+
+    greet() {
+        console.log("Hello " + this.name);
+    }
+}
+
+const user = new User("Priti");
+
+setTimeout(user.greet, 1000);
+```
+
+this.greet = this.greet.bind(this);
+original greet
+      ↓
+bind(instance)
+      ↓
+new bound function
+      ↓
+this always refers to instance
+
+7. Fix #2 — Arrow Class Field
+
+Here greet is an arrow function.
+
+Arrow functions don't create their own this.
+
+They capture the surrounding this lexically.
+```js
+class User {
+    constructor(name) {
+        this.name = name;
+    }
+
+    greet = () => {
+        console.log("Hello " + this.name);
+    };
+}
+
+const user = new User("Priti");
+
+setTimeout(user.greet, 1000);
+```
+
+# What does new actually do?
+it looks like new User() is simply "calling a function."
+
+But internally, JavaScript performs roughly four important steps:
+
+new User("Priti", 25)
+        ↓
+1. Create empty object
+        ↓
+2. Connect object to User.prototype
+        ↓
+3. Call User with this = new object
+        ↓
+4. Return object
+
+2. Step 1 — Create an empty object
+```js
+// suppose 
+function User(name, age) {
+    this.name = name;
+    this.age = age;
+}
+
+const user = new User("Priti", 25);
+
+// Before the constructor runs, JavaScript conceptually creates:   {}
+
+// Let's call it:  newObject
+
+new User()
+
+        ↓
+
+newObject = {}
+
+// At this point: newObject is empty {}
+```
+3. Step 2 — Connect to the prototype
+```js
+newObject.__proto__ = User.prototype;
+
+
+newObject
+   |
+   | [[Prototype]]
+   ↓
+User.prototype
+
+
+// LIKE THIS: 
+User.prototype.sayHello = function () {
+    console.log("Hello");
+};
+
+// NOW :
+const user = new User("Priti", 25);
+user.sayHello();
+
+// JavaScript doesn't find sayHello directly on user.
+// It searches:👇
+user
+ ↓
+User.prototype
+ ↓
+sayHello()
+```
+4. Step 3 — Constructor executes with this
+```js
+User("Priti", 25)
+
+// but with:👇
+this = newObject
+
+// So:
+function User(name, age) {
+    this.name = name;
+    this.age = age;
+}
+
+// BECOMES:
+newObject.name = "Priti";
+newObject.age = 25;
+
+{
+    name: "Priti",
+    age: 25
+}
+```
+
+5. Step 4 — What does new return?
+```js
+function User(name) {
+    this.name = name;
+}
+
+const user = new User("Priti");
+
+// RETURNS THE NEWLY CREATED OBJECT :👇
+{
+    name: "Priti"
+}
+
+
+// But there's an important exception.
+// If the constructor explicitly returns an object, that object can replace the automatically created object
+
+
+new Constructor(args)
+
+        ↓
+
+① Create new object
+
+        ↓
+
+② Link object to
+   Constructor.prototype
+
+        ↓
+
+③ Execute Constructor
+   with this = object
+
+        ↓
+
+④ If constructor returns
+   an object → return it
+
+   otherwise → return
+   the new object
+```
+
+#  What does Object.create() do?"
+Object.create(proto) creates a new object and sets its internal [[Prototype]] to the object passed as proto. It doesn't copy the prototype's properties and it doesn't invoke a constructor. When we access a property that isn't found directly on the object, JavaScript follows this prototype link and continues up the prototype chain. It's therefore a simple way to implement prototype-based inheritance without constructor functions.
+
+Object.create(proto) creates a brand-new object whose internal [[Prototype]] points to proto.
+
+It does not copy the properties of proto.
+
+It creates a prototype relationship.
+
+Object.create creates a child and links the child to the parent through [[Prototype]]
+**Object.create(proto) with copying proto**
+```js
+const parent = {
+    score: 100
+};
+
+const child = Object.create(parent);
+
+child.score = 200;
+
+// doesn't modify:   parent.score
+// because child.score = 200 creates/shadows the child's property.
+console.log(child.score);  // 200
+console.log(parent.score); // 100
+
+
+// But be careful with nested mutable objects.
+const parent = {
+    settings: {
+        theme: "dark"
+    }
+};
+
+const child = Object.create(parent);
+
+child.settings.theme = "light";
+
+console.log(parent.settings.theme);//light
+// Because child.settings was found through the prototype chain and points to the same object:
+// So:
+
+// Object.create() does not deep-copy inherited objects.
+```
+
+# Object.create() Can Also Define Properties
+```js
+// Object.create(proto, propertiesObject)
+const person = {
+    greet() {
+        console.log("Hello");
+    }
+};
+
+const user = Object.create(person, {
+    name: {
+        value: "Priti",
+        writable: true,
+        enumerable: true,
+        configurable: true
+    }
+});
+console.log(user.name);
+user.greet();
+``` 
+
+**Property Shadowing**
+The child's own property shadows the inherited property.
+The parent property hasn't disappeared.
+
+It's simply no longer reached when looking up child.name.
+```js
+const parent = {
+    name: "Parent"
+};
+
+const child = Object.create(parent);
+
+console.log(child.name);
+
+child.name = "Child";
+
+console.log(child.name);
+console.log(parent.name);
+```
+
 
 #  Object.create() vs {}
+Object.create(proto) directly creates an object with its internal [[Prototype]] set to proto, without invoking a constructor. new Constructor() creates a new object whose prototype is Constructor.prototype, invokes the constructor with the new object as this, and returns the resulting object according to the constructor-return rules
+
+Object.create(proto) creates a brand-new object whose internal [[Prototype]] points to proto.
+
+It does not copy the properties of proto.
+
+It creates a prototype relationship.
+
 ```javascript
 const user = {};
+console.log(user.toString); 
+// function
 ```
 Its prototype is:
     user
@@ -2441,6 +3166,8 @@ Its prototype is:
 Object.create()
 ```javascript
 const user = Object.create(null);
+console.log(user.toString);
+// undefined
 ```
 Its prototype is:
 user
@@ -2460,7 +3187,17 @@ dictionary.toString  //undefined
 ```
 
 #  Object.create() vs new?
-Object.create() is a JavaScript method used to create a new object with a specified prototype. It does not execute a constructor; it simply creates the object and sets its internal [[Prototype]] to the supplied object.
+Object.create(proto) directly creates an object with its internal [[Prototype]] set to proto, without invoking a constructor. new Constructor() creates a new object whose prototype is Constructor.prototype, invokes the constructor with the new object as this, and returns the resulting object according to the constructor-return rules
+
+Object.create(proto) creates a brand-new object whose internal [[Prototype]] points to proto.
+
+It does not copy the properties of proto.
+
+It creates a prototype relationship.
+
+
+When the new operator is used with a constructor function, JavaScript creates a new object, sets its internal [[Prototype]] to the constructor's prototype object, invokes the constructor with the newly created object as this, and then returns the new object unless the constructor explicitly returns an object or function.
+
 ```javascript
 function User(name) {
   this.name = name;
@@ -2475,7 +3212,7 @@ const user1 = new User("Priti");
 user1.name // "Priti"
 
 
-// Using Object.create()
+// Using Object.create()    
 const user2 = Object.create(User.prototype);
 // Prototype set hua, but constructor execute nahi hua.
 // Therefore:
@@ -2491,7 +3228,7 @@ const parent = {
     console.log("Hello");
   }
 };
-
+// Object.create() lets you establish the prototype relationship directly:
 const child = Object.create(parent);
 Object.getPrototypeOf(child) === parent
 // true
@@ -2736,6 +3473,322 @@ delete proxyUser.role;
 console.log("role" in proxyUser);
 
 ```
+
+# What does instanceof actually do?
+obj instanceof Constructor checks whether Constructor.prototype is found anywhere in obj's prototype chain.
+```js
+function Person(name) {
+    this.name = name;
+}
+
+const person = new Person("Priti");
+
+console.log(person instanceof Person); // true  it means "Is Animal.prototype somewhere in dog's prototype chain?"
+console.log(person instanceof Object); // true    because Object.prototype is also in the chain.
+```
+
+# How does instanceof work in JavaScript?
+instanceof checks whether the prototype property of a constructor exists anywhere in the prototype chain of an object. For obj instanceof Constructor, JavaScript starts from the object's internal [[Prototype]] and walks upward until it finds Constructor.prototype or reaches null. If it finds it, the result is true; otherwise it's false. It's therefore a prototype-chain check rather than simply a check of which constructor created the object. Its behavior can also be customized using Symbol.hasInstance
+
+
+# hasOwnProperty() vs in
+# Where does this property come from — the object itself, or its prototype chain
+
+hasOwnProperty() checks only own properties, while in checks both own and inherited properties.
+
+hasOwnProperty() checks whether a property exists directly on the object itself, whereas the in operator checks whether the property exists either directly on the object or anywhere in its prototype chain.
+
+For example, if an object inherits name from its prototype, name in obj returns true, but obj.hasOwnProperty("name") returns false.
+
+In modern JavaScript, I prefer Object.hasOwn(obj, "name") because it safely checks own properties without relying on the object's hasOwnProperty method.
+```js
+const parent = {
+    role: "admin"
+};
+
+const user = Object.create(parent);
+
+user.name = "Priti";
+
+user.hasOwnProperty("name"); // true
+user.hasOwnProperty("role"); // false
+
+
+
+"name" in user; // true      in does not checks the value 
+"role" in user; // true
+
+// ************************************************
+hasOwnProperty
+      ↓ comes from 👇
+ONLY object itself
+
+     in
+      ↓
+object itself
+      ↓
+prototype
+      ↓
+prototype's prototype
+      ↓
+...
+      ↓
+    null
+
+// hasOwnProperty() checks only own properties, while in checks both own and inherited properties.
+
+// *****************************************
+Object.hasOwn(obj, "property");   //It was introduced in ES2022.
+
+const user = {
+    name: "Priti"
+};
+
+console.log(Object.hasOwn(user, "name"));
+// true
+
+console.log(Object.hasOwn(user, "toString"));
+// false
+
+
+
+// ***************************************************************
+const obj = {
+    name: "Priti",
+    hasOwnProperty: function () {
+        return false;
+    }
+};
+
+console.log(obj.hasOwnProperty("name"));//false 
+
+// Because obj itself contains:👇
+
+hasOwnProperty: function () {
+    return false;
+}
+
+// So this:👇
+obj.hasOwnProperty("name");
+// doesn't call the original Object.prototype.hasOwnProperty.
+
+// It calls the object's own function:
+
+obj
+│
+├── name
+│
+└── hasOwnProperty()  ← this shadows Object.prototype method
+
+
+// How to safely check it
+
+// Use:
+console.log(Object.hasOwn(obj, "name")); // this works 
+// true
+
+
+// **********************
+const obj = Object.create(null);
+
+obj.name = "Priti";
+
+console.log(obj.hasOwnProperty("name"));//TypeError: obj.hasOwnProperty is not a function
+
+// BECAUSE:  Object.create(null)   ← creates an object with no prototype.   Therefore it doesn't inherit:  hasOwnProperty  from Object.prototype
+
+// Object.create(null)
+//    ↓
+// null
+
+
+// in does not checks the values   Even though: obj.name==undefined   
+const obj={
+  name:undefined,
+}
+const name= "name" in obj;
+console.log(name)// true    because The Property exists
+
+// So don't do this:👇
+if (obj.name !== undefined) {
+    // property exists
+}
+
+
+// ****Constructor Function *********
+function User(name) {
+    this.name = name;
+}
+
+User.prototype.sayHello = function () {
+    console.log(`Hello ${this.name}`);
+};
+
+const user = new User("Priti");
+Object.hasOwn(user, "name");
+// true
+
+Object.hasOwn(user, "sayHello");
+// false
+
+"sayHello" in user;
+// true
+// This explains why prototype methods can be shared by all instances.
+
+// for in loop 
+const parent = {
+    role: "admin"
+};
+
+const child = Object.create(parent);
+
+child.name = "Priti";
+
+for (const key in child) {
+    console.log(key);  // Because for...in can enumerate enumerable inherited properties too.
+}// name role
+
+
+// BUT  Object.keys(child);  returns only own enumerable properties:
+Object.keys(child);  //["name"]
+```
+
+# What is prototype pollution, and why is it dangerous?
+Prototype pollution means changing Object.prototype.
+
+Prototype Pollution is a security vulnerability that happens when an attacker manages to modify an object that sits in the prototype chain, especially Object.prototype.
+
+Prototype pollution is a security vulnerability where attacker-controlled input modifies an object's prototype, commonly Object.prototype, so that inherited properties are unexpectedly added to many objects. Because JavaScript property lookup traverses the prototype chain, those polluted properties can affect unrelated objects and application logic. This can lead to authorization bypasses, configuration manipulation, or other unexpected behavior. We can reduce the risk by validating keys, avoiding unsafe recursive merges, blocking dangerous keys such as __proto__, constructor, and prototype, and using Object.create(null) for dictionary-like data when appropriate.
+
+1. What exactly is Prototype Pollution?
+First remember the prototype chain:
+
+user
+  ↓
+Object.prototype
+  ↓
+null
+
+Suppose:
+```js
+const user = {
+    name: "Priti"
+};
+```
+user
+ │
+ ├── own properties
+ │      name: "Priti"
+ │
+ ↓
+Object.prototype
+ │
+ ├── toString
+ ├── hasOwnProperty
+ └── ...
+ │
+ ↓
+null
+
+Now imagine someone does:
+```js
+Object.prototype.admin = true;
+
+// THEN
+const user = {};
+
+console.log(user.admin);  //true
+
+// But we never actually put admin inside user.
+user.admin
+    ↓
+Does user have "admin"?
+    ↓
+NO
+    ↓
+Check user.__proto__
+    ↓
+Object.prototype
+    ↓
+Does Object.prototype have "admin"?
+    ↓
+YES
+    ↓
+true
+
+// So prototype pollution is essentially poisoning the prototype chain.
+```
+2. Why is it dangerous?
+Imagine an application contains:
+```js
+function isAdmin(user){
+return user.admin==true
+}
+
+const user = {
+    name: "Priti"
+};
+
+console.log(isAdmin(user));//flase
+
+// BUT
+Object.prototype.admin = true;
+console.log(isAdmin(user));//true
+
+// The application may accidentally believe that every user is an admin.
+
+// That's why prototype pollution is a security issue.
+
+console.log(Object.hasOwn(user, "isAdmin"));//false   
+console.log("isAdmin" in user);//true   Because in checks the prototype chain too.
+
+
+
+const obj = {};
+
+obj.__proto__.admin = true;
+
+const user1 = {};
+const user2 = {};
+
+console.log(user1.admin);
+console.log(user2.admin);
+// obj.__proto__   points to:  Object.prototype
+
+
+
+
+const payload = JSON.parse(
+    '{"__proto__": {"isAdmin": true}}'
+);
+
+console.log(payload.isAdmin); //undefined
+
+// Because JSON.parse() creates an own property literally named __proto__. It does not automatically invoke the legacy __proto__ setter just because the JSON contains that key.
+
+```
+
+
+Fix this using :
+1. Never directly modify Object.prototype Avoid 
+Object.prototype.admin = true;
+obj.__proto__.admin = true;
+Because if obj.__proto__ is Object.prototype, you're modifying the shared prototype.
+
+2. Use Object.create(null) for dictionaries instead of const data = {};
+```js
+const data = Object.create(null);
+
+data.name = "Priti";
+data.age = 25;
+
+console.log(data.name);
+```
+
+3. Freeze prototypes when appropriate
+
+I prevent prototype pollution by never modifying Object.prototype, validating or allowlisting keys from untrusted input, blocking dangerous keys such as __proto__, constructor, and prototype, avoiding unsafe recursive merge operations, and using Object.create(null) or Map for dictionary-like data. I also use Object.hasOwn() when I need to distinguish own properties from inherited properties.
+
 
 # == vs ===
 == performs loose equality comparison and can convert types before comparing. === performs strict equality comparison, so both the type and value must match. In modern JavaScript, === is generally preferred because it avoids unexpected type coercion.
