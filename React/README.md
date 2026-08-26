@@ -1,6 +1,7 @@
 # React Interview Question Collection
 1. [What is React](#what-is-react)
 2. [What is JSX](#what-is-jsx)
+  [What is the Virtual DOM, and how does React use it to update the UI?](#what-is-the-virtual-dom-and-how-does-react-use-it-to-update-the-UI)
 3. [What is Declarative/Imperative Syntax](#what-is-declarativeimperative-syntax)
 4. [Components in React](#components-in-react)
 5. [Component vs HTML Element](#component-vs-html-element)
@@ -38,7 +39,8 @@
 37. [Lifecycle methods](#lifecycle-methods)
 38. [What is Virtual DOM](#what-is-virtual-dom)
 39. [How Virtual Dom Works](#how-virtual-dom-works)
-40. [Reconciliation](#reconciliation)
+40. [  [How does React's reconciliation algorithm work, and why does it use keys?]](#reconciliation)
+
 41. [React Fiber](#react-fiber)
 42. [Fiber tree vs DOM tree?](#fiber-tree-vs-dom-tree)
 43. [What is a Fiber Node?](#what-is-a-fiber-node)
@@ -58,21 +60,60 @@
 # What is React?
 React is a JavaScript library developed by Meta for building interactive user interfaces. It uses a component-based and declarative approach, allowing developers to build reusable UI components. React manages UI updates based on changes in state and props and uses an in-memory UI representation to efficiently determine updates to the browser DOM.
 
+# What is a React Fragment, and why would you use it instead of a <div>
 
-# What is JSX
-JSX stands for JavaScript XML. It is a syntax extension for JavaScript that allows you to write HTML-like markup directly inside a JavaScript file
-JSX returns  a React element, which is fundamentally a plain JavaScript object.it converted  into JavaScript using Babel
+A React Fragment allows a component to return multiple elements/Fiver Tree without adding an extra DOM node. It is useful when I need to group elements logically for React but don't want to change the resulting HTML structure. The shorthand syntax is <>...</>, while the full syntax is <React.Fragment>...</React.Fragment>. The full syntax is important when rendering fragments inside a list because it supports the key prop, whereas the shorthand does not.
+
+Internally, React represents the Fragment in its element/Fiber tree, but it doesn't create a corresponding DOM element. Its children are reconciled normally and committed directly into the parent DOM structure.
+
 ```js
-const element = <h1 className="welcome">Hello, world!</h1>;
+function App() {
+  return (
+    <React.Fragment>
+      <h1>Hello</h1>
+      <p>Welcome</p>
+    </React.Fragment>
+  );
+}
+```
+# What is the Virtual DOM, and how does React use it to update the UI?
+The Virtual DOM is a lightweight in-memory representation of the UI, represented primarily by React elements and processed through React's internal Fiber architecture. When state or props change, React renders the component again and produces a new element tree. React then performs reconciliation between the previous and new trees to determine what changed. During the commit phase, React applies the necessary changes to the actual DOM. The benefit is that developers don't have to manually calculate and coordinate DOM mutations; React handles that declaratively.
 
-//it is same like this
-const element = React.createElement(
-  'h1',
-  { className: 'welcome' },
-  'Hello, world!'
-);
+However, the Virtual DOM itself isn't simply "faster than the real DOM." The important benefit is that React can efficiently determine and coordinate UI updates, while its reconciliation and scheduling model manages when and how host mutations are committed.
+
+```js
+function App() {
+    const name = "Priti";
+
+    return (
+        <div>
+            <h1>Hello {name}</h1>
+        </div>
+    );
+}
+//  Conceptually 
+// JavaScript objects
+
+// React elements are represented as JavaScript data.
+{
+    type: "div",
+    props: {
+        children: {
+            type: "h1",
+            props: {
+                children: "Hello Priti"
+            }
+        }
+    }
+}
 
 
+// Immutability
+// React state updates are typically modeled with new values rather than mutating existing state directly.
+setUser({
+    ...user,
+    name: "Priti"
+});
 ```
 
 # What is Declarative/Imperative  Syntax 
@@ -121,17 +162,24 @@ function Counter() {
                         ↓
                         DOM updates
 
+
 # Components in React
 Components are the fundamental building blocks of React applications. A component encapsulates a piece of UI and its related logic, can receive data through props, manage local state, and compose with other components to build larger interfaces. Modern React primarily uses function components with Hooks.
 
+
 ***Component Types**
 **Functional ComponentS**
+# What is a functional component?
+A functional component is a JavaScript function that receives props and returns React elements or JSX describing the UI. With Hooks, function components can manage state, effects, refs, context, and other React features.
+
 ```JS
 function User() {
   return <h1>User</h1>;
 }
 ```
 **Class Component**
+# What is a class component?
+A class component is a JavaScript class extending React.Component. It receives props through this.props, can maintain state through this.state, and historically used lifecycle methods such as componentDidMount and componentDidUpdate.
 ```JS
 class User extends React.Component {
   render() {
@@ -156,6 +204,23 @@ function UserCard() {
   );
 }
 ```
+# Why did React move from class components to functional components?
+Functional components became the preferred approach because they provide a simpler JavaScript model and, with Hooks, can handle state, side effects, context, refs, and reusable stateful logic without class-specific concepts such as this, constructors, and lifecycle methods.
+
+Class components are still supported, but modern React development generally uses function components with Hooks.
+
+#  Does a functional component have an instance?
+Not in the same sense as a class component. A function component is invoked as a function, while React associates its state and Hooks with its Fiber.
+
+
+# Where is Hook state stored?
+React maintains Hook state on the component's Fiber; the function reads the appropriate Hook state when React renders it.
+
+# What are props in React, and why are they read-only?
+Props are read-only inputs passed from a parent component to a child component. They are represented as values on the component's props object and can contain any JavaScript value such as strings, numbers, objects, arrays, functions, or React elements. Props follow one-way data flow, meaning data flows from parent to child. A child should never mutate its props because the parent owns that data, and object or array props may reference the same underlying JavaScript object. If the child needs to change something, it should either request the parent to change it through a callback prop or maintain its own state.
+
+# Are props mutable?
+Props should be treated as read-only by the receiving component. If data needs to change, the owner of that data should update it and pass the new value down.
 
 
 # React Element vs DOM Element
@@ -241,7 +306,23 @@ function App() {
 }
 ```
 
-# Why Do We Use JSX?
+# Why Do We Use JSX ? What is JSX
+JSX is a syntax extension to JavaScript used to describe React UI in an HTML-like way. The browser cannot execute JSX directly, so a compiler such as Babel transforms it into JavaScript. Traditionally, JSX was transformed into React.createElement(type, props, ...children), which creates React Element objects. With the modern React JSX transform, it can instead compile to jsx and jsxs helpers from the JSX runtime, so React doesn't have to be imported just for JSX. React then uses these element objects as input to its rendering, Fiber, and reconciliation process before committing the necessary changes to the real DOM.
+
+
+JSX returns  a React element, which is fundamentally a plain JavaScript object.it converted  into JavaScript using Babel
+```js
+const element = <h1 className="welcome">Hello, world!</h1>;
+
+//it is same like this
+const element = React.createElement(
+  'h1',
+  { className: 'welcome' },
+  'Hello, world!'
+);
+```
+
+
 Without JSX, creating React elements can be more verbose:
 ```js
 import { createElement } from "react";
@@ -464,6 +545,200 @@ No. If the child's props actually change, React.memo will normally allow the chi
 React.memo skips the child when its props are equal
 The props passed to the child are the same as the props from the previous render.
 
+```js
+// primitive vs object props
+import React, { useState } from "react";
+
+const User = React.memo(function User({ user }) {
+    console.log("User rendered");
+
+    return <h2>{user.name}</h2>;
+});
+
+function App() {
+    const [count, setCount] = useState(0);
+
+    const user = {
+        name: "Priti"
+    };
+
+    return (
+        <>
+            <button onClick={() => setCount(count + 1)}>
+                {count}
+            </button>
+
+            <User user={user} />
+        </>
+    );
+}
+
+
+// Every time App renders: with this obj 👇
+
+const user = {
+    name: "Priti"
+};
+
+// creates a new object.
+
+oldUser !== newUser
+
+// Therefore:
+
+Object.is(oldUser, newUser)
+
+// is: false
+
+
+// Fix with useMemo👇
+
+ const user = useMemo(() => {
+        return {
+            name: "Priti"
+        };
+    }, []);
+
+//     Render 1
+
+// user → Object A
+
+// Render 2:
+
+// user → Object A
+
+Object.is(oldUser, newUser);
+// true   Therefore user skiped
+```
+
+```js
+import React, { useState } from "react";
+
+const Child = React.memo(function Child({ onClick }) {
+    console.log("Child rendered");
+
+    return (
+        <button onClick={onClick}>
+            Child Button
+        </button>
+    );
+});
+
+function Parent() {
+    const [count, setCount] = useState(0);
+
+    const handleClick = () => { //this creates a new function on every render
+        console.log("Clicked");
+    };
+
+    return (
+        <>
+            <button onClick={() => setCount(count + 1)}>
+                Count: {count}
+            </button>
+
+            <Child onClick={handleClick} />
+        </>
+    );
+}
+
+// Will Child skip rendering when count changes?  No 
+// Because:👇
+
+const handleClick = () => {};
+// creates a new function every render.
+// Render 1:
+// handleClick → Function A
+
+// Render 2:
+// handleClick → Function B
+
+Object.is(FunctionA, FunctionB);
+// false
+
+// So React.memo says:
+// Props changed
+//    ↓
+// Child renders
+
+
+// Fix with useCallback
+const handleClick = useCallback(() => {
+        console.log("Clicked");
+    }, []);
+
+    // Now React keeps the same function reference:
+
+//     Render 1
+//    ↓
+// handleClick → Function A
+
+// Render 2
+//    ↓
+// handleClick → Function A
+```
+React.memo is a higher-order component used to memoize a functional component. It allows React to skip re-rendering the component when its props haven't changed according to a shallow comparison. React compares the previous and next prop values, effectively using Object.is for each prop. If the props are equal, React can reuse the previous result instead of rendering the component again.
+
+However, React.memo does not prevent all renders. The component can still re-render when its own state changes or when a context value it consumes changes. Also, memoization can be defeated if we pass newly created objects, arrays, or functions as props on every parent render.
+
+Therefore, React.memo is primarily a performance optimization and is most useful for components that render frequently and receive stable props.
+
+# What are default props in React?
+Default props provide fallback values when a component doesn't receive a prop. In modern React function components, I use JavaScript default parameters, for example function Button({ label = 'Click' }). The default is applied when the prop is undefined, including when the prop is omitted, but not when it's null, false, 0, or an empty string. Historically React supported Component.defaultProps, but React 19 removed defaultProps for function components and recommends parameter defaults instead. Class components still support defaultProps.
+
+# What is the difference between defaultProps and default parameters?
+defaultProps was the traditional React mechanism for providing fallback prop values. For function components, React 19 removed support for defaultProps, so the recommended approach is to use JavaScript default parameters or destructuring defaults such as function Button({ label = "Click" }). The default is applied when the prop value is undefined, including when the prop is omitted. It does not apply to values such as null, false, 0, or an empty string.
+```js
+function Button({ label = "Click" }) {
+    return <button>{label}</button>;
+}
+
+<Button />
+            <Button label={undefined} />
+            <Button label={null} />
+            <Button label="" />
+            <Button label={0} />
+            <Button label={false} />
+
+// Multiple Default props
+function Card({
+    title = "Untitled",
+    size = "medium",
+    isFeatured = false
+}) {
+    return (
+        <div className={`card ${size}`}>
+            <h2>{title}</h2>
+
+            {isFeatured && (
+                <span>Featured</span>
+            )}
+        </div>
+    );
+}
+
+
+// defaultProps vs Parameter Defaults
+// defaultProps was the traditional React mechanism for providing fallback prop values. For function components, React 19 removed support for defaultProps, so the recommended approach is to use JavaScript default parameters or destructuring defaults such as function Button({ label = "Click" }). The default is applied when the prop value is undefined, including when the prop is omitted. It does not apply to values such as null, false, 0, or an empty string.
+
+function Button(props) {
+    return <button>{props.label}</button>;
+}
+
+Button.defaultProps = {
+    label: "Click"
+};
+// Morder style
+function Button({ label = "Click" }) {
+    return <button>{label}</button>;
+}
+
+
+// Or DO THIS 
+const result = value || "Default";
+const result = value ?? "Default";
+```
+
 # Controlled vs Uncontrolled Components
 Controlled components keep form data in React state, making React the source of truth. Every input change updates state, and the state is passed back through the value prop.
 
@@ -552,6 +827,166 @@ export default ProfileUpload;
   ref={inputRef}
 />
 ```
+
+# Explain PropTypes.
+PropTypes is a runtime type-checking mechanism for React props provided by the prop-types package. We define validators on Component.propTypes, such as name: PropTypes.string.isRequired. During development, React can validate the component's incoming props against these validators and log warnings when the values don't match. PropTypes doesn't prevent incorrect values at runtime; it's mainly a development-time validation tool. In modern React applications, TypeScript is generally preferred because it provides static type checking before runtime.
+
+# What is the difference between PropTypes and TypeScript?
+PropTypes performs runtime validation of React props, usually in development, whereas TypeScript performs static type checking before the code runs. PropTypes can detect incorrect values at runtime, while TypeScript catches type errors during development/build time. In modern typed React applications, TypeScript is generally preferred because it provides broader static type safety, so PropTypes is often unnecessary.
+```js
+
+Component.propTypes = {
+  name: PropTypes.string,
+  age: PropTypes.number,
+  active: PropTypes.bool,
+  callback: PropTypes.func,
+  user: PropTypes.object,
+  items: PropTypes.array,
+  anything: PropTypes.any,
+  node: PropTypes.node,
+  element: PropTypes.element,
+};
+
+
+import PropTypes from "prop-types";
+
+<UserCard
+  user={{
+    name: "Priti",
+    age: 25,
+  }}
+  skills={["JavaScript", "React", "Node"]}
+  status="success"
+/>
+
+function UserCard({ user, skills, status }) {
+  return (
+    <div>
+      <h2>{user.name}</h2>
+
+      <p>Age: {user.age}</p>
+
+      <p>Skills: {skills.join(", ")}</p>
+
+      <p>Status: {status}</p>
+    </div>
+  );
+}
+
+UserCard.propTypes = {
+  user: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    age: PropTypes.number.isRequired,
+  }).isRequired,
+
+  skills: PropTypes.arrayOf(
+    PropTypes.string
+  ).isRequired,
+
+  status: PropTypes.oneOf([
+    "loading",
+    "success",
+    "error",
+  ]).isRequired,
+};
+
+// shape() doesn't mean:
+// "This object can contain ONLY these properties."
+// It validates the specified properties.
+// If you want stricter checking of extra properties, there's:
+```
+
+
+# What is props.children in React, and is it always an array?
+props.children is the value React puts inside a component when that component is used with an opening and closing tag.
+It is not a special JavaScript keyword. children is simply a property on the props object, with React/JSX determining what value gets assigned to it.
+
+
+props.children is a special prop populated by React with whatever is placed between a component's opening and closing tags. For example, in <Card><h1>Hello</h1></Card>, the <h1> element becomes props.children inside Card. It is not always an array. A single child can be a single React element or another renderable value, while multiple children can represent multiple child values. Therefore, if I need to safely iterate or manipulate children, I can use utilities such as React.Children.map, React.Children.forEach, or React.Children.toArray.
+```js
+function Card(props) {
+  return (
+    <div className="card">
+      {props.children}
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <Card>
+      <h1>Hello Priti</h1>
+      <p>Welcome to React.</p>
+    </Card>
+  );
+}
+// props.children Represent a <h1> Hello </h1> and   <p>Welcome to React.</p>
+
+
+
+function Layout({ children }) {
+  return (
+    <div>
+      <header>
+        <h1>My Website</h1>
+      </header>
+
+      <main>
+        {children}
+      </main>
+
+      <footer>
+        <p>Copyright 2026</p>
+      </footer>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <Layout>
+      <h2>Dashboard</h2>
+      <p>Welcome back!</p>
+    </Layout>
+  );
+}
+
+// React.Children Utilities
+React.Children.map()
+React.Children.forEach()
+React.Children.count()
+React.Children.toArray()
+React.Children.only()
+
+
+function Wrapper({ children }) {
+  return (
+    <div>
+      {React.Children.map(children, child => (
+        <div className="wrapper">
+          {child}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+
+
+function App() {
+  const children = (
+    <>
+      <h1>Hello</h1>
+      <p>World</p>
+    </>
+  );
+
+  console.log(React.Children.count(children));  //count of children
+
+  return null;
+}
+```
+
 
 ## HOOKS 
 Hooks are special React functions that let function components use React features such as state, effects, context, refs, and other React functionality without using class components.
@@ -1958,6 +2393,7 @@ React applies the necessary DOM changes.
 
 
 # Reconciliation
+# How does React's reconciliation algorithm work, and why does it use keys?
 "Reconciliation is React's process of comparing the previous and newly rendered UI representations to determine what has changed and what updates need to be applied."
 When state or props change, React renders the component again and produces a new React element tree. React's reconciliation process compares this new tree with the previous one, determines the necessary changes, and then the commit phase applies those changes to the browser DOM."
 ```JS
@@ -1978,44 +2414,357 @@ When state or props change, React renders the component again and produces a new
                     Real DOM Update
 ```
 ```JS 
-function Counter() {
-  const [count, setCount] = useState(0);
+<div className="old">
+  Hello
+</div>
+// update  to this 👇
+<div className="new">
+  Hello
+</div>
+
+// Both are div 
+// So React conceptually says: It does not need to recreate the <div>
+Old: div
+New: div
+       ↓
+Same type
+       ↓
+Reuse existing DOM/Fiber
+       ↓
+Update className
+
+
+
+
+// Different Type → Replace
+// OLD TREE
+<div>
+  Hello
+</div>
+// Replace to this update 👇 
+<span>
+  Hello
+</span>
+
+// REACT SEES:
+Old type = div
+New type = span
+        ↓
+Different type
+        ↓
+Unmount(delete) old tree
+        ↓
+Create new tree
+
+
+
+// Lists → Keys Identify Identity
+// OLD TREE
+[
+  <li key="a">Apple</li>,
+  <li key="b">Banana</li>
+]
+// New Tree
+[
+  <li key="b">Banana</li>,
+  <li key="a">Apple</li>
+]
+// The order changed.
+// Because React has keys:
+
+// "a" → same logical item
+// "b" → same logical item
+
+// React can preserve their identity while moving them.
+
+
+function App({ loggedIn }) {
   return (
-    <div>
-      <h1>Counter</h1>
-
-      <p>{count}</p>
-
-      <button onClick={() => setCount(count + 1)}>
-        Increment
-      </button>
-    </div>
+    <h1>
+      {loggedIn ? "Welcome" : "Please Login"}
+    </h1>
   );
 }
 
-Initially:
-            div
-            ├── h1 → Counter
-            ├── p  → 0
-            └── button → Increment
-After clicking:
-            div
-            ├── h1 → Counter
-            ├── p  → 1
-            └── button → Increment
-React compares:
-                            Previous Tree          New Tree
+// initial render : loggedIn= false
+// Later: loggedIn =true
+// React gets welcom
 
-                            div                           div
-                            ├── h1 Counter         ├── h1 Counter
-                            ├── p  0                    ├── p  1       ← changed
-                            └── button                └── button
+// OLD                    NEW
 
-React determines that the relevant change is:
-                                                            <p>0</p>
-                                                            ↓
-                                                            <p>1</p>
-It then commits the necessary update to the Real DOM
+// <h1>                   <h1>
+//  Please Login            Welcome
+// </h1>                  </h1>
+
+//        ↓
+
+// Same type: h1
+//        ↓
+// Reuse h1
+//        ↓
+// Update text
+
+// Same element type generally means React can reuse the existing node/Fiber and reconcile its props and children.
+// Old DOM <h1>
+//      ↓
+// Keep it
+//      ↓
+// Change textContent
+
+
+// Different Types
+function App({ showDiv }) {
+  return showDiv ? (
+    <div>
+      Hello
+    </div>
+  ) : (
+    <span>
+      Hello
+    </span>
+  );
+}
+// Initial:
+ showDiv = true
+//  Tree:
+  <div>Hello</div>
+//  Later: 👇
+showDiv = false
+
+// Tree:
+<span>Hello</span>
+
+// OLD              NEW
+
+// div              span
+//  |                 |
+// Hello             Hello
+
+// Types differ:  div !== span
+// THEREFORE:👇
+
+// Unmount <div>
+//        ↓
+// Remove old subtree
+//        ↓
+// Create <span>
+//        ↓
+// Mount <span>
+
+
+// Initially:
+          
+                    New Element
+                             |
+        ┌─────────┴─────────┐
+        |                                        |
+    Same Type                Different Type
+        |                                       |
+    Reuse node               Destroy old
+        |                                      |
+    Update props            Create new
+        |
+    Check children
+        |
+    Keys help
+```
+
+```js
+function Input() {
+  const [value, setValue] = useState("");
+
+  return <input value={value} onChange={e => setValue(e.target.value)} />;
+}
+// If the component's identity is replaced because of a different type/position/key, React may create a new component instance/Fiber and its state is not preserved.
+
+// This is why understanding reconciliation helps explain seemingly mysterious React state resets.
+```
+
+React reconciliation is the process of comparing the previous React element tree with the newly rendered tree to determine the minimum set of changes needed for the UI.
+
+React uses heuristics to make this practical at roughly O(n), rather than performing an expensive general-purpose tree comparison.
+
+First, if the element types are the same, React generally reuses the existing Fiber/DOM node and reconciles its props and children.
+
+If the element types are different, React treats them as different trees, unmounts the old subtree, and creates a new one.
+
+For lists, React uses the key to identify the identity of each child across renders. Stable keys allow React to match old and new children even when their positions change.
+
+Using array indexes as keys can cause incorrect component identity when items are inserted, removed, or reordered, potentially causing local state to appear on the wrong item.
+
+So the key idea is: same type enables reuse, different type causes replacement, and stable keys preserve identity in lists.
+
+
+# Why is using array index as a key sometimes bad?
+Because an array index represents position, not identity. If the list is reordered, inserted into, or deleted from, the same index can refer to a different item. React may then reuse a component's existing Fiber and state for a different item. A stable unique identifier such as a database ID is generally better.
+
+# What does JSX compile into?
+JSX is syntactic sugar for creating React Elements. For example, <h1>Hello</h1> is conceptually transformed into React.createElement("h1", null, "Hello") in the classic JSX transform. React.createElement() returns a lightweight React Element object containing information such as its type, props, key, and ref. React uses these element descriptions as part of its rendering and reconciliation process to determine what changes need to be committed to the actual DOM.
+```js
+const element = (
+    <div className="box">
+        <h1>Hello</h1>
+    </div>
+);
+
+// React.createElement() doesn't directly create a DOM node. It creates a React Element description
+// INTO:
+const element = React.createElement(
+    "div",
+    { className: "box" },
+    React.createElement(
+        "h1",
+        null,
+        "Hello"
+    )
+);
+
+// component vs string
+function Welcome() {
+    return <h1>Hello</h1>;
+}
+
+const element = <Welcome />;
+// INTO
+React.createElement(
+    Welcome,// component 
+    null
+);
+
+// key and ref
+<li key={user.id}>
+    {user.name}
+</li>
+// INTO
+React.createElement(
+    "li",
+    {
+        key: user.id
+    },
+    user.name
+);
+
+// props.children
+<Button>
+    Hello/                           /content
+</Button>
+// means the content becomes children.
+React.createElement(
+    Button,
+    null,
+    "Hello"  //content
+);
+
+function Button(props) {
+    console.log(props.children);
+
+    return <button>{props.children}</button>;
+}
+```
+# Explain React.createElement.
+React.createElement() is an API that creates a React Element, which is a lightweight description of what the UI should look like. In the classic JSX transform, JSX such as <h1>Hello</h1> becomes React.createElement('h1', null, 'Hello'). The resulting object contains information such as the element type and props, including children. It does not directly create a DOM node; React later uses these element descriptions during reconciliation and commits the necessary changes to the actual DOM. Modern React can use the automatic JSX runtime, so JSX doesn't necessarily compile literally to React.createElement(), but the underlying element-description model remains.
+
+# Why can't you use if directly inside JSX, and how do you conditionally render elements in React?
+JSX expressions inside {} must evaluate to a JavaScript value. if and for are JavaScript statements, not expressions, so they cannot be placed directly inside JSX. For conditional rendering, I can use JavaScript expressions such as the ternary operator for if/else cases and && for rendering something only when a condition is truthy. If the logic is more complex, I move the if statement outside the JSX, usually before the return, and store the resulting JSX in a variable or use an early return.
+
+JSX expressions are JavaScript expressions embedded inside {} that are evaluated during rendering, while conditional rendering uses expression-based constructs like && and ?:; statement-level control flow such as if and for must be handled outside the JSX expression.
+
+# Expression vs Statement
+An expression produces a value. 
+```js
+<h1>{10 + 20}</h1>
+<h1>{user.name}</h1>
+<h1>{isLoggedIn ? "Logout" : "Login"}</h1>
+
+10+20 =  produce 30
+user.name
+isLoggedIn ? "Logout" : "Login"   
+count > 0  produce true
+```
+A statement performs an action/control-flow operation.
+```js
+if (condition) {
+}
+for (...) {
+}
+const x = 10;
+```
+# Conditional Rendering
+React doesn't have a special JSX if syntax.
+
+Instead, we use normal JavaScript expressions.
+
+The three most important patterns are:
+
+1. &&       → render something conditionally
+2. ? :      → choose between two things
+3. if       → move logic outside JSX
+
+```js
+function App() {
+    const isLoggedIn = false;
+    const name = "Priti";
+
+    return (
+        <div>
+            {isLoggedIn
+                ? <h1>Welcome {name}</h1>
+                : <h1>Please login</h1>
+            }
+        </div>
+    );
+}
+
+
+// move the if before return. if want to use if else 
+function App() {
+    const isLoggedIn = true;
+
+    let content;
+
+    if (isLoggedIn) {
+        content = <h1>Welcome</h1>;
+    } else {
+        content = <h1>Please login</h1>;
+    }
+
+    return (
+        <div>
+            {content}
+        </div>
+    );
+}
+
+// null undefined and false in jsx 
+function App() {
+    return (
+        <div>
+            {false}
+            {null}
+            {undefined}
+        </div>
+    );
+}
+// These don't produce visible text.
+
+// That's why this works:
+
+{isLoggedIn && <Dashboard />}
+
+
+// Function Calls Inside JSX 
+// function calls are expression too
+function getGreeting(name) {
+    return `Hello ${name}`;
+}
+
+function App() {
+    return (
+        <h1>
+            {getGreeting("Priti")}
+        </h1>
+    );
+}
 ```
 
 # React Fiber
@@ -2323,6 +3072,69 @@ Because the lazy component is loaded asynchronously. While React is waiting for 
   <Dashboard />
 </Suspense>
 ```
+
+
+
+
+# What is Component Composition?
+Component composition means building a complex UI by combining smaller components instead of creating one huge component or relying on inheritance.
+```js
+function Layout({ sidebar, content }) {
+    return (
+        <div className="layout">
+            <aside>
+                {sidebar}
+            </aside>
+
+            <main>
+                {content}
+            </main>
+        </div>
+    );
+}
+
+function Sidebar() {
+    return <nav>Menu</nav>;
+}
+
+function Dashboard() {
+    return <h1>Dashboard</h1>;
+}
+
+function App() {
+    return (
+        <Layout
+            sidebar={<Sidebar />}
+            content={<Dashboard />}
+        />
+    );
+}
+```
+# Why does React favor composition over inheritance? Explain with an example.
+React favors composition because components can be combined through props and children, which makes them more flexible and reusable than inheritance-based designs. Instead of creating a subclass that inherits behavior from another component, we can create a reusable component that accepts content or behavior from its parent.
+```js
+function Card({ children }) {
+    return <div className="card">{children}</div>;
+}
+```
+Then different callers can compose it with different children:
+```js
+<Card>
+    <Profile />
+</Card>
+
+<Card>
+    <Product />
+</Card>
+```
+The Card component doesn't need to know about Profile or Product. The parent decides what goes inside it.
+
+This produces loosely coupled, reusable components and avoids the rigid hierarchy that inheritance can create.
+
+React prefers composition because we can build reusable components by passing behavior and UI through props and children instead of creating rigid inheritance hierarchies."
+
+
+
 
 
 # Error Boundaries
