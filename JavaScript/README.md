@@ -4219,6 +4219,21 @@ console.log(third); // 30
 
 ```
 
+#  computed property names [ ]
+Computed property names let you create object keys dynamically inside an object literal. You wrap a variable, function call, or string math expression in square brackets []. JavaScript evaluates this code at runtime to set the final property name
+
+```js
+const dynamicKey = "role";
+const user = { [dynamicKey]: "Admin" };
+// Result: { role: "Admin" }
+
+
+const prefix = "item";
+const cart = { [`${prefix}_id`]: 101 };
+// Result: { item_id: 101 }
+```
+
+
 
 #  Higher-Order Functions
 ```A Higher-Order Function is a function that takes one or more functions as arguments or returns a function. Common examples in JavaScript are map, filter, and reduce. Higher-order functions are useful for abstraction, code reuse, and functional programming.```
