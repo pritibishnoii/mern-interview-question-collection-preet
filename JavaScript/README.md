@@ -1634,9 +1634,9 @@ Function Execution Context
 # Objects, Prototypes & this
 
 # What is [[Prototype]]? 
-Every ordinary JavaScript object internally has a special internal slot called:[[Prototype]] It contains either another object or null
+JavaScript object has an internal [[Prototype]] slot. It stores a reference to another object—or null. When JavaScript can't find a property on the current object, it follows this reference to search the prototype chain
 
-[[Prototype]] is an internal slot present on JavaScript objects that points to another object or null. It forms the prototype chain. When a property or method isn't found directly on an object, JavaScript follows its [[Prototype]] and continues searching up the chain until it finds the property or reaches null. Object.getPrototypeOf() can be used to inspect this relationship.
+Every JavaScript object has an internal [[Prototype]] slot that points to another object or null. When we access a property, JavaScript first checks the object's own properties. If the property isn't found, it follows the object's [[Prototype]] and continues searching up the prototype chain until the property is found or the chain reaches null. This mechanism enables prototype-based inheritance and property sharing between objects.
 
 object
    |
@@ -1898,6 +1898,69 @@ p
 // step 3 
 // Person.call(Object,"vipin")
 ```
+# Property Shadowing
+```js
+const parent = {
+    name: "Parent"
+};
+
+const child = Object.create(parent);
+
+console.log(child.name);
+
+child.name = "Child";
+
+console.log(child.name);
+console.log(parent.name);
+
+// Output:
+
+// Parent
+// Child
+// Parent
+
+// child.name// finds the property on parent.
+
+// Then:
+
+// child.name = "Child";
+
+// creates an own property on child.
+
+
+const parent = {
+    x: 10
+};
+
+const child = Object.create(parent);
+
+console.log(child.x);
+console.log(child.hasOwnProperty("x")); //hasOwnProperty  Checks only the object itself:
+
+console.log("x" in child);  //in   Checks the entire prototype chain:
+// 10
+// false
+// true
+```
+
+null Prototype
+
+You can intentionally create an object whose prototype is null:
+```js
+const obj = Object.create(null);
+
+console.log(Object.getPrototypeOf(obj));//null
+// obj.toString//undefined 
+```
+# prototype vs [[Prototype]]
+Objects have an internal [[Prototype]]; functions used as constructors have a prototype property.
+```js
+
+[[Prototype]]	 Internal link from an object to another object
+prototype	    Property on constructor functions used as the prototype for objects created with new
+__proto__	    Accessor for an object's [[Prototype]]
+Prototype     chain	Sequence formed by following [[Prototype]] links
+```
 
 # 🧬 Prototype Chain
 "p" object  does not  contain  directly sayHello inside it .
@@ -2003,6 +2066,7 @@ const dog = Object.create(animal);
 dog.sound = "Bark";
 console.log(dog.sound);//Bark   
 ```
+
 # What happens internally when you access obj.property?
 When JavaScript evaluates obj.property, it first checks whether the property exists as an own property of obj. If it exists, JavaScript returns that value immediately. If it doesn't, JavaScript follows the object's internal [[Prototype]] link and checks the prototype. It continues traversing the prototype chain until it finds the property or reaches null. If the property is not found anywhere in the chain, the result is undefined.
 ```js
@@ -2018,18 +2082,22 @@ console.log(child.country);
 
 ```
 
+# Define prototype chain lookup
+Prototype chain lookup is JavaScript's property-resolution mechanism where it searches an object's own properties first and, if the property isn't found, recursively searches its [[Prototype]] chain until the property is found or the chain reaches null.
+
 #  Difference between __proto__ and prototype?
 Every JavaScript object can have an internal link to another object called its prototype.
 
-prototype belongs to functions. __proto__ belongs to objects.
+__proto__ → belongs to an object → points to its prototype.
+.prototype → belongs to a constructor function → becomes the prototype of objects created with new.
 
-prototype is a property of constructor functions that is used as the prototype object for instances created with new.
 
 __proto__ represents the prototype relationship of an object. It allows us to access the object's internal [[Prototype]]. On the other hand, .prototype is a property that constructor functions have. When we create an object using new Constructor(), the new object's [[Prototype]] is set to Constructor.prototype.
 
 For example, if const user = new User(), then Object.getPrototypeOf(user) === User.prototype.
 
 The prototype chain is then used for property lookup: if a property isn't found directly on the object, JavaScript searches its prototype, then that prototype's prototype, and so on until it reaches null.
+
 
 
 ```javascript
@@ -2701,6 +2769,8 @@ console.log(user.name);//priti
 #  What is Object.create()?
 Object.create(proto) creates a new object whose internal [[Prototype]] points to the object passed as proto.
 
+Object.create(proto) creates a new object and sets its internal [[Prototype]] to the object passed as proto. The new object doesn't copy the prototype's properties; instead, property lookup follows the prototype chain when a property isn't found directly on the object. Unlike new, Object.create() doesn't invoke a constructor. It's therefore a direct way to create objects with prototype-based inheritance
+
 ```javascript
 const userPrototype = {
   greet() {
@@ -3072,7 +3142,7 @@ const parent = {
     score: 100
 };
 
-const child = Object.create(parent);
+const child = Object.create(parent);// This creates a new object whose internal prototype ([[Prototype]]) points to parent.
 
 child.score = 200;
 
@@ -3089,7 +3159,7 @@ const parent = {
     }
 };
 
-const child = Object.create(parent);
+const child = Object.create(parent);// ;// This creates a new object whose internal prototype ([[Prototype]]) points to parent.
 
 child.settings.theme = "light";
 
@@ -3101,6 +3171,7 @@ console.log(parent.settings.theme);//light
 ```
 
 # Object.create() Can Also Define Properties
+Object.create() allows you to explicitly choose the object's prototype.
 ```js
 // Object.create(proto, propertiesObject)
 const person = {
@@ -3141,6 +3212,18 @@ console.log(child.name);
 console.log(parent.name);
 ```
 
+```js
+const parent = {
+    x: 10
+};
+
+const child = Object.create(parent);
+
+console.log(Object.getPrototypeOf(child) === parent);
+
+// To change a prototype after creation, there's also:
+Object.setPrototypeOf(child, anotherObject);
+```
 
 #  Object.create() vs {}
 Object.create(proto) directly creates an object with its internal [[Prototype]] set to proto, without invoking a constructor. new Constructor() creates a new object whose prototype is Constructor.prototype, invokes the constructor with the new object as this, and returns the resulting object according to the constructor-return rules
@@ -3476,19 +3559,49 @@ console.log("role" in proxyUser);
 
 # What does instanceof actually do?
 obj instanceof Constructor checks whether Constructor.prototype is found anywhere in obj's prototype chain.
+
 ```js
 function Person(name) {
     this.name = name;
 }
 
-const person = new Person("Priti");
+const person = new Person("Priti");//JavaScript creates an object whose prototype points to:  Person.prototype
 
 console.log(person instanceof Person); // true  it means "Is Animal.prototype somewhere in dog's prototype chain?"
 console.log(person instanceof Object); // true    because Object.prototype is also in the chain.
+
+// const person = new Person("Priti");//JavaScript creates an object whose prototype points to:
+
+// Person.prototype
+
+
+// Manually Creating the Prototype Relationship
+
+const person = Object.create(Person.prototype);
+
+console.log(person instanceof Person);
+console.log(person.constructor === Person);
+console.log(person instanceof Person);
+
+
+function Animal() {}
+
+function Dog() {}
+
+Dog.prototype = Object.create(Animal.prototype);
+
+const dog = new Dog();
+
+console.log(dog instanceof Dog);
+console.log(dog instanceof Animal);
+console.log(dog instanceof Object);
 ```
 
 # How does instanceof work in JavaScript?
 instanceof checks whether the prototype property of a constructor exists anywhere in the prototype chain of an object. For obj instanceof Constructor, JavaScript starts from the object's internal [[Prototype]] and walks upward until it finds Constructor.prototype or reaches null. If it finds it, the result is true; otherwise it's false. It's therefore a prototype-chain check rather than simply a check of which constructor created the object. Its behavior can also be customized using Symbol.hasInstance
+
+# What is the difference between instanceof and typeof in JavaScript?
+typeof tells us the general JavaScript type/category of a value, while instanceof checks whether an object's prototype chain contains a particular constructor's prototype.
 
 
 # hasOwnProperty() vs in
@@ -3653,12 +3766,19 @@ for (const key in child) {
 Object.keys(child);  //["name"]
 ```
 
+
 # What is prototype pollution, and why is it dangerous?
 Prototype pollution means changing Object.prototype.
 
-Prototype Pollution is a security vulnerability that happens when an attacker manages to modify an object that sits in the prototype chain, especially Object.prototype.
+Prototype Pollution is a JavaScript security vulnerability where an attacker is able to modify a shared prototype, commonly Object.prototype. Since normal JavaScript objects inherit from Object.prototype, polluted properties can become visible on many unrelated objects.
 
-Prototype pollution is a security vulnerability where attacker-controlled input modifies an object's prototype, commonly Object.prototype, so that inherited properties are unexpectedly added to many objects. Because JavaScript property lookup traverses the prototype chain, those polluted properties can affect unrelated objects and application logic. This can lead to authorization bypasses, configuration manipulation, or other unexpected behavior. We can reduce the risk by validating keys, avoiding unsafe recursive merges, blocking dangerous keys such as __proto__, constructor, and prototype, and using Object.create(null) for dictionary-like data when appropriate.
+For example, if Object.prototype.isAdmin = true, then an object like {} can access user.isAdmin even though isAdmin was never defined directly on user.
+
+This can lead to security issues when application logic trusts inherited properties, such as checking if (user.isAdmin).
+
+Prototype pollution commonly occurs through unsafe handling of user-controlled keys such as __proto__, constructor, and prototype, especially in recursive merge or object-path utilities.
+
+To prevent it, we should validate keys, avoid modifying built-in prototypes, safely handle untrusted object paths, and use objects created with Object.create(null) when we need a dictionary that doesn't inherit from Object.prototype
 
 1. What exactly is Prototype Pollution?
 First remember the prototype chain:
@@ -4065,7 +4185,7 @@ Number.isNaN(10);
 
 
 #  Shallow vs Deep Copy
-A shallow copy creates a new top-level object, but nested objects still share the same references. A deep copy recursively creates independent copies of nested objects, so changes to the copied object's nested data don't affect the original.
+A shallow copy creates a new top-level object, but nested objects and arrays still share their references with the original object. For example, the spread operator and Object.assign() perform shallow copies. Therefore, modifying a nested object in the copy can also modify the original. A deep copy recursively creates independent copies of nested objects as well, so changes to the copy don't affect the original. In modern JavaScript, structuredClone() can be used for deep cloning of supported values.
 
 ```javascript 
 Shallow copy creates a new object, but nested objects are still shared between the original and copied object.
@@ -4127,6 +4247,128 @@ address:{ // we are assigning  a new  object   to address properties (reassign/r
     city:"mumbai"// override city  update city
 }})
 ```
+
+# ES6 + Modern javascript
+
+# Arrow function 
+Arrow functions do not create their own this, arguments, or prototype, and they cannot be used as constructors.
+
+Arrow functions were introduced in ES6. They provide concise function syntax, support implicit returns for expression bodies, and most importantly they have lexical this rather than their own dynamically determined this. They also don't have their own arguments, don't have a prototype, and cannot be called with new. They're especially useful for callbacks and nested functions where I want to preserve the surrounding this, but I generally avoid them for object methods when the method needs the object's this
+```js
+const add = (a, b) => {
+    return a + b;
+};
+
+// Normal function gets its own this
+const user = {
+    name: "Priti",
+
+    greet: function () {
+        console.log(this.name);
+    }
+};
+
+user.greet();
+
+// Arrow function does NOT create this
+const user = {
+    name: "Priti",
+
+    greet: () => {
+        console.log(this.name);// An arrow function gets this lexically from its surrounding scope.
+    }
+};
+
+user.greet();
+
+// Arrow Functions and arguments
+// Normal functions have their own arguments object:
+function test(a, b) {
+    console.log(arguments);
+}
+
+test(10, 20);
+
+// arguments
+//     ↓
+// {
+//     0: 10,
+//     1: 20
+// }
+// Arrow functions don't have their own arguments.
+const test = () => {
+    console.log(arguments);
+};
+
+// This does not create an arrow-specific arguments.
+
+// Instead, if an outer normal function has arguments, the arrow can access that outer arguments.
+function outer(a, b) {
+
+    const inner = () => {
+        console.log(arguments[0]);
+    };
+
+    inner();
+}
+
+outer(10, 20);
+
+const test = (...args) => {
+    console.log(args);
+};
+
+test(10, 20, 30);
+
+// Arrow Functions Have No prototype
+// Normal functions can have a prototype property:
+function Person(name) {
+    this.name = name;
+}
+
+console.log(Person.prototype);
+
+// You get an object.
+
+// But: With arrow function   Arrow Functions Have No prototype
+// Because arrow functions aren't designed to participate in constructor-based prototype inheritance.
+
+const Person = (name) => {
+    this.name = name;
+};
+
+console.log(Person.prototype);
+
+Output:
+
+undefined
+
+// Arrow Functions Cannot Be Constructors
+function Person(name) {
+    this.name = name;
+}
+
+const p = new Person("Priti");
+
+console.log(p.name);//priti
+
+const Person = (name) => {
+    this.name = name;
+};
+
+const p = new Person("Priti");
+
+// Throws:
+
+// TypeError: Person is not a constructor
+
+// Why?
+
+// Because new expects a constructor function.
+```
+# What is the difference between normal functions and arrow functions?
+The biggest difference is how this works. Normal functions have their own this, and its value is determined by how the function is called. Arrow functions don't have their own this; they lexically capture this from the surrounding scope.
+
 # Spread vs Rest
 
 ```Spread and Rest both use the ... syntax, but   their purpose is opposite .Spread expands or unpacks elements from an array or properties from an object, while Rest collects multiple values or remaining properties into a single array or object.```
@@ -4169,6 +4411,29 @@ console.log(name);
 
 console.log(otherDetails);
 // { age: 25, city: "Mumbai" }
+
+// Spread with object 
+const user = {
+    name: "Priti",
+    age: 24
+};
+
+const updatedUser = {
+    ...user,
+    role: "Developer"
+};
+
+console.log(updatedUser);
+
+
+// Rest + spread 
+function addBonus(...numbers) {
+    return [...numbers, 100];
+}
+
+const result = addBonus(10, 20, 30);
+
+console.log(result);
 ```
 # Destructuring
 ```Destructuring is an ES6 feature that allows us to extract values from arrays or properties from objects and assign them to variables using a concise syntax. Array destructuring works based on position, while object destructuring works based on property names..```
@@ -4216,8 +4481,151 @@ const [first, , third] = numbers;
 console.log(first); // 10
 console.log(third); // 30
 
+// Skipping values/
 
+// You can skip elements using an empty comma:
+const arr = ["A", "B", "C"];
+
+const [a, , c] = arr;
+
+console.log(a); // A
+console.log(c); // C
+
+
+// Renaming During Destructuring
+const user = {
+  name: "Priti",
+  
+};
+
+// You want the variable to be called username.
+
+// Write:👇
+
+const { name: username } = user;
+
+console.log(username); // Priti
+
+// Default Values
+
+// You can provide a default value.
+const { name, age = 25 } = user; // Because age doesn't exist, the default is used.
+
+const { x: renamed = defaultValue } = obj;
+
+
+
+const user = {
+  name: "Priti",
+  address: {
+    city: "Indore"
+  }
+};
+
+const {
+  name: username,
+  age = 25,
+  address: {
+    city
+  }
+} = user;
+
+console.log(username); // Priti
+console.log(age);      // 25
+console.log(city);     // Indore
+
+// for...of + Destructuring
+const users = [
+  { name: "A", age: 20 },
+  { name: "B", age: 25 },
+  { name: "C", age: 30 }
+];
+
+for (const { name, age } of users) {
+  console.log(name, age);
+}
+const users = [
+  { name: "A", age: 20 },
+  { name: "B", age: 25 },
+  { name: "C", age: 30 }
+];
+
+for (const { name, age } of users) {
+  console.log(name, age);
+}
+
+
+// undefined vs null
+// Default values activate only when the extracted value is:undefined 
+// undefined → default applies
+// null      → default does NOT apply
+const user = {
+  name: undefined,
+  age: null
+};
+
+const {
+  name = "Guest",
+  age = 18
+} = user;
+
+console.log(name);
+console.log(age);
+
+
+// ({ name } = user);
+// The parentheses tell JavaScript:
+
+// "This is an expression/assignment, not a block."
+let name;
+
+const user = {
+  name: "Priti"
+};
+
+({ name } = user);
+
+console.log(name); // Priti
+
+// Destructuring + Rest 
+const user = {
+  name: "Priti",
+  age: 25,
+  city: "Indore"
+};
+
+const { name, ...other } = user;
+
+console.log(name);  // Priti
+console.log(other); // { age: 25, city: "Indore" }
+
+// Destructuring → extracting
+// Rest          → collecting remaining values
+
+
+// Destructuring vs Spread
+const newUser = {
+  ...user// Expands/copies properties into another object.
+};
 ```
+
+# What is the difference between array and object destructuring?
+Array destructuring is positional, while object destructuring is property-name based.
+
+In array destructuring, variables receive values according to their position in the iterable:
+
+const [a, , c] = arr;
+
+Here a receives the first value and c receives the third value.
+
+In object destructuring, variables are matched with object properties by name:
+const { name, age } = user;
+
+We can also rename properties and provide defaults:
+
+const { name: username, age = 18 } = user;
+
+Destructuring can also be used in function parameters, loops, and other ES6+ syntax.
 
 #  computed property names [ ]
 Computed property names let you create object keys dynamically inside an object literal. You wrap a variable, function call, or string math expression in square brackets []. JavaScript evaluates this code at runtime to set the final property name
@@ -4232,6 +4640,472 @@ const prefix = "item";
 const cart = { [`${prefix}_id`]: 101 };
 // Result: { item_id: 101 }
 ```
+
+
+# Optional Chaining ?.
+Optional chaining ?. is a modern JavaScript operator that safely accesses properties, methods, or computed properties by short-circuiting to undefined when the value being accessed is null or undefined, instead of throwing a TypeError.
+
+?. lets you safely access a property, method, or array element when the value before it might be null or undefined.
+```js
+const user = null;
+
+// without ? 
+// null.name
+
+// That's invalid → TypeError.
+console.log(user?.name);//undefined
+
+console.log(user.name);
+
+// You get: / TypeError: Cannot read properties of null
+
+const user = {
+    name: "Priti"
+};
+
+console.log(user?.name);
+
+// JavaScript essentially performs this check:👇
+
+if (user === null || user === undefined) {
+    return undefined;
+} else {
+    return user.name;
+}
+
+
+// Three ways to use Optional Chaining
+//A  Property access
+obj?.property
+
+// B. Method call
+obj?.method()
+
+// C. Bracket / array access
+obj?.[key]
+
+
+const user = {
+    profile: {
+        name: "Priti"
+    }
+};
+
+console.log(user?.profile?.name);
+
+
+const users = ["Priti", "Vipin", "Aman"];
+
+console.log(users?.[0]);
+
+// Optional Chaining + Dynamic Properties
+const user = {
+    name: "Priti",
+    age: 24
+};
+
+const key = "name";
+
+console.log(user?.[key]);
+
+
+
+
+// Protect the object
+// user?.greet()
+
+// If user is null/undefined → undefined.
+
+// But if greet exists and isn't a function → error.
+
+// 2. Protect the method
+// user.greet?.()
+
+// If greet is null/undefined → undefined.
+const user = {};
+
+console.log(user.greet?.());//undefind 
+
+
+// Optional Chaining + Nullish Coalescing👇
+const value = obj?.property ?? defaultValue;
+
+// This is better than blindly using || when 0, false, or "" are valid values.
+const user = null;
+
+const name = user?.name ?? "Guest";
+
+console.log(name);
+
+
+
+const user = {
+    age: 0
+};
+
+console.log(user?.age ?? 18);//18 because 0 is falsy 
+
+
+
+// Optional Chaining + Functions
+function processData(callback) {
+    callback?.("Data processed");
+}
+
+processData();
+```
+Optional chaining does not protect against every kind of error. It only short-circuits when the value being optionally accessed is null or undefined. It can be used for property access, method calls, and computed property access such as obj?.[key].
+
+
+# Nullish Coalescing (??) vs OR (||)
+# What is the difference between || and ?? in JavaScript? When would you use one over the other?
+"|| uses JavaScript truthiness and returns the right-hand value when the left-hand value is falsy, such as 0, false, an empty string, NaN, null, or undefined.
+
+?? is the nullish coalescing operator. It returns the right-hand value only when the left-hand value is null or undefined.
+
+Therefore, I use ?? when values like 0, false, or "" are valid and should be preserved. I use || when any falsy value should trigger the fallback.
+
+```js
+a ?? b
+   ↓
+Use b ONLY when a is null or undefined
+
+a || b
+   ↓
+Use b when a is ANY falsy value
+```
+
+```js
+a ?? b
+
+means:
+
+if (a === null || a === undefined) {
+    return b;
+}
+
+return a;
+
+So only two values trigger the fallback:
+
+null
+undefined
+
+Everything else is preserved:
+
+0
+""
+false
+NaN
+
+a || b
+
+works using JavaScript's truthiness.
+
+Conceptually:
+
+if (!a) {
+    return b;
+}
+
+return a;
+The following are falsy:
+
+false
+0
+-0
+0n
+""
+null
+undefined
+NaN
+```
+
+```js
+const username = null;
+
+console.log(username ?? "Guest");
+console.log(username || "Guest");
+
+const age = 0;
+
+console.log(age ?? 18);// 0
+console.log(age || 18);
+
+
+const user = {
+    name: "Priti",
+    age: 0,
+    isAdmin: false,
+    bio: ""
+};
+
+Suppose we want defaults:
+
+console.log(user.age ?? 18);//0
+console.log(user.isAdmin ?? true);//false
+console.log(user.bio ?? "No bio"); //""
+
+console.log(user.age || 18);//18
+console.log(user.isAdmin || true); //true
+console.log(user.bio || "No bio"); //No bio
+
+
+console.log(false || "JavaScript");
+console.log(false ?? "JavaScript");
+
+console.log(0 || 100);
+console.log(0 ?? 100);
+
+console.log("" || "Default");
+console.log("" ?? "Default");
+
+console.log(NaN || 50);
+console.log(NaN ?? 50);
+
+
+// Traditional approach
+// Before ??, developers often wrote:
+
+const username =
+    value === null || value === undefined
+        ? "Guest"
+        : value;
+
+// With nullish coalescing:
+
+const username = value ?? "Guest";
+```
+
+
+# Template Literal 
+# What are tagged template literals, and what arguments does the tag function receive?
+A tagged template literal allows a function to process a template literal before the final string is created. The tag function receives the static string portions as its first argument and the evaluated interpolation values as the remaining arguments, commonly captured using ...values.
+
+For example, tag\Hello ${name}!`gives the tag something conceptually equivalent tostrings = ["Hello ", "!"]andvalues = [name]`. The tag can then transform, validate, escape, format, or combine those pieces to produce a final result.
+
+Tagged templates are used in libraries such as CSS-in-JS solutions and SQL/query builders.
+```js
+function tag(strings, ...values) {
+    console.log("strings:", strings);
+    console.log("values:", values);
+}
+
+const name = "Priti";
+const age = 25;
+
+tag`Hello ${name}, you are ${age} years old.`;
+
+
+const Button = styled.button`
+    color: red;
+    padding: 10px;
+`;
+
+```
+# What is the difference between ||=, &&=, and ??=?
+Logical assignment operators combine logical short-circuiting with assignment. ||= assigns the right-hand value when the left-hand value is falsy, &&= assigns when the left-hand value is truthy, and ??= assigns only when the left-hand value is null or undefined. The important distinction is that ||= treats values like 0, false, and "" as needing a default, while ??= preserves those valid values and only replaces missing values.
+
+```js
+// &&= practical use
+// &&= is useful when you want to modify something only if it already exists / is enabled.
+
+let user = {
+    isActive: true
+};
+
+user.isActive &&= false;
+
+console.log(user.isActive);//false
+
+
+const data = {};
+
+data.items ??= [];
+
+data.items.push("JavaScript");
+
+console.log(data);//{ items:["javascript"]}
+
+const config = {
+    debug: false
+};
+
+config.debug ??= true;
+
+console.log(config.debug);//false  Because false isn't nullish.
+
+
+let enabled = false;
+
+enabled ||= true;
+
+console.log(enabled);//true
+
+
+
+if (isLoggedIn) {
+    isLoggedIn = false;
+}
+
+// Modern:👇
+
+isLoggedIn &&= false;
+
+
+if (!name) {
+    name = "Guest";
+}
+
+Modern:
+
+name ||= "Guest";
+
+
+let a = 0;
+let b = "";
+let c = null;
+let d = false;
+let e = undefined;
+
+a ||= 10;
+b ??= "Hello";
+c ??= "World";
+d &&= true;
+e ||= 20;
+
+console.log(a);
+console.log(b);
+console.log(c);
+console.log(d);
+console.log(e);
+```
+
+# What's the difference between property shorthand and computed property names?
+Property shorthand is used when the variable name and object property name are the same. For example, { name } is equivalent to { name: name }.
+
+Computed property names allow us to dynamically determine an object's property name using an expression inside square brackets, such as { [key]: value }. The expression is evaluated at runtime and its result becomes the property key.
+
+# What are Object Shorthand & Computed Keys?
+
+```js
+// befor ES6
+const name = "Priti";
+const age = 25;
+
+const user = {
+    name: name,
+    age: age
+};
+
+console.log(user);
+
+// ES6 let us write 
+const user = {
+  name,
+  age
+}
+// javascript undastand it 
+{
+    name: name,
+    age: age
+}
+
+
+
+const name = "Priti";
+
+const user = {
+    name
+};
+
+// Conceptually JavaScript interprets it as:
+
+const user = {
+    name: name
+};
+
+
+// Computed Property Names
+// Sometimes you don't know the property name until runtime.
+const key = "name";
+
+const user = {
+    [key]: "Priti"
+};
+
+console.log(user);
+
+{
+    name: "Priti"
+}
+// [key ] means Evaluate key first and use its resulting value as the property name.
+
+// Computed keys become especially useful when creating objects dynamically.
+
+function createUser(key,value){
+  return {
+    [key]:value
+  }
+}
+
+const user1= createUser("name","priti")
+const user2= createUser("age",24)
+console.log(user1)//{name:"priti"}
+console.log(user2)// {age:24}
+
+
+const name = "Priti";
+const age = 25;
+
+const methodName = "greet";
+
+const user = {
+    name,
+    age,
+
+    [methodName]() {
+        return `Hello ${this.name}`;
+    }
+};
+
+console.log(user.greet());
+
+// Computed Keys Can Use Expressions
+// The expression inside [] doesnot have to be a variable 
+
+
+const prefix ='user'
+const obj={
+  [`${prefix}_name]:"priti",
+  [`${prefix}_age]:24
+}
+console.log(obj)
+// output 👇
+{
+    user_name: "Priti",
+    user_age: 25
+}
+
+// computed keys also work with method 
+const action ="login"
+const user ={
+  [action](){
+    return "user logged in"
+  }
+};
+console.log(user.login())//user logged in
+
+
+const environment = "production";
+
+const config = {
+    [`${environment}Url`]: "https://api.example.com"
+};
+
+console.log(config);
+```
+
 
 
 
@@ -4547,6 +5421,91 @@ Promise.reject("Something went wrong")
   .catch((error) => console.log(error));
 ```
 
+# Can a Promise change its state after it is fulfilled or rejected?"
+No. A Promise starts in the pending state and can transition only once to either fulfilled or rejected. Once it becomes fulfilled or rejected, it is settled and its state is immutable. Any subsequent calls to resolve() or reject() are ignored.
+
+
+# What happens when you return a value, return a Promise, or throw an error inside .then()?
+.then() always returns a new Promise. If the callback returns a normal value, the new Promise fulfills with that value, conceptually through Promise.resolve(). If the callback returns a Promise, the new Promise adopts the state of that returned Promise and waits for it to settle. If the callback throws an error, the new Promise becomes rejected with that error. This behavior allows us to build Promise chains where values flow forward and errors propagate down to .catch().
+```js
+Promise.resolve("Start")
+    .then((value) => {
+        console.log(value);
+
+        throw new Error("Something failed");
+    })
+    .then((value) => {
+        console.log("This will NOT execute");
+    })
+    .catch((error) => {
+        console.log("Caught:", error.message);
+    });
+```
+
+# What is the difference between sequential await and Promise.all()? When would you use each?
+In sequential execution, each await waits for the previous asynchronous operation to complete before starting the next one. For example, await a(); await b(); means b() isn't called until a() has resolved.
+
+With Promise.all(), the asynchronous operations are started before we await their combined result. For example, await Promise.all([a(), b()]) starts both operations without waiting for the first one to finish, so independent operations can overlap and usually complete faster.
+
+I use sequential execution when the second operation depends on the result of the first, and Promise.all() when the operations are independent and I need all their results.
+```js
+const user = await getUser();
+const posts = await getPosts();
+
+const [user, posts] = await Promise.all([
+    getUser(),
+    getPosts()
+]);
+```
+
+
+# What's the difference between .catch() and try/catch with async/await, and what happens if you forget to await a Promise inside a try block?
+.catch() handles rejected Promises in a Promise chain. With async/await, a rejected Promise can be caught using try/catch when the Promise is awaited inside the try block.
+
+A key difference is that try/catch doesn't automatically catch an asynchronous Promise rejection just because the Promise was created inside the try block. If I forget to use await, the Promise can reject later after the try block has already completed, so the local catch won't handle that rejection.
+
+Therefore, for an awaited asynchronous operation, I would write try { await operation(); } catch (error) { ... }, or explicitly attach .catch() to the Promise.
+
+
+# What actually happens with async/await?
+async/await looks synchronous, but it does not block JavaScript's main thread. It is essentially a cleaner syntax built on top of Promises + the Event Loop + Microtask Queue.
+```js
+async function getData() {
+    const result = await fetch("/users");
+
+    console.log(result);
+}
+
+getData();
+```
+await pause async function not the entire javascript program/code 
+Call async function
+      ↓
+Function starts executing
+      ↓
+fetch() returns Promise
+      ↓
+await sees Promise
+      ↓
+PAUSE async function
+      ↓
+async function immediately returns Promise
+      ↓
+JavaScript continues executing other code
+      ↓
+Promise settles
+      ↓
+continuation goes to Microtask Queue
+      ↓
+Event Loop picks microtask
+      ↓
+async function resumes
+      ↓
+console.log()
+
+# s async/await synchronous or asynchronous?
+async/await is asynchronous. An async function always returns a Promise. When execution reaches an await, the async function is suspended until the awaited Promise settles. The rest of the function is then scheduled as a microtask, while the JavaScript thread continues executing other synchronous code. Therefore, await pauses only the async function, not the entire JavaScript runtime.
+
 # async/await
 ```async/await is Promise-based syntax that makes asynchronous code easier to read. An async function always returns a Promise, and await pauses that async function until the Promise settles and gives access to its fulfilled value. Errors are commonly handled using try/catch.```
 
@@ -4593,6 +5552,7 @@ main();
 //3
 ```
 
+
 # Asynchronous JavaScript
 ```javascript is single threaded what does it mean? ```
 Javascript can execute only One Piece of Code at a time .
@@ -4614,8 +5574,15 @@ There are 6 important parts
          -MicroTask Queue - (Microtask vs Macrotask)
          -Event Loop
 
+
+# JavaScript is single-threaded. Then how does it handle asynchronous operations without blocking?"
+JavaScript has a single call stack, so synchronous JavaScript executes one thing at a time. Asynchronous operations are handled by the browser or Node.js runtime APIs. Once they complete, their callbacks are queued, and the Event Loop schedules them when the call stack is free. Promise microtasks are processed before the next task. That's how JavaScript achieves non-blocking asynchronous behavior despite having a single main JavaScript thread."
+
 # Call Stack
 ```The Call Stack is a LIFO data structure used by JavaScript to manage function execution. Whenever a function is called, its execution context is pushed onto the stack, and when it finishes, it is popped from the stack. JavaScript executes the function at the top of the stack```
+
+
+The Call Stack is a LIFO data structure used by JavaScript to keep track of function execution. Whenever a function is called, an execution frame is pushed onto the stack. JavaScript executes the function at the top of the stack. When that function returns, its frame is popped and execution resumes from the previous frame. Because JavaScript executes synchronous code through the Call Stack, deeply nested or infinite recursion can cause a stack overflow. For asynchronous operations such as timers, promises, and I/O, their callbacks don't execute immediately on the Call Stack; they are handled through the host environment and later scheduled by the Event Loop when the Call Stack becomes available.
 
 ```javascript 
 // call stack
@@ -4669,671 +5636,201 @@ await
      // it only Pauses one async function, While the rest of JS keep Running.
 ```
 
+ # What is a Stack Frame?
+ Every function call creates an execution context/frame containing information needed while that function executes.
+'
+
+# What are Web APIs / Node APIs?
+The JS engine executes JavaScript, but the environment provides capabilities around it.
+setTimeout() is not implemented by the core JavaScript language itself.
+
+The host environment provides it.
+
+In a browser, that capability comes from browser APIs.
+
+In Node.js, it comes from Node's runtime APIs.
+
+
+Web APIs / Node APIs are host-environment capabilities that extend JavaScript beyond the core language. They handle things such as timers, networking, DOM events, file-system operations, and other asynchronous work. Once the work is ready, the associated callback or promise reaction is scheduled through the runtime's queues, and the event loop coordinates its execution by the JavaScript engine.
+```js
+┌──────────────────────────────────────┐
+│          JavaScript Engine           │
+│                                      │
+│  Call Stack                          │
+│  Heap                                │
+│  Execution of JS code                │
+└──────────────────────────────────────┘
+                 │
+                 │ uses
+                 ▼
+┌──────────────────────────────────────┐
+│       Host Environment APIs          │
+│                                      │
+│ Browser:                             │
+│  setTimeout   fetch   DOM events     │
+│                                      │
+│ Node.js:                             │
+│  fs           HTTP     timers        │
+│  networking   streams  etc.          │
+└──────────────────────────────────────┘
+```
+
+# Are Web APIs part of the JavaScript engine?
+No. Web APIs are not part of the JavaScript engine. The JavaScript engine, such as V8, is responsible for executing JavaScript code using components like the call stack and heap. APIs such as setTimeout, fetch, and DOM event handling are provided by the host environment, such as the browser. In Node.js, Node provides its own runtime APIs such as fs, HTTP, streams, and timers. These APIs handle asynchronous operations and, when the operation is ready, make callbacks or promise reactions eligible for execution through the event-loop mechanism.
+
+For example, when setTimeout() is called, the timer is handled by the host environment rather than blocking the JavaScript call stack. Once the timer is ready, its callback is queued. The event loop eventually schedules that callback when the JavaScript execution context is ready.
+
+```js
+button.addEventListener("click", () => {
+    console.log("Clicked");
+});
+
+addEventListener() is provided by the browser environment.
+
+
+setInterval(() => {
+    console.log("Hello");
+}, 1000);
+
+setTimeout()
+setInterval()
+fetch()
+addEventListener()
+localStorage
+WebSocket
+DOM APIs
+```
+
+
 #  Event Loop
 ```The Event Loop is the mechanism that allows JavaScript to handle asynchronous operations while JavaScript itself executes code on a single main thread. It continuously checks whether the Call Stack is empty and then moves eligible callbacks from queues to the Call Stack for execution.```
 
 ```Microtask Queue and Macrotask Queue are queues used by the JavaScript runtime to schedule asynchronous callbacks. After the Call Stack becomes empty, the Event Loop prioritizes microtasks before moving to the next macrotask.```
 
-#  Microtask vs Macrotask
-```Microtasks and macrotasks are different categories of asynchronous work. Promise callbacks such as .then() go into the microtask queue, while timer callbacks such as setTimeout are tasks. After the current JavaScript execution completes, the event loop processes pending microtasks before moving to the next task```
+JavaScript executes synchronous code on the call stack. Once the current synchronous execution finishes, the runtime drains the microtask queue, which includes Promise reactions and queueMicrotask callbacks. Then it selects a task, such as a timer or event callback, executes it, and drains the microtask queue again. In browsers, rendering can occur between these steps when appropriate. This process repeats continuously, allowing JavaScript to handle asynchronous operations without blocking the main JavaScript execution thread.
 
-# Debouncing
-Both are performance optimization techniques used when an event fires many times, such as:
-input
-scroll
-resize
-mousemove
-keyup
-```Debouncing ensures that a function executes only after a specified amount of time has passed since the last event.```
+setTimeout(fn, 0) schedules fn as a future task; the callback runs only after the timer is eligible, the current JavaScript execution finishes, and the relevant microtask checkpoint has been processed.
 
-🧠 Remember   - Debounce = "Wait until the user stops."
-```javascript
-function searchAPI(query) {
-  console.log("API call:", query);
-}
-let timer;
-function debounce(callback, delay) {
-  return function (...args) {
-    clearTimeout(timer);
+#  Microtask vs Macrotask(task)
+The task or macrotask queue contains callbacks from asynchronous task sources such as timers, I/O, and user events. The microtask queue contains things such as Promise reactions and queueMicrotask() callbacks. After the current synchronous JavaScript execution finishes, the runtime performs a microtask checkpoint and processes pending microtasks before moving on to the next task. Therefore, in the common browser model, microtasks have priority over the next task. This is why a resolved Promise callback usually runs before a setTimeout(..., 0) callback."
 
-    timer = setTimeout(() => {
-      callback(...args);
-    }, delay);
-  };
-}
-const handleSearch = debounce(searchAPI, 500);
-```
+Typical macrotask/task sources include:
+setTimeout
+setInterval
+I/O callbacks
+UI events
+MessageChannel / posted messages
+Node.js timers and certain I/O callbacks
 
-# Throttling
-```Throttling ensures that a function executes at most once within a specified time interval, even if the event keeps firing```
+Microtask Queue
+│
+├── Promise.then()
+├── Promise.catch()
+├── Promise.finally()
+├── queueMicrotask()
+└── MutationObserver
 
- ```javascript
-function handleScroll() {
-  console.log("Scroll event");
-}
 
-function throttle(callback, delay) {
-  let lastCall = 0;
 
-  return function (...args) {
-    const now = Date.now();
-
-    if (now - lastCall >= delay) {
-      lastCall = now;
-      callback(...args);
-    }
-  };
-}
-const handleScrollThrottled = throttle(handleScroll, 1000);
-  ```
-# Event Propagation
-
-Event propagation is the process by which an event travels through the DOM from the target element to other elements in the DOM hierarchy.
-Event propagation has 3 phases:
-            1. Capturing Phase
-                  ↓
-            2. Target Phase
-                 ↓
-            3. Bubbling Phase
-```Event propagation is the mechanism through which an event travels through the DOM. It has three phases: capturing, where the event travels from the root toward the target; target phase, where it reaches the target element; and bubbling, where it travels back from the target toward the root. By default, most event listeners handle events during the bubbling phase.```
-
-# Event Bubbling/Capturing
-
-Event Bubbling is the process in which an event starts from the target element and propagates upward through its parent elements.
-```javascript
-Bubbling-
-            button
-            ↑
-            div
-            ↑
-            body
-            ↑
-            html
-
-<div id="parent">
-  <button id="child">
-    Click Me
-  </button>
-</div>
-
-const parent = document.getElementById("parent");
-const child = document.getElementById("child");
-
-parent.addEventListener("click", () => {
-  console.log("Parent");
+# Why is Microtask Queue higher priority?
+Because microtasks are designed for work that should happen as soon as the current JavaScript execution and current task complete, before the event loop moves on to another task.
+```js
+Promise.resolve().then(() => {
+    console.log("microtask");
 });
 
-child.addEventListener("click", () => {
-  console.log("Button");
-});
-//Button 
-//Parent
-```
-
-Event Capturing is the process in which an event propagates from the top-level ancestor down toward the target element.
-```javascript
-Capturing-
-                html
-                ↓
-                body
-                ↓
-                div
-                ↓
-                button
-
-parent.addEventListener(
-  "click",
-  () => {
-    console.log("Parent");
-  },
-  true
-);
-//Parent
-//Button
-```
-# stopPropagation() vs stopImmediatePropagation()
-stopPropagation() stops the event from propagating to other elements in the capturing or bubbling phase, but it does not stop other event listeners on the same element.
-
-```javascript
-button.addEventListener("click", () => {
-  console.log("Listener 1");
-  event.stopPropagation();
-});
-
-button.addEventListener("click", () => {
-  console.log("Listener 2");
-});
-//Button
-//stopPropagation()  stop 
-//Does not execute parent handler
-//button
-  //↓
-//stopPropagation()
- // ↓
-//🛑 Parent propagation stops
-```
-stopImmediatePropagation() stops the event from propagating AND prevents any remaining event listeners on the same element from executing.
-
-```javascript
-button.addEventListener("click", (event) => {
-  console.log("Listener 1");
-
-  event.stopImmediatePropagation();
-});
-
-button.addEventListener("click", () => {
-  console.log("Listener 2");
-});
-//Listener 1
-// Listener 2 will not execute.
-
-button
-  │
-  ├── Listener 1
-  │      ↓
-  │  stopImmediatePropagation()
-  │      ↓
-  🛑 Listener 2
-  🛑 Parent
-```
-
-
-#  Event Delegation
- 
- Event Delegation is a technique where we attach a single event listener to a parent element instead of attaching separate listeners to each child element, and use event bubbling to determine which child triggered the event.
-
- ```javascript
-//  without Event Delegation
-const buttons = document.querySelectorAll("button");
-//100 buttons
-//100 event listeners
-buttons.forEach((button) => {
-  button.addEventListener("click", () => {
-    console.log(button.textContent);
-  });
-});
-
-
-// With Event Delegation 
-<ul id="users">
-  <li>Priti</li>
-  <li>Vipin</li>
-  <li>John</li>
-</ul>
-const users = document.getElementById("users");
-
-users.addEventListener("click", (event) => {
-  if (event.target.tagName === "LI") {
-    console.log(event.target.textContent);
-  }
-});
-
-                     ul
-                      │
-      ┌───────┼───────┐
-      ↓              ↓              ↓
-      li               li             li
-      Priti           Vipin    John
-      │
-      │ click
-      ↓
-   bubbling
-      ↓
-      ul
-      ↓
-parent listener
-
- ```
-# Currying
-
-Currying is a technique of transforming a function that takes multiple arguments into a sequence of functions, where each function takes one argument.
-
-```javascript
-// Normal function
-function add(a, b, c) {
-  return a + b + c;
-}
-
-add(10, 20, 30);
-
-// Currying 
-function add(a) {
-  return function (b) {
-    return function (c) {
-      return a + b + c;
-    };
-  };
-}
-
-add(10)(20)(30);
-//60
-Currying allows us to provide arguments gradually and create reusable, specialized functions.
-```
-
-Suppose we have:
-```javascript
-function multiply(a, b) {
-  return a * b;
-}
-
-```
-We frequently want to multiply something by 10.
-
-Without currying:
-```javascript
-multiply(10, 5);
-multiply(10, 8);
-multiply(10, 20);
-```
-with Currying
-
-```javascript
-function multiply(a) {
-  return function (b) {
-    return a * b;
-  };
-}
-const multiplyBy10 = multiply(10);
-multiplyBy10(5);  // 50
-multiplyBy10(8);  // 80
-multiplyBy10(20); // 200
-
-
-
-multiply(10)
-     ↓
-returns function
-     ↓
-multiplyBy10
-     ↓
-multiplyBy10(5)
-     ↓
-50
-```
-Real Use Of Currying
-```javascript
-// Instead of repeatedly writing:
-fetch("/api/users", {
-  headers: {
-    Authorization: "Bearer TOKEN"
-  }
-});
-
-fetch("/api/orders", {
-  headers: {
-    Authorization: "Bearer TOKEN"
-  }
-});
-// We can create a reusable curried function:
-function createApiRequest(token){
-    return function(url){
-        return fetch(url,{
-            headers:{
-                Authorization:`Bearer ${token}`
-            }
-        })
-    }
-}
-
-const apiRequest = createApiRequest("MY_TOKEN");
-
-apiRequest("/api/users");
-apiRequest("/api/orders");
-apiRequest("/api/products");
-```
-
-# Array Methods
-# map, filter, reduce
- # map()
- map() is an array method used to transform each element of an array and return a new array of the transformed
-values. Internally, JavaScript creates a new array, iterates over the original array once, calls the provided callback
-for every element (passing the current value, index, and original array), stores the callback's return value in the new
-array, and finally returns that new array. The original array is never modified.
-```javascript
-
-let arr = [2, 30, 4, 50];
-const result=arr.map((val,index,arr)=>{
-    return val*2
-})
-console.log(result)
-```
-
-# filter()
-filter() iterates through every element of an array and calls the callback function with the current value, index, and
-original array. If the callback returns a truthy value, the original element is added to a new array. If it returns a falsy
-value, the element is skipped. After processing all elements, filter() returns the new filtered array without modifying
-the original array.
-
-```javascript
-let users=[
-    {name:"priti",age:24},
-    {name:"vipin",age:14},
-    {name:"Preeti",age:50},
-]
-const result = users.filter((user)=>{
-    return user.age>=18
-})
-console.log(result)
-```
-# reduce()
-Unlike map() or filter(), reduce() returns ONE final value.
-It could be:
-✅Number 
-✅String 
-✅Object 
-✅Array 
-✅Map 
-Anything
-reduce() iterates over an array and combines all elements into a single accumulated result. It starts with an initial
-accumulator value, calls the callback for each element, updates the accumulator with the callback's return value,
-and finally returns the accumulated result. Unlike map() or filter(), reduce() produces one final value instead of a
-new array.
-
-```javascript
-const arr = [1,2,3,5,6,7,8,9,10]
-let sum = arr.reduce((accumulator, current) => {
-return accumulator + current;
+setTimeout(() => {
+    console.log("macrotask");
 }, 0);
+
+microtask
+macrotask
 ```
 
-# slice()
-slice(start, end) creates and returns a new array containing elements from the start index up to, but not including,
-the end index. It does not modify the original array. Internally, it copies references or values into a new array. 
+```js
+console.log("Start");
 
-# splice()
-splice(start, deleteCount, ...items) modifies the original array. It can remove, insert, or replace elements. Internally,
-JavaScript removes the specified elements, shifts the remaining elements as needed, inserts any new items, and
-returns an array of the removed elements
+setTimeout(() => {
+    console.log("Timeout");
+}, 0);
 
-# find()
-find() iterates over an array and calls the callback function for each element. As soon as the callback returns a
-truthy value, find() immediately returns that original element and stops iterating. If no element satisfies the
-condition, it returns undefined. Unlike filter(), it does not create a new array and only returns the first matching
-element.
-
-It checks every element until it finds the first match.
-If callback returns true 
-✅
-Return that element immediately.
-Stop the loop.
-If callback returns false 
-❌
-Continue searching.
-If no element matches
-Return undefined
-
-```javascript
-let users=[
-    {name:"priti",age:24},
-    {name:"vipin",age:14},
-    {name:"Preeti",age:50},
-]
-const result= users.find((user)=>{
-    return user.name=="vipin"
-})
-console.log(result)
-```
-
-# lastIndexOf()
-lastIndexOf() searches an array or string from the end and returns the index of the last occurrence of the specified value. If the value is not found, it returns -1
-```javascript
-let sentence = ["JS", "React", "Node", "React", "MongoDB"];
-console.log(sentence.lastIndexOf("React"));//3
-
-```
-
-# indexOf()
-indexOf() is an Array/String method that searches for a specified value and returns the index of its first occurrence. If the value is not found, it returns -1
-
-indexOf() searches for an exact value.
-findIndex() lets you define a condition.
-
-Left → Right
-First matching index using a callback
-
-```javascript
-let sentence = ["JS", "React", "Node", "React", "MongoDB"];
-console.log(sentence.lastIndexOf("React"));//3
-
-
-let usersList=[
-    { id: 1, name: "Priti" },
-    { id: 2, name: "Vipin" },
-]
-
-const find_user= usersList.indexOf({id:2,name:"vipin"})
-console.log(find_user)//-1 Won't work because objects are compared by reference
-```
-
-# findIndex() 
-findIndex() iterates through the array and executes the callback for each element. As soon as the callback returns
-true, it immediately returns that element's index and stops iterating. If no element satisfies the condition, it returns -1.
-Unlike indexOf(), it searches using a callback condition instead of exact value comparison.
-
-```javascript 
-
-let usersList=[
-    { id: 1, name: "Priti" },
-    { id: 2, name: "Vipin" },
-]
-
-const find_user= usersList.findIndex((user)=>{
-    return user.id==2
-})
-console.log(find_user)//Vipin
-```
-
-
-# some() 
- At least one condition satisfies the conditon ,return true otherwise false
-
-```javascript 
-const arr = [10,20,30,40];
-const result = arr.some((num)=>num>25)//true
-console.log(result);
-```
-
-# every()
-It Check if All Matches return ture Oterwise false
-
-```javascript 
-const  users1 = [{ role: "USER" }, { role: "ADMIN" }, { role: "USER" }];
-const users1 = [{ verified: true }, { verified: true }, { verified: true }]
-const result = users1.every((user)=>user.verified)//true
-console.log(result);
-
-```
-
-# sort()
-
-```javascript 
-const number = [1,2,10,5];
-number.sort();
-console.log(number)//[1,10,2,5]
-// Why ? because Javascript Does not sort numbers by default it Convert everything into String first
-
-// Javascript internally convert Them to String 
-// "1"
-//"10"
-//"2"
-//"5"
-
-// using compare function 
-// [30,10,20]
-number.sort((a,b)=>a-b)//
-//30-10=  20  positive  swap them [10,30]
-//return 10 30
-//now compare  30-20=10 positive  swap them [20 30]
-// return [10,20,30]
-// If
-// Negative
-// Keep order
-
-
-const  fruits = ["banana", "apple", "mango"];
-fruits.sort()// apple, banana,mango
-// String are already sorted Alphabetically
-
-const users=[
-    { name: "Priti", age: 24 },
-{ name: "Rahul", age: 18 },
-{ name: "Aman", age: 30 },
-]
-
-users.sort((a,b)=>a.age-b.age)
-
-```
-
-# includes()
-includes() checks whether an array or string contains a specified value. It iterates through the elements and returns
-true as soon as it finds a match; otherwise it returns false. Unlike indexOf(), it returns a boolean instead of an index. 
-
-```javascript
-const  fruits = ["apple", "banana", "orange"];
-console.log(fruits.includes("banana"))//true
-
-const users = [{ id: 1 }, { id: 2 }];
-console.log(users.includes({ id: 1 })); // object are compare by refrence not value  false
-```
-
-
-# flat()
-flat() creates a new array by removing nested array levels. By default, it flattens one level (depth = 1). You can pass
-a depth such as flat(2) or flat(Infinity) to flatten deeper nested arrays. It does not modify the original array.
-
-```javascript
-const  strings = ["Hello World", ["JavaScript is Awesome"]];
-const flatArr= strings.flat();
-
-console.log(flatArr)//[ 'Hello World', 'JavaScript is Awesome' ]
-
-const users = [
-  {
-    name: "Priti",
-    skills: ["JavaScript", "React"]
-  },
-  [
-    {
-    name: "Vipin",
-    skills: ["Node.js", "MongoDB"]
-  }
-  ]
-];
-
-const flatUsers= users.flat()
-
-console.log(flatUsers)
-```
-
-# flatMap()
-flatMap() combines the behavior of map() and flat(1). It applies a callback to every element, expects the callback to
-return an array or value, and then automatically flattens the result by one level. It returns a new array and does not
-modify the original array.
-
-```javascript
-// flatMap() is a combination of map() and one-level flat(). It transforms each element and then flattens the resulting array by one level.
-
-
-const users = [
-  {
-    name: "Priti",
-    skills: ["JavaScript", "React"]
-  },
-  {
-    name: "Vipin",
-    skills: ["Node.js", "MongoDB"]
-  }
-];
-const skills = users.map((user) => user.skills);
-
-console.log(skills);//
- [
-   ["JavaScript", "React"],
-   ["Node.js", "MongoDB"]
- ]
-
-// but we want 
-[
-  "JavaScript",
-  "React",
-  "Node.js",
-  "MongoDB"
-]
-// With flatMap()
-const skills = users.flatMap((user) => user.skills);
-console.log(skills);
-```
-
-# Array.from()
-Array.from(iterable, mapFunction)
-
-imagine you have something that looks like an array but isn't actually an array.
-
-Array.from() creates a new array from an iterable (like a string, Set, or Map) or an array-like object (such as { length:n }). It can also take an optional mapping function that transforms each element while creating the new array. It
-returns a new array without modifying the original source.
-
-```javascript
-"Hello".map(s=>s)//  TypeError "Hello".map is not a function
-
-const string = "Hello"
-console.log(typeof string) //string
-const newStr = Array.from(string);
-console.log(newStr)//[ 'H', 'e', 'l', 'l', 'o' ]]
-console.log(typeof newStr) //object
-
-const number = Array.from({length:5});
-console.log(number)// [ undefined, undefined, undefined, undefined, undefined ]]
-
-const  numbers = Array.from({length:10},(_,i)=>i+1) 
-console.log(numbers)//Array.from() also accepts a mapping function, just like map()
-[
-  1, 2, 3, 4,  5,
-  6, 7, 8, 9, 10
-]
-
-// Set to array 
-const set = new Set([10, 20, 30]);
-
-const result = Array.from(set);
-
-console.log(result);
-
-// NodeList to Array 
-const elements = document.querySelectorAll("div");
-
-const arr = Array.from(elements);
-
-console.log(arr);
-
-
-// Array.from() also accepts a mapping function, just like map()
-const result = Array.from([1, 2, 3], (num) => {
-  return num * 2;
+Promise.resolve().then(() => {
+    console.log("Promise");
 });
 
-console.log(result);
-
-// Similar to 
-Array.from([1, 2, 3]).map((num) => num * 2);
+console.log("End");
 ```
 
+JavaScript first executes all synchronous code on the call stack, so "Start" and "End" are printed first. The Promise.then() callback is placed into the microtask queue, while the setTimeout() callback is placed into the task/macrotask queue. Once the synchronous code finishes, the event loop drains the microtask queue before processing the next macrotask. Therefore "Promise" is printed before "Timeout"
 
 
-# Array.isArray()
-Array.isArray() is a static method used to check whether a value is actually an Array. It returns true for arrays and false for other values.
+# Why doesn't setTimeout(fn, 0) execute immediately?
+setTimeout(fn, 0) schedules the callback as a task after the timer becomes eligible. It cannot interrupt currently executing synchronous JavaScript. Once the current task finishes, the runtime drains pending microtasks, and only then can the timer callback execute as a subsequent task
 
-```javascript
-const arr= [1,2,3];
-console.log(typeof arr==="Array")// false
 
-// solution 
-console.log(Array.isArray(arr))//true
-console.log(Array.isArray({})) //false
-console.log(Array.isArray("Hello"));//false
-console.log(Array.isArray(100));//false
-console.log(Array.isArray(true));//false
 
-```
+# 
+Microtask starvation occurs when the microtask queue continuously adds new microtasks, so the event loop never gets a chance to process macrotasks such as setTimeout, user events, I/O, or rendering.
+The event loop essentially keeps doing:
+Take a macrotask
+      ↓
+Execute it
+      ↓
+Is microtask queue empty?
+      ↓
+     NO
+      ↓
+Run microtask
+      ↓
+Did it create another microtask?
+      ↓
+     YES
+      ↓
+Run that microtask
+      ↓
+Repeat until queue is empty
+      ↓
+Only THEN continue
+
+
+Why Can Starvation Happen?
+Microtask #1
+    ↓
+creates Microtask #2
+    ↓
+creates Microtask #3
+    ↓
+creates Microtask #4
+    ↓
+creates Microtask #5
+    ↓
+...
+
+The queue never becomes empty.
+
+And because the event loop wants to fully drain the microtask queue, it cannot move forward to the next macrotask.
+
+ Macrotask blocked
+                ↓
+      Rendering blocked
+
+This is microtask starvation.
+
+A microtask is allowed to enqueue another microtask, and that newly created microtask must also be processed before the queue is considered drained.
+
+
+# Can a Promise or microtask block a setTimeout(..., 0)?"
+Yes.
+
+Promise.then(), queueMicrotask(), and other microtask-producing mechanisms are processed in the microtask checkpoint before the event loop proceeds to another macrotask/task.
+
+If a microtask continuously schedules another microtask, the microtask queue may never become empty. As a result, the event loop cannot proceed to pending macrotasks such as setTimeout, and in browsers rendering and user-event processing can also be delayed.
+
+sort :👇
+Yes. setTimeout(fn, 0) only makes the callback eligible to run in a future task; it doesn't give it priority. The event loop processes the current task and then drains the microtask queue. If microtasks keep adding more microtasks, the queue never becomes empty, so the event loop can starve subsequent tasks and, in a browser, delay rendering and user events.
+
+
+
 # Map() Data Structure
 
 Map is a built-in JavaScript data structure used to store key-value pairs.    Unlike regular objects, Map allows keys of any data type and provides methods such as set, get, has, delete, and clear. It is commonly used for frequency counting, caching, lookup tables, and DSA problems such as Two Sum."
@@ -5470,50 +5967,6 @@ loggedInUsers.delete(102);
 
 console.log(loggedInUsers.has(102));
 // false
-```
-
-# Memoization
-Memoization is a performance optimization technique where we cache the result of a function based on its inputs. When the function is called again with the same input, we return the cached result instead of recalculating it. It is useful for expensive, repeated, and preferably pure computations.
-
-```javascript
-function square(n) {
-  console.log("Calculating...");
-  return n * n;
-}
-square(5);
-square(5);
-square(5);
-// Calculating...
-// Calculating...
-// Calculating...
-// Same calculation 3 times ho rahi hai.
-function memoize(fn) {
-  const cache = new Map();
-
-  return function (n) {
-    if (cache.has(n)) {
-      console.log("From cache");
-      return cache.get(n);
-    }
-
-    console.log("Calculating...");
-
-    const result = fn(n);
-
-    cache.set(n, result);
-
-    return result;
-  };
-}
-
-function square(n) {
-  return n * n;
-}
-const memoizedSquare = memoize(square);
-console.log(memoizedSquare(5));
-console.log(memoizedSquare(5));
-console.log(memoizedSquare(10));
-console.log(memoizedSquare(5));
 ```
 
 # Generator Functions
@@ -5670,6 +6123,9 @@ greet("Priti");
 # DOM 
 he DOM (Document Object Model) is a tree-like, in-memory object representation of the HTML document, built by the browser's parser. JavaScript reads/modifies this object model — not the original HTML file.
 
+# What is the DOM, and how is the DOM represented internally?
+The DOM, or Document Object Model, is a programming interface created by the browser from an HTML document. The browser parses the HTML and represents it as a hierarchical tree of nodes. The document object is the root, HTML elements become Element nodes, and text and comments are represented as separate nodes. JavaScript can traverse this tree using relationships such as parentElement, children, and nextElementSibling, and can manipulate the nodes using APIs such as createElement, appendChild, remove, and textContent. Events also use this tree structure for propagation through capturing and bubbling.
+
 # 1. What is DOM?
 
 ## Definition
@@ -5767,7 +6223,20 @@ Document
 
 ------------------------------------------------------------------------
 
+# What is the difference between querySelectorAll() and getElementsByClassName()?"
+
+
+querySelectorAll() accepts a CSS selector and returns a static NodeList containing all matching elements. getElementsByClassName() accepts class names and returns a live HTMLCollection. The important difference is that a static NodeList doesn't automatically reflect later DOM changes, while a live HTMLCollection does.
+
+```js
+const staticList =
+  document.querySelectorAll(".item");
+
+const liveCollection =
+  document.getElementsByClassName("item");
+  ```
 # 3. querySelector vs querySelectorAll
+
 
 ## Definition
 
@@ -6431,6 +6900,171 @@ console.log(button.closest(".card"));
 
 ------------------------------------------------------------------------
 
+# Event Propagation
+
+Event propagation is the process by which an event travels through the DOM from the target element to other elements in the DOM hierarchy.
+Event propagation has 3 phases:
+            1. Capturing Phase
+                  ↓
+            2. Target Phase
+                 ↓
+            3. Bubbling Phase
+```Event propagation is the mechanism through which an event travels through the DOM. It has three phases: capturing, where the event travels from the root toward the target; target phase, where it reaches the target element; and bubbling, where it travels back from the target toward the root. By default, most event listeners handle events during the bubbling phase.```
+
+# Event Bubbling/Capturing
+
+Event Bubbling is the process in which an event starts from the target element and propagates upward through its parent elements.
+```javascript
+Bubbling-
+            button
+            ↑
+            div
+            ↑
+            body
+            ↑
+            html
+
+<div id="parent">
+  <button id="child">
+    Click Me
+  </button>
+</div>
+
+const parent = document.getElementById("parent");
+const child = document.getElementById("child");
+
+parent.addEventListener("click", () => {
+  console.log("Parent");
+});
+
+child.addEventListener("click", () => {
+  console.log("Button");
+});
+//Button 
+//Parent
+```
+
+Event Capturing is the process in which an event propagates from the top-level ancestor down toward the target element.
+```javascript
+Capturing-
+                html
+                ↓
+                body
+                ↓
+                div
+                ↓
+                button
+
+parent.addEventListener(
+  "click",
+  () => {
+    console.log("Parent");
+  },
+  true
+);
+//Parent
+//Button
+```
+# stopPropagation() vs stopImmediatePropagation()
+stopPropagation() stops the event from propagating to other elements in the capturing or bubbling phase, but it does not stop other event listeners on the same element.
+
+```javascript
+button.addEventListener("click", () => {
+  console.log("Listener 1");
+  event.stopPropagation();
+});
+
+button.addEventListener("click", () => {
+  console.log("Listener 2");
+});
+//Button
+//stopPropagation()  stop 
+//Does not execute parent handler
+//button
+  //↓
+//stopPropagation()
+ // ↓
+//🛑 Parent propagation stops
+```
+stopImmediatePropagation() stops the event from propagating AND prevents any remaining event listeners on the same element from executing.
+
+```javascript
+button.addEventListener("click", (event) => {
+  console.log("Listener 1");
+
+  event.stopImmediatePropagation();
+});
+
+button.addEventListener("click", () => {
+  console.log("Listener 2");
+});
+//Listener 1
+// Listener 2 will not execute.
+
+button
+  │
+  ├── Listener 1
+  │      ↓
+  │  stopImmediatePropagation()
+  │      ↓
+  🛑 Listener 2
+  🛑 Parent
+```
+
+
+#  Event Delegation
+ 
+ Event Delegation is a technique where we attach a single event listener to a parent element instead of attaching separate listeners to each child element, and use event bubbling to determine which child triggered the event.
+
+
+Event delegation is a technique where we attach a single event listener to a common parent instead of attaching separate listeners to each child. It works because events such as click bubble from the target element up through its ancestors. Inside the parent listener, we use event.target or methods like closest() to determine which child triggered the event.
+
+It reduces the number of event listeners, which can improve memory usage and simplify event handling. Another major advantage is that it works naturally with dynamically added child elements because the parent listener already exists.
+ ```javascript
+//  without Event Delegation
+const buttons = document.querySelectorAll("button");
+//100 buttons
+//100 event listeners
+buttons.forEach((button) => {
+  button.addEventListener("click", () => {
+    console.log(button.textContent);
+  });
+});
+
+// when nested elements are involved:
+// event.target.closest(".some-selector")
+
+// With Event Delegation 
+<ul id="users">
+  <li>Priti</li>
+  <li>Vipin</li>
+  <li>John</li>
+</ul>
+const users = document.getElementById("users");
+
+users.addEventListener("click", (event) => {
+  if (event.target.tagName === "LI") {
+    console.log(event.target.textContent);
+  }
+});
+
+                     ul
+                      │
+      ┌───────┼───────┐
+      ↓              ↓              ↓
+      li               li             li
+      Priti           Vipin    John
+      │
+      │ click
+      ↓
+   bubbling
+      ↓
+      ul
+      ↓
+parent listener
+
+ ```
+
 # DOMContentLoaded vs load
 
 ## `DOMContentLoaded`
@@ -6701,6 +7335,126 @@ manage UI updates.
 ------------------------------------------------------------------------
 
 
+
+# What is MutationObserver and why is it asynchronous?
+
+MutationObserver is a browser API that asynchronously watches the DOM for mutations such as added or removed nodes, attribute changes, and text changes. When a matching mutation occurs, the browser creates MutationRecords and delivers them to the observer callback during microtask processing. Unlike deprecated MutationEvents, it allows DOM changes to be handled asynchronously and efficiently.
+
+When a matching DOM mutation occurs, the browser creates a MutationRecord and queues it for the observer. The observer callback is then delivered during microtask processing rather than executing synchronously at the exact point of the DOM mutation.
+
+This makes it much more efficient than the old MutationEvent approach and allows multiple DOM changes to be collected and delivered together.
+
+# What is MutationObserver?
+
+MutationObserver is a browser API that lets JavaScript watch for changes made to the DOM.
+
+For example, you can observe:
+
+A new element being added
+An element being removed
+An attribute changing
+Text/content changing
+Changes inside an entire subtree
+
+MutationObserver asynchronously observes changes to the DOM and executes a callback with information about those changes.
+
+```js
+const observer = new MutationObserver((mutations) => {
+    console.log(mutations);
+});
+
+observer.observe(targetNode, {
+    childList: true,
+    attributes: true,
+    characterData: true,
+    subtree: true
+});
+```
+Three important steps:
+
+```js
+Step 1 — Create observer
+const observer = new MutationObserver(callback);
+Step 2 — Tell it what to observe
+observer.observe(element, options);
+Step 3 — Stop observing when necessary
+observer.disconnect();
+```
+
+# What is IntersectionObserver?
+IntersectionObserver is a browser Web API that lets JavaScript observe whether one element is intersecting with another element, most commonly:
+
+When the element enters or leaves the viewport, the browser tells your JavaScript.
+```js
+<img
+    class="lazy"
+    data-src="large-photo.jpg"
+    width="400"
+    height="300"
+/>
+
+<script>
+const images = document.querySelectorAll(".lazy");
+
+const observer = new IntersectionObserver(
+    (entries, observer) => {
+        entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+
+            const img = entry.target;
+
+            img.src = img.dataset.src;
+
+            img.onload = () => {
+                img.classList.add("loaded");
+            };
+
+            observer.unobserve(img);
+        });
+    },
+    {
+        rootMargin: "200px"
+    }
+);
+
+images.forEach((image) => {
+    observer.observe(image);
+});
+</script>
+```
+
+# Why use IntersectionObserver instead of a scroll event with getBoundingClientRect()?"
+
+IntersectionObserver is designed specifically for detecting intersection between an element and a root such as the viewport. Instead of manually handling frequent scroll events and repeatedly calculating element positions with APIs such as getBoundingClientRect(), we let the browser perform the intersection tracking and notify our callback when the relevant intersection thresholds are crossed. This generally produces cleaner and more efficient code and avoids having to build our own visibility-detection logic. It's commonly used for lazy loading, infinite scrolling, animations, and impression tracking.
+
+Short version for a fast interview:
+
+"IntersectionObserver lets the browser track element visibility for us, instead of manually listening to scroll and calculating positions. It's cleaner, usually more efficient, and supports thresholds, root margins, and custom scroll containers."
+
+
+# What is DocumentFragment, and why is it useful?
+
+DocumentFragment is a lightweight DOM container that is not attached to the document. We can create and modify multiple DOM nodes inside the fragment and then append the fragment to the live DOM. When the fragment is appended, its children are moved into the target element and the fragment becomes empty. This is useful for batching DOM construction and reducing unnecessary interaction with the live DOM. For performance, we should also avoid repeatedly alternating DOM writes with layout-triggering reads because that can cause layout thrashing.
+
+```js
+<ul id="users"></ul>
+const users = ["Priti", "Vipin", "Aman"];
+
+const ul = document.querySelector("#users");
+
+const fragment = document.createDocumentFragment();
+
+users.forEach(user => {
+    const li = document.createElement("li");
+
+    li.textContent = user;
+
+    fragment.appendChild(li);
+});
+
+ul.appendChild(fragment);
+```
+
 #  Stack vs Heap?'
 The Stack stores fixed-size primitive values and execution frames, while the Heap stores dynamic, complex reference types (objects, arrays, functions).
 
@@ -6813,19 +7567,200 @@ console.log(user + "");     // "User"
 
 
 # What is Function Composition?
+Function composition means taking several small functions and combining them into one larger function.
+
 Function composition is a functional programming concept where you combine two or more functions to create a new function.
 In composition, the output of one function automatically becomes the input of the next function. It follows the mathematical principle of \(f(g(x))\), executing from the rightmost (innermost) function to the leftmost (outermost) function.
 
 ```JS
-const double = (x) => x * 2;
-const addTen = (x) => x + 10;
-const result = addTen(double(5));
+const addOne = x => x + 1;
+const double = x => x * 2;
+const square = x => x * x;
+
+// Instead of doing:
+const result = square(double(addOne(2)));
 console.log(result);
+// we can create one function:
+const composed = compose(square, double, addOne);
+
+console.log(composed(2)); // 36
+
 ```
+
+# What is pipe()?
+
+pipe() does the same general job, but functions execute LEFT → RIGHT.
+pipe and compose are higher-order functions because they accept functions as arguments and return a new function. pipe executes those functions from left to right, while compose executes them from right to left. I can implement pipe using reduce() and compose using reduceRight(). The returned function closes over the functions array."
+
+```js
+const addOne = x => x + 1;
+const double = x => x * 2;
+const square = x => x * x;
+
+const piped = pipe(
+    addOne,
+    double,
+    square
+);
+
+console.log(piped(2)); // 36
+
+compose(square, double, addOne)(2)
+
+// and
+
+pipe(addOne, double, square)(2)
+
+// produce the same result.
+
+// The ordering of the function arguments is what differs.
+
+
+const getUser = id => ({
+    id: id,
+    name: "Priti"
+});
+
+const getNameLength = name => name.length;
+
+const pipeline = pipe(
+    getUser,
+    getNameLength
+);
+
+console.log(pipeline(10));
+```
+
 # Why Use It?
 Instead of creating monolithic, complex functions, function composition allows you to build small, reusable, single-responsibility functions and glue them together. This results in cleaner, more testable, and declarative code.
 
 
+
+
+
+# Pure Function Connection
+
+A pure function is a function that always produces the same output for the same input and has no side effects. It doesn't modify external state, mutate its arguments, perform I/O, or depend on changing external values such as time or random numbers.
+
+Same input
+   ↓
+Same output
+and doesn't produce side effects
+
+Same inputs → same output
+No external variable modified
+No DOM
+No API
+No console dependency
+No random value
+```js
+const square = x => x * x;//this is pure 
+function multiply(a, b) {
+  return a * b;
+}
+
+console.log(multiply(4, 5)); // 20
+console.log(multiply(4, 5)); // 20
+console.log(multiply(4, 5)); // 20
+// but
+let total = 0;
+
+const add = x => {
+    total += x;
+    return total;
+};//has a side effect because it modifies external state.
+
+
+let multiplier = 2;
+
+function multiply(a) {
+  return a * multiplier;
+}
+multiply(5); // 10
+multiplier = 10;
+
+multiply(5); // 50
+Same argument:
+
+5
+
+but different output:
+
+10
+50
+
+
+// Arrays and Mutation
+function addItem(arr, item) {
+  arr.push(item);
+
+  return arr;
+}//this is impure.  because arr.push(item);  mutates the original array.
+
+
+
+// Pure version
+
+// Create a new array:
+function addItem(arr, item) {
+  return [...arr, item];
+}
+
+const numbers = [1, 2, 3];
+
+const result = addItem(numbers, 4);
+
+console.log(result);  // [1, 2, 3, 4]
+console.log(numbers); // [1, 2, 3]
+
+
+const user = {
+  name: "Priti",
+  age: 25
+};
+
+function updateAge(user) {
+  user.age = 30;
+  return user;
+}
+
+const result = updateAge(user);
+
+console.log(result);
+console.log(user);
+// The function mutates the object:  user.age = 30;
+
+// external object
+//       ↓
+//    modified
+
+// The function has a side effect.
+
+
+// PURE Version 
+function updateAge(user) {
+  return {
+    ...user,
+    age: 30
+  };
+}
+
+const user = {
+  name: "Priti",
+  age: 25
+};
+
+const result = updateAge(user);
+
+console.log(result);
+// { name: "Priti", age: 30 }
+
+console.log(user);
+// { name: "Priti", age: 25 }
+
+// Now the original object remains unchanged.
+
+```
 
 # What is Pure Function?
 "A pure function is a function that always produces the same output for the same input and has no side effects. It doesn't modify external state or depend on external mutable data. Because of this, pure functions are predictable, reusable, and easy to test."
@@ -6952,3 +7887,2914 @@ user.greet();
 # Implement an Event Emitter.
 An EventEmitter is a design pattern (and a built-in module in Node.js) that allows objects to communicate with each other by emitting named events and registering listener functions to handle them
 
+
+
+
+# localStorage vs sessionStorage
+
+Both are browser-provided Web Storage APIs that let JavaScript persist string key-value data. The biggest difference is lifetime and scope.
+
+
+
+# What is the difference between localStorage and sessionStorage?
+Both localStorage and sessionStorage are browser Web Storage APIs that store key-value data as strings. The main difference is their lifetime and scope. localStorage persists after the tab and browser are closed and is shared across pages and tabs of the same origin. sessionStorage is associated with a particular page session/tab, so it is isolated between tabs and is normally cleared when that tab is closed. Both APIs are synchronous and have browser-dependent storage limits, typically around a few megabytes.
+
+Then give an example:
+
+I would use localStorage for things like theme preferences or non-sensitive persisted UI settings, while I would use sessionStorage for temporary tab-specific state, such as a multi-step form state that shouldn't be shared with another tab.
+
+
+
+# What does "same-origin" mean?
+
+An origin is roughly:
+
+protocol + hostname + port
+
+For example:
+
+https://example.com:443
+
+If two pages have the same origin, they can access the same localStorage.
+
+For example:
+
+Tab 1:
+https://example.com/page1
+
+Tab 2:
+https://example.com/page2
+
+Both have the same origin.
+
+Therefore:
+```js
+localStorage.setItem("theme", "dark");
+```
+in Tab 1 can be read from Tab 2:
+
+```js
+localStorage.getItem("theme");
+```
+But sessionStorage is different
+
+Each tab gets its own session storage.
+
+Tab A
+example.com
+sessionStorage
+     ↓
+theme = dark
+
+
+Tab B
+example.com
+sessionStorage
+     ↓
+theme = light
+
+Same origin doesn't mean same sessionStorage.
+
+window.localStorage
+window.sessionStorage
+localStorage.setItem("name", "Priti");
+
+is conceptually:
+
+window.localStorage.setItem("name", "Priti");
+
+The browser then manages the actual persistence.
+
+```js
+localStorage.setItem("name", "Priti");
+
+const name = localStorage.getItem("name");
+
+console.log(name);
+console.log(typeof name);
+
+localStorage.removeItem("name");
+
+console.log(localStorage.getItem("name"));//null
+
+localStorage.clear();
+```
+
+```js
+const settings = {
+    theme: "dark",
+    fontSize: 18,
+    language: "en"
+};
+
+localStorage.setItem(
+    "settings",
+    JSON.stringify(settings)
+);
+
+const storedSettings = JSON.parse(
+    localStorage.getItem("settings")
+);
+
+console.log(storedSettings);
+```
+
+
+Storage Events
+```js
+window.addEventListener("storage", (event) => {
+    console.log("Key:", event.key);
+    console.log("Old value:", event.oldValue);
+    console.log("New value:", event.newValue);
+});
+```
+
+```js
+// Store data
+sessionStorage.setItem("username", "Priti");
+
+// Get data
+const username = sessionStorage.getItem("username");
+
+console.log(username);
+sessionStorage.removeItem("username");
+
+console.log(sessionStorage.getItem("username"));
+
+const user = {
+    name: "Priti",
+    age: 25
+};
+
+sessionStorage.setItem("user", JSON.stringify(user));
+
+const storedUser = JSON.parse(
+    sessionStorage.getItem("user")
+);
+
+console.log(storedUser);
+console.log(storedUser.name);
+
+```
+
+
+# Cookies in JavaScript
+
+A cookie is a small piece of data stored by the browser and associated with a website/domain. Unlike localStorage, cookies can be automatically attached to matching HTTP requests to the server.
+
+
+Cookie = Browser storage + HTTP request metadata + security rules
+
+# How Cookies Work Internally
+There are two major ways cookies get created.
+
+A. Server creates cookie
+
+Server response:
+
+HTTP/1.1 200 OK
+Set-Cookie: sessionId=abc123; HttpOnly; Secure; SameSite=Lax
+
+The browser's cookie storage receives:
+
+Domain: example.com
+Name: sessionId
+Value: abc123
+HttpOnly: true
+Secure: true
+SameSite: Lax
+
+Then, when a matching request is made:
+
+GET /dashboard
+Cookie: sessionId=abc123
+
+The browser handles this automatically.
+
+B. JavaScript creates cookie
+
+JavaScript can use:
+
+document.cookie = "theme=dark";
+
+The browser stores it.
+
+Then:
+
+console.log(document.cookie);
+
+might produce:
+
+theme=dark
+
+But JavaScript cannot see HttpOnly cookies.
+
+
+HttpOnly
+Set-Cookie: sessionId=abc123; HttpOnly
+
+Then:
+
+console.log(document.cookie);
+
+will not show:
+
+sessionId=abc123
+
+Why?
+
+Because the browser prevents JavaScript from reading an HttpOnly cookie.
+
+This is useful against cookie theft through many XSS scenarios.
+
+Secure
+Set-Cookie: sessionId=abc123; Secure
+
+The browser sends it only over HTTPS.
+
+Conceptually:
+
+https://example.com
+       ↓
+   Cookie ✅
+
+http://example.com
+       ↓
+   Cookie ❌
+SameSite
+
+Controls when cookies are included in cross-site requests.
+
+Common values:
+
+SameSite=Strict
+SameSite=Lax
+SameSite=None
+```js
+// Create cookie
+document.cookie = "username=priti";
+document.cookie = "theme=dark";
+document.cookie =
+  "theme=dark; Max-Age=3600; Secure; SameSite=Lax";
+
+  // You can also use Path:
+
+document.cookie =
+  "adminMode=true; Path=/admin; Max-Age=3600";
+
+// Now the browser associates that cookie with /admin paths.
+
+// Read cookies
+console.log(document.cookie);
+
+
+
+// Deleting a Cookie
+document.cookie = "theme=dark; Max-Age=3600";
+
+// To delete it: browser romoves it 
+
+document.cookie = "theme=; Max-Age=0";
+
+document.cookie =
+  "theme=; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+```
+
+# Cookies vs localStorage — What's the difference
+Cookies and localStorage are both browser-side storage mechanisms, but they serve different purposes. Cookies are primarily designed to participate in HTTP communication and can be automatically sent with matching requests to the server. localStorage is client-side storage that JavaScript must explicitly read and send to the server. Cookies also support security and lifecycle attributes such as HttpOnly, Secure, SameSite, Expires, and Max-Age, while localStorage does not provide equivalent cookie attributes.
+
+
+Suppose your frontend is:
+
+https://app.example.com
+
+and API:
+
+https://api.example.com
+
+For cookie-based authentication, requests may need credentials enabled depending on whether the request is same-origin or cross-origin.
+
+For cross-origin fetch:
+
+fetch("https://api.example.com/profile", {
+  credentials: "include"
+});
+
+Then the server must also be configured appropriately for credentialed CORS.
+
+This connects cookies directly with:
+
+
+# What is IndexedDB?
+IndexedDB is a browser-provided asynchronous, transactional, NoSQL database. It lets a web application store large amounts of structured data locally, including objects, arrays, and Blob/binary data.
+Browser
+│
+├── localStorage
+│     └── simple key → value
+│
+├── sessionStorage
+│     └── temporary key → value
+│
+├── Cookies
+│     └── small data sent with HTTP requests
+│
+└── IndexedDB
+      └── Full client-side database
+          ├── Objects
+          ├── Arrays
+          ├── Blobs
+          ├── Indexes
+          └── Transactions
+
+It is particularly useful for:
+
+Offline-first applications
+PWAs
+Caching API responses
+Storing large datasets
+Storing files/images/blobs
+Applications that need data persistence without a server connection
+
+
+# Why is IndexedDB asynchronous?
+
+Suppose you had:
+
+const users = indexedDB.getAllUsers();
+
+If the browser had to synchronously read a huge database from disk:
+
+JS
+ ↓
+Read database
+ ↓
+Disk/storage
+ ↓
+Wait...
+ ↓
+Return data
+
+That could block the main thread.
+
+JavaScript in the browser needs to keep the UI responsive.
+
+So IndexedDB uses an asynchronous request model:
+
+
+```js
+const request = indexedDB.open("MyDB", 1);
+
+request.onupgradeneeded = function (event) {
+    const db = event.target.result;
+
+    db.createObjectStore("users", {
+        keyPath: "id"//The id property inside each object becomes the key.   101 → { id: 101, name: "Priti" }
+        //  autoIncrement: true// Now IndexedDB can generate keys.
+    });
+};
+
+request.onsuccess = function (event) {
+    const db = event.target.result;
+
+    const transaction = db.transaction("users", "readwrite");
+
+    const store = transaction.objectStore("users");
+
+    store.add({
+        id: 1,
+        name: "Priti",
+        role: "Developer"
+    });
+
+    transaction.oncomplete = function () {
+        console.log("User saved");
+    };
+};
+
+request.onerror = function () {
+    console.log("Database error");
+};
+```
+
+```js
+const request = indexedDB.open("AppDB", 1);
+
+request.onupgradeneeded = function (event) {
+    const db = event.target.result;
+
+    const store = db.createObjectStore("users", {
+        keyPath: "id"
+    });
+
+    store.createIndex(
+        "emailIndex",
+        "email",
+        { unique: true }
+    );
+};
+
+request.onsuccess = function (event) {
+    const db = event.target.result;
+
+    // WRITE
+    const writeTransaction =
+        db.transaction("users", "readwrite");
+
+    const store =
+        writeTransaction.objectStore("users");
+
+    store.put({
+        id: 1,
+        name: "Priti",
+        email: "priti@example.com"
+    });
+
+    writeTransaction.oncomplete = function () {
+
+        // READ
+        const readTransaction =
+            db.transaction("users", "readonly");
+
+        const userStore =
+            readTransaction.objectStore("users");
+
+        const emailIndex =
+            userStore.index("emailIndex");
+
+        const request =
+            emailIndex.get("priti@example.com");
+
+        request.onsuccess = function () {
+            console.log(request.result);
+        };
+    };
+};
+
+
+
+
+
+// Deleting data
+
+// Delete one record:
+
+const transaction =
+    db.transaction("users", "readwrite");
+
+const store =
+    transaction.objectStore("users");
+
+store.delete(1);
+
+// Clear all records:
+
+store.clear();
+
+// Delete the entire database:
+
+indexedDB.deleteDatabase("MyDB");
+```
+
+add()
+
+Adds a new record.
+
+store.add({
+    id: 1,
+    name: "Priti"
+});
+
+If key 1 already exists:
+
+ERROR
+put()
+
+Adds or replaces a record.
+
+store.put({
+    id: 1,
+    name: "Priti"
+});
+
+If 1 doesn't exist:
+Create
+
+If 1 exists:
+
+Update
+
+# What is IndexedDB, and how is it different from localStorage?
+IndexedDB is an asynchronous, transactional, NoSQL database built into the browser. It is designed for storing larger amounts of structured data, including objects and binary data such as Blobs. It supports object stores, indexes, keys, cursors, and transactions.
+
+localStorage, on the other hand, is a much simpler synchronous key-value storage API that stores strings. It doesn't provide database-style transactions, indexes, or querying capabilities.
+
+Because IndexedDB is asynchronous and supports structured data and transactions, it's more suitable for applications such as offline-first PWAs, large client-side caches, and applications that need persistent local data.
+
+
+
+
+
+
+
+
+
+
+# Fetch apis 
+fetch() is the modern browser API for making HTTP requests. It returns a Promise, and the returned Response contains a ReadableStream body that you explicitly consume with .json(), .text(), .blob(), etc.
+
+fetch("https://api.example.com/users");
+
+fetch() does not immediately give you the data.
+```js
+fetch("/api/users")
+  .then(response => response.json())
+  .then(data => {
+    console.log(data);
+  });
+
+  // or 
+  async function getUsers() {
+  const response = await fetch("/api/users");
+
+  const data = await response.json();
+
+  console.log(data);
+}
+
+
+// The Response object
+// A Response contains information such as:
+
+response.status
+response.ok
+response.statusText
+response.headers
+response.body
+
+// Example:
+
+const response = await fetch("/api/users");
+
+console.log(response.status);
+console.log(response.ok);
+console.log(response.headers);
+console.log(response.body);
+
+const data = await response.json();
+// Plain text
+const text = await response.text();
+// Binary/file data
+const blob = await response.blob();
+
+
+// Fetched with headers 
+const response = await fetch("/api/users", {
+  method: "GET",
+
+  headers: {
+    "Authorization": "Bearer token123",
+    "Content-Type": "application/json"
+  }
+});
+
+// Axios also provides conveniences such as interceptors and automatic JSON handling.
+
+// But Fetch is a native Web API and doesn't require an additional library.
+  ```
+
+
+  # What is the difference between fetch() rejecting and receiving an HTTP error such as 404?"
+fetch() returns a Promise that resolves to a Response once the browser receives a response from the server. HTTP status codes like 404 or 500 normally do not cause the Promise to reject. Instead, the Promise resolves with a Response where response.ok is false. The Promise rejects for failures such as network errors or an aborted request. Therefore, in production code I explicitly check response.ok or response.status before processing the response body.
+
+
+
+
+# What is CORS?
+CORS = Cross-Origin Resource Sharing.
+
+It is a browser security mechanism that controls whether JavaScript running on one origin can access resources from another origin.
+
+CORS, or Cross-Origin Resource Sharing, is a browser security mechanism that allows a server to specify which cross-origin requests can be accessed by frontend JavaScript. By default, the browser follows the Same-Origin Policy and restricts JavaScript from reading cross-origin responses.
+
+For a simple cross-origin request, the browser can send the actual request with an Origin header. The server responds with Access-Control-Allow-Origin, and the browser checks whether the requesting origin is allowed.
+
+For non-simple requests, such as requests using certain methods or custom headers, the browser first sends an OPTIONS preflight request. The preflight includes headers such as Origin, Access-Control-Request-Method, and Access-Control-Request-Headers. The server responds with headers such as Access-Control-Allow-Origin, Access-Control-Allow-Methods, and Access-Control-Allow-Headers. If the CORS policy permits the request, the browser sends the actual request.
+
+An important point is that CORS is enforced by browsers, not by the HTTP server itself. That's why an API can work in Postman or curl but fail when called from browser JavaScript.
+
+An origin consists of:
+
+protocol + host + port
+
+For example:
+
+http://localhost:3000
+
+and
+
+http://localhost:5000
+
+are different origins because the ports differ.
+
+Similarly:
+
+http://example.com
+https://example.com
+
+are different origins because the protocols differ.
+And:
+
+https://example.com
+https://api.example.com
+
+are different origins because the hosts differ.
+
+
+# Why does CORS exist?
+
+Imagine you're logged into:
+
+https://bank.com
+
+Your browser has your bank cookies.
+
+Now you visit a malicious website:
+
+https://evil.com
+
+Its JavaScript tries:
+
+fetch("https://bank.com/account");
+
+Without browser security restrictions, evil.com could potentially read sensitive data returned by your bank.
+
+So browsers enforce the Same-Origin Policy (SOP).
+
+```js
+const cors = require("cors");
+app.use(cors({
+    origin: "http://localhost:3000"
+}));
+
+
+// YOU CAN ALLOW  MULTIPLE KNOWN ORIGIN
+const allowedOrigins = [
+    "http://localhost:3000",
+    "https://myapp.com"
+];
+
+app.use(cors({
+    origin: function (origin, callback) {
+
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error("Not allowed by CORS"));
+        }
+    }
+}));
+
+
+app.use(cors({
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
+
+// Access-Control-Allow-Origin
+
+// Server says which origin is allowed:
+
+// Access-Control-Allow-Origin: http://localhost:3000
+
+// Can also be:
+
+// Access-Control-Allow-Origin: *
+
+// Access-Control-Allow-Methods
+
+
+// Access-Control-Allow-Methods: GET, POST, PUT, DELETE
+// Access-Control-Allow-Headers
+
+// Access-Control-Allow-Headers: Content-Type, Authorization
+
+// Access-Control-Allow-Credentials
+
+// Used when cross-origin requests involve credentials such as cookies.
+
+// Access-Control-Allow-Credentials: true
+
+
+
+// CORS + COOKIE
+// For cross-origin credentialed requests:
+fetch("https://api.example.com/profile", {
+    credentials: "include"
+});
+
+// The server needs appropriate CORS configuration.
+
+// For example:
+
+app.use(cors({
+    origin: "http://localhost:3000",
+    credentials: true
+}));
+```
+
+
+# Explain Web Workers
+Web Workers are a browser API that executes JavaScript in a separate thread and communicates with the main thread through messages, allowing CPU-intensive work to happen without blocking UI responsiveness.
+
+# What is a Web Worker, and how is it different from the JavaScript event loop?
+A Web Worker allows JavaScript to execute in a separate browser thread, independently of the main UI thread. It is useful for CPU-intensive tasks such as parsing large data, image processing, encryption, or complex calculations because those tasks can otherwise block the main thread and make the UI unresponsive.
+
+Workers cannot directly access the DOM or window. The main thread and worker communicate through postMessage() and message events. Data is generally transferred using the structured clone algorithm, with transferable objects available when ownership transfer is preferable.
+
+The JavaScript event loop, on the other hand, coordinates asynchronous callbacks and tasks within an execution environment. It doesn't automatically move CPU-heavy JavaScript to another thread. A Web Worker provides the separate execution context/thread that can perform that work without blocking the main UI thread.
+
+# Does JavaScript become multithreaded?
+JavaScript execution in the browser is traditionally single-threaded per execution context, but browsers provide Web Workers that allow JavaScript code to run in separate worker threads. These contexts don't normally share ordinary JavaScript objects and communicate through messages.
+
+
+```js
+const worker = new Worker("worker.js");// This tells the browser: "Create a worker thread and execute worker.js there.
+
+// Then communication happens using:
+worker.postMessage(data);
+worker.postMessage("Hello Worker");
+// self.postMessage(data);
+
+// The worker listens using:
+self.onmessage = (event) => {
+    console.log(event.data);// Communication is message-based.
+};
+
+// The worker does not share the same normal JavaScript execution environment with the main thread.
+// Web Worker has its own global scope
+
+// Inside a worker:
+
+console.log(self);// 
+
+
+// window is not available like it is on the page.
+
+// Workers also don't have normal DOM access:    document.querySelector(...)   ❌ Not available.
+
+
+
+// document.body.innerHTML = "Hello" ;  ❌ Not available.
+
+// The DOM belongs to the page/main-thread environment.
+
+Main Thread
+│
+├── window
+├── document
+├── DOM
+└── UI
+
+
+Worker Thread
+│
+├── JavaScript
+├── self
+├── fetch()
+├── timers
+└── computation
+
+
+
+// main.js
+const worker = new Worker("worker.js");
+
+worker.postMessage(10); //postMessage() sends a message, not a live reference to your variable.
+
+worker.onmessage = (event) => {
+    console.log("Result from worker:", event.data);
+};
+
+
+// worker.js
+self.onmessage = (event) => {
+    const number = event.data;
+
+    const result = number * 2;
+
+    self.postMessage(result);
+};
+
+// Worker doesn't make the calculation itself faster
+// Worker makes the MAIN THREAD available
+// The goal is primarily responsiveness, not automatically faster computation.
+
+worker.onerror = (error) => {
+    console.error("Worker error:", error);
+};
+
+worker.terminate();//This immediately stops the worker from the main thread side.
+self.close()//Worker can also terminate itself:
+
+
+```
+
+
+# What is a Service Worker, and how does its lifecycle work?
+A Service Worker is a browser-managed JavaScript worker that acts as a programmable network proxy between a web application and the network. It can intercept requests, serve cached responses, provide offline functionality, and support features such as push notifications and background processing.
+
+Its lifecycle primarily consists of installation, activation, and fetch handling. During install, we commonly pre-cache application resources. During activate, we can clean up old caches and take control of clients. Once active and controlling a page, the Service Worker can intercept requests through the fetch event and decide whether to respond from cache or fetch from the network.
+
+Unlike normal page JavaScript, it doesn't directly manipulate the DOM and runs in a worker context.
+
+
+It allows web applications to implement custom caching and offline strategies, making applications faster and more resilient to network failures. It's also one of the core technologies behind Progressive Web Apps.
+
+"Service Workers require a secure context, normally HTTPS, with localhost being allowed for development.
+
+Service Workers can explicitly interact with the Cache Storage API:
+
+caches.open(...)
+caches.match(...)
+cache.put(...)
+cache.delete(...)
+
+# What exactly is a Service Worker?
+
+the Service Worker sits between the browser/page and network requests.
+
+Request
+   ↓
+Should I:
+   ├── return cached response?
+   ├── fetch from network?
+   ├── return fallback?
+   └── do something else?
+
+
+   A Service Worker is JavaScript, but it does not run like your normal page JavaScript.
+
+For example:
+
+console.log(window);
+
+Inside a Service Worker, you don't have normal DOM globals like:
+
+window
+document
+
+Instead, you typically work with:
+
+self
+
+and browser APIs such as:
+
+caches
+fetch
+clients
+
+
+
+The three lifecycle events you should immediately remember are:
+```js
+install → activate → fetch
+install
+
+Used for initial setup.
+
+Usually:
+
+self.addEventListener("install", event => {
+    // Pre-cache important files
+});
+activate
+
+Used for cleanup/upgrading.
+
+For example:
+
+self.addEventListener("activate", event => {
+    // Delete old caches
+});
+fetch
+
+Used to intercept network requests.
+
+self.addEventListener("fetch", event => {
+    // Decide how to respond
+});
+```
+
+register a Service Worker
+```js
+// main.js
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/sw.js")
+        .then(registration => {
+            console.log("Service Worker registered");
+        })
+        .catch(error => {
+            console.error("Registration failed", error);
+        });
+}
+
+
+// then create  
+// sw.js
+self.addEventListener("install", event => {
+    console.log("Service Worker installed");
+});
+
+self.addEventListener("activate", event => {
+    console.log("Service Worker activated");
+});
+
+self.addEventListener("fetch", event => {
+    console.log("Request:", event.request.url);
+});
+
+
+// Registration is done from the page:
+
+// navigator.serviceWorker.register("/sw.js");
+
+// But the Service Worker itself runs separately from the page's normal JS execution context
+```
+
+"If the resource is cached, use cache. Otherwise go to network."
+
+```js
+const CACHE_NAME = "app-v1";
+
+self.addEventListener("install", event => {
+    event.waitUntil(
+        caches.open(CACHE_NAME)
+            .then(cache => {
+                return cache.addAll([
+                    "/",
+                    "/index.html",
+                    "/style.css",
+                    "/app.js"
+                ]);
+            })
+    );
+});
+
+self.addEventListener("fetch", event => {
+    event.respondWith(
+        caches.match(event.request)
+            .then(cachedResponse => {
+
+                if (cachedResponse) {
+                    return cachedResponse;
+                }
+
+                return fetch(event.request);
+            })
+    );
+});
+
+```
+
+
+# What is AbortController?
+AbortController is a Web API that lets you cancel certain asynchronous browser operations.
+For fetch(), the pattern is:
+```js
+const controller = new AbortController();
+
+fetch(url, {
+    signal: controller.signal
+});
+
+// Cancel the request
+controller.abort();
+```
+
+
+AbortController doesn't directly cancel fetch().
+You give the fetch request the controller's signal, and then calling abort() tells that signal to become aborted.
+
+# How does it work internally?
+```js
+// Create controller
+const controller= new AbortController();
+
+// The browser creates something like :
+controller={
+  signal:AbortSignal,
+  abort:function(){
+    // tell signal to abort 
+  }
+}
+
+
+
+
+// step 2  pass the signal to fetch
+// The fetch request is listening to that signal.
+fetch("/users",{
+  signal:controller.signal
+})
+
+
+// step 3 Abort 
+controller.abort();
+// the signal becomes aborted /
+
+
+
+
+// YOU CAN CHECK 
+console.log(controller.signal.aborted);
+// false
+
+controller.abort();
+
+console.log(controller.signal.aborted);
+// true
+
+
+// step 4  fetch rejects
+// If the fetch is still in progress, aborting it causes the fetch promise to reject.
+
+// AbortError
+
+
+try {
+  const response await fetch("users",{
+    signal:controller.signal,
+  })
+}catch(err){
+  console.log(err)
+}
+
+
+
+// example 
+const controller = new AbortController();
+
+fetch("https://jsonplaceholder.typicode.com/users", {
+    signal: controller.signal
+})
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+    })
+    .catch(error => {
+        if (error.name === "AbortError") {
+            console.log("Request cancelled");
+        } else {
+            console.log("Network error:", error);
+        }
+    });
+
+// Cancel request
+controller.abort();
+```
+
+
+```js
+useEffect(() => {
+    fetch("/api/users")
+        .then(res => res.json())
+        .then(data => {
+            setUsers(data);
+        });
+}, []);
+
+Potential problem:
+
+Component mounted
+      ↓
+fetch starts
+      ↓
+Component unmounts
+      ↓
+request still running
+      ↓
+response arrives
+      ↓
+.then()
+      ↓
+setUsers()
+
+// You don't want an old request continuing to affect your component logic.
+
+// The better pattern is:
+
+useEffect(() => {
+    const controller = new AbortController();
+
+    fetch("/api/users", {
+        signal: controller.signal
+    })
+        .then(res => res.json())
+        .then(data => {
+            setUsers(data);
+        })
+        .catch(error => {
+            if (error.name === "AbortError") {
+                console.log("Fetch cancelled");
+            } else {
+                console.error(error);
+            }
+        });
+
+    return () => {
+        controller.abort();
+    };
+}, []);
+
+
+// This uses the exact effect cleanup idea from your prep material: React runs cleanup when the component unmounts, and cleanup is also used before a changed effect is replaced.
+
+
+
+useEffect(() => {
+    const controller = new AbortController();
+
+    fetch(`/api/users/${userId}`, {
+        signal: controller.signal
+    })
+        .then(res => res.json())
+        .then(data => {
+            setUser(data);
+        })
+        .catch(error => {
+            console.log(error.name);
+        });
+
+    return () => {
+        controller.abort();
+    };
+}, [userId]);
+```
+
+
+
+# How do you cancel a fetch request in JavaScript?
+
+We can cancel an in-flight fetch() request using the browser's AbortController API. We create an AbortController, pass its signal to the fetch options, and call controller.abort() when we want to cancel the request. The fetch promise then rejects, typically with an AbortError, which we can handle separately from genuine network or server errors. In React, this is commonly used inside useEffect, where the controller is created inside the effect and controller.abort() is called from the cleanup function when the component unmounts or the effect needs to be replaced
+
+
+```js
+useEffect(() => {
+    const controller = new AbortController();
+
+    async function loadUsers() {
+        try {
+            const response = await fetch("/api/users", {
+                signal: controller.signal
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            setUsers(data);
+        } catch (error) {
+            if (error.name === "AbortError") {
+                // Expected when cleanup cancels the request
+                return;
+            }
+
+            console.error("Failed to fetch users:", error);
+        }
+    }
+
+    loadUsers();
+
+    return () => {
+        controller.abort();
+    };
+}, []);
+```
+
+# "What does it mean that functions are first-class citizens in JavaScript?
+
+JavaScript treats functions as first-class values. This means functions can be assigned to variables, passed as arguments, returned from other functions, and stored in objects or arrays. Because of this, JavaScript can implement callbacks and Higher-Order Functions. Methods like map, filter, and reduce rely heavily on this behavior. First-class functions, together with closures and lexical scope, are also fundamental to Functional Programming in JavaScript.
+
+# What are First-Class Functions?
+
+
+functions are values, we can:
+
+Store them in variables
+Pass them as arguments
+Return them from other functions
+Store them inside arrays/objects
+Assign them to properties
+
+These capabilities are what we mean when we say:
+
+JavaScript has first-class functions.
+
+# How Does It Work Internally?
+
+```js
+function greet() {
+    console.log("Hello");
+}
+
+const fn = greet;
+
+```
+
+```js
+// Step 1 — Function object is created
+// When JavaScript evaluates:
+
+function greet() {
+    console.log("Hello");
+}
+
+a function object is created.
+// The variable greet contains a reference to that function object.
+
+
+// Step 2 — Assignment copies the reference
+const fn = greet;
+
+// This does not create another function.
+
+greet ──────┐
+                      ↓
+       Function Object
+                      ↑
+fn ─────────┘
+
+
+console.log(greet === fn);// true
+// Both variables refer to the same function object.
+```
+
+#  First-Class Function vs Calling a Function
+
+
+```js
+Passing the function
+function greet() {
+    console.log("Hello");
+}
+
+const fn = greet;// Here we are passing the function itself.
+
+
+// Calling the function
+const fn = greet();
+// Now we are executing the function.
+
+// If greet() doesn't return anything: 
+console.log(fn)// undefined
+
+greet     // function value
+greet()   // function execution/result
+
+
+
+
+function greet() {
+    console.log("Hello!");
+}
+
+const sayHello = greet;
+
+sayHello();//Hello
+
+// greet and sayHello point to the same function.
+
+console.log(greet === sayHello);//true
+
+
+// A function can be assigned to another variable just like a number or string.
+
+// Passing Functions as Arguments
+function add(a, b) {
+    return a + b;
+}
+
+function calculate(a, b, operation) {
+    return operation(a, b);
+}
+
+console.log(calculate(10, 5, add));
+
+
+
+
+function outer() {
+    return function inner() {
+        console.log("Hello");
+    };
+}
+
+const result = outer();
+
+console.log(typeof result);//funcction
+
+result();//Hello   result ───────→ inner Function Object'''
+
+
+// fn    → function itself
+// fn()  → result of executing function
+function greet() {
+    return "Hello";
+}
+
+function execute(fn) {
+    console.log(fn);
+}
+
+execute(greet);// passes the function  means: execute recieves function
+
+// but 
+execute(greet())// executes the function first  means:   greet() --> Hello--> execute("hello")
+
+
+
+// SO 
+function excute(fn){
+  fn()
+}
+
+
+// REQUIRES
+execute(greet)
+
+// NOT 
+execute(greet())
+// First-Class Function
+
+// A language feature/property:
+
+// Functions can be treated as values.
+
+// Higher-Order Function
+
+// A function that:
+
+// Accepts a function as an argument OR returns a function.
+
+
+
+// Function inside arraya 
+// because functions are values :
+const opetrations=[
+function (a,b){
+  return a+b;
+},
+function (a,b){
+  return a-b
+},
+function (a,b){
+  return a*b
+},
+]
+
+conssole.log(operations[0](10,5)) //15
+conssole.log(operations[1](10,5))// 5
+conssole.log(operations[2](10,5))// 50
+
+
+
+// FUNCTION INSIDE OBJECTS 
+const calculator={
+  add:function(a,b){
+    return a+b
+  },
+  subtract:function(a,b){
+    return a-b
+  }
+}
+
+console.log(calculator.add(10,20))
+
+
+// Anonymous Function 
+// Because functions are values , they don't necessarily need a name
+const greet= function(){
+  console.log("hello")
+}
+// this is anonymos function expression 
+// YOU can also pass one directly 
+setTimeout(function(){
+  console.log("hello")
+},1000)
+
+// The function is created and passed as a value 
+
+
+// Arrow function 
+const add = (a,b)=>{
+return a+b
+}
+const add =(a,b)=>a+b
+
+// Can be passed around 
+function execute(fn){
+  return fn(10,20)
+}
+console.log(execute(add))//30  
+
+const x= add() //executing the function and storing its result?
+const x= add; // storing  the function
+```
+JavaScript is a multi-paradigm language that supports functional programming because functions are first-class values and JavaScript provides features such as closures, higher-order functions, map/filter/reduce, and function composition.
+
+
+
+
+
+# Array Methods
+# map, filter, reduce
+ # map()
+ map() is an array method used to transform each element of an array and return a new array of the transformed
+values. Internally, JavaScript creates a new array, iterates over the original array once, calls the provided callback
+for every element (passing the current value, index, and original array), stores the callback's return value in the new
+array, and finally returns that new array. The original array is never modified.
+```javascript
+
+let arr = [2, 30, 4, 50];
+const result=arr.map((val,index,arr)=>{
+    return val*2
+})
+console.log(result)
+```
+
+# map() — Transform Every Element
+Definition
+
+map():
+
+visits every element
+calls your callback
+stores each returned value
+returns a new array
+result has the same length as the original array
+
+```js
+Array.prototype.myMap = function(callback) {
+    const result = [];
+
+    for (let i = 0; i < this.length; i++) {
+        result.push(callback(this[i], i, this));
+    }
+
+    return result;
+};
+
+// usage
+const numbers = [1, 2, 3];
+
+const result = numbers.map(x => x * 2);
+```
+
+
+
+
+# What is the difference between map(), filter(), and reduce()?
+
+map() is used when I want to transform every element of an array. It returns a new array with the same number of elements.
+
+filter() is used when I want to select elements based on a condition. It returns a new array containing only the elements for which the callback returns a truthy value.
+
+reduce() is used when I want to accumulate or combine array elements into a single result. The result can be a number, string, object, array, or another data structure.
+
+All three methods accept callback functions, so they are examples of higher-order functions. They don't mutate the original array by themselves.
+
+
+```js
+// reduce () can build objects 
+
+const users=[
+  {id:1,name:"A"},
+  {id:2,name:"B"},
+  {id:3,,name:"C"}
+]
+
+//Convert it into 
+{
+  1:"A",
+  2:"B",
+  3:"C"
+}
+
+
+// SOLUTION :
+const result = users.reduce((acc,user)=>{
+acc[user.id]= user.name
+return acc;
+},{})
+console.log(result)
+```
+
+# Can map() / filter() Mutate Objects?
+The methods themselves don't mutate the array.
+
+But your callback can mutate objects inside the array.
+
+map(), filter(), and reduce() don't inherently mutate the original array, but the callback can still mutate referenced objects or other external state.
+```js
+const users=[
+  {name:"A",age:20},
+  {name:"B",age:25}
+];
+
+const result = users.map(user=>{
+  user.age++;
+  return user;
+})
+console.log(users)
+
+
+
+
+// The Orignal objects have changed ,
+// because array contains references to objects 
+// map() creates a new array, but the objects can still be the same references.
+// map() never mutates anything
+```
+# filter()
+filter() iterates through every element of an array and calls the callback function with the current value, index, and
+original array. If the callback returns a truthy value, the original element is added to a new array. If it returns a falsy
+value, the element is skipped. After processing all elements, filter() returns the new filtered array without modifying
+the original array.
+
+```javascript
+let users=[
+    {name:"priti",age:24},
+    {name:"vipin",age:14},
+    {name:"Preeti",age:50},
+]
+const result = users.filter((user)=>{
+    return user.age>=18
+})
+console.log(result)
+```
+
+# filter() — Select Elements
+
+filter() answers:
+
+"Which elements should I keep?"
+
+The callback must return something truthy/falsy.
+Unlike map(), the output can have a different length.
+
+```js
+Array.prototype.myFilter = function(callback) {
+    const result = [];
+
+    for (let i = 0; i < this.length; i++) {
+        if (callback(this[i], i, this)) {
+            result.push(this[i]);
+        }
+    }
+
+    return result;
+};
+
+
+[1, 2, 3].filter(() => "hello");
+
+// "hello" is truthy, so all elements survive.
+
+const users = [
+    { name: "A", age: 17 },
+    { name: "B", age: 25 },
+    { name: "C", age: 30 },
+    { name: "D", age: 15 }
+];
+
+// We want names of users who are adults.
+const adultNames= users.filter(user=>user.age>=18).map(user=>user.name)
+
+console.log(adultNames)// ["b","c"]
+```
+
+# reduce() — Fold Everything Into a Result
+combine all these elements into one result?
+It can be:
+
+number
+string
+object
+array
+Map
+Set
+etc.
+
+what happen if we don't provied acc initial value ? 
+JavaScript uses the first array element as the initial accumulator.
+```js
+Array.prototype.myReduce = function(callback, initialValue) {
+
+    let accumulator = initialValue;
+
+    for (let i = 0; i < this.length; i++) {
+        accumulator = callback(
+            accumulator,
+            this[i],
+            i,
+            this
+        );
+    }
+
+    return accumulator;
+};
+
+
+const numbers = [1, 2, 3, 4];
+
+const sum = numbers.reduce(
+    (accumulator, current) => accumulator + current,
+    0
+);
+
+console.log(sum);
+```
+# reduce()
+Unlike map() or filter(), reduce() returns ONE final value.
+It could be:
+✅Number 
+✅String 
+✅Object 
+✅Array 
+✅Map 
+Anything
+reduce() iterates over an array and combines all elements into a single accumulated result. It starts with an initial
+accumulator value, calls the callback for each element, updates the accumulator with the callback's return value,
+and finally returns the accumulated result. Unlike map() or filter(), reduce() produces one final value instead of a
+new array.
+
+```javascript
+const arr = [1,2,3,5,6,7,8,9,10]
+let sum = arr.reduce((accumulator, current) => {
+return accumulator + current;
+}, 0);
+```
+
+
+# slice()
+slice(start, end) creates and returns a new array containing elements from the start index up to, but not including,
+the end index. It does not modify the original array. Internally, it copies references or values into a new array. 
+
+# splice()
+splice(start, deleteCount, ...items) modifies the original array. It can remove, insert, or replace elements. Internally,
+JavaScript removes the specified elements, shifts the remaining elements as needed, inserts any new items, and
+returns an array of the removed elements
+
+# find()
+find() iterates over an array and calls the callback function for each element. As soon as the callback returns a
+truthy value, find() immediately returns that original element and stops iterating. If no element satisfies the
+condition, it returns undefined. Unlike filter(), it does not create a new array and only returns the first matching
+element.
+
+It checks every element until it finds the first match.
+If callback returns true 
+✅
+Return that element immediately.
+Stop the loop.
+If callback returns false 
+❌
+Continue searching.
+If no element matches
+Return undefined
+
+```javascript
+let users=[
+    {name:"priti",age:24},
+    {name:"vipin",age:14},
+    {name:"Preeti",age:50},
+]
+const result= users.find((user)=>{
+    return user.name=="vipin"
+})
+console.log(result)
+```
+
+# lastIndexOf()
+lastIndexOf() searches an array or string from the end and returns the index of the last occurrence of the specified value. If the value is not found, it returns -1
+```javascript
+let sentence = ["JS", "React", "Node", "React", "MongoDB"];
+console.log(sentence.lastIndexOf("React"));//3
+
+```
+
+
+# indexOf()
+indexOf() is an Array/String method that searches for a specified value and returns the index of its first occurrence. If the value is not found, it returns -1
+
+indexOf() searches for an exact value.
+findIndex() lets you define a condition.
+
+Left → Right
+First matching index using a callback
+
+```javascript
+let sentence = ["JS", "React", "Node", "React", "MongoDB"];
+console.log(sentence.lastIndexOf("React"));//3
+
+
+let usersList=[
+    { id: 1, name: "Priti" },
+    { id: 2, name: "Vipin" },
+]
+
+const find_user= usersList.indexOf({id:2,name:"vipin"})
+console.log(find_user)//-1 Won't work because objects are compared by reference
+```
+
+# findIndex() 
+findIndex() iterates through the array and executes the callback for each element. As soon as the callback returns
+true, it immediately returns that element's index and stops iterating. If no element satisfies the condition, it returns -1.
+Unlike indexOf(), it searches using a callback condition instead of exact value comparison.
+
+```javascript 
+
+let usersList=[
+    { id: 1, name: "Priti" },
+    { id: 2, name: "Vipin" },
+]
+
+const find_user= usersList.findIndex((user)=>{
+    return user.id==2
+})
+console.log(find_user)//Vipin
+```
+
+
+# some() 
+ At least one condition satisfies the conditon ,return true otherwise false
+
+```javascript 
+const arr = [10,20,30,40];
+const result = arr.some((num)=>num>25)//true
+console.log(result);
+```
+
+# every()
+It Check if All Matches return ture Oterwise false
+
+```javascript 
+const  users1 = [{ role: "USER" }, { role: "ADMIN" }, { role: "USER" }];
+const users1 = [{ verified: true }, { verified: true }, { verified: true }]
+const result = users1.every((user)=>user.verified)//true
+console.log(result);
+
+```
+# What's the difference between find, findIndex, some, and every?
+
+find() returns the first element that satisfies the predicate, or undefined if no element matches.
+
+findIndex() returns the index of the first matching element, or -1 if no element matches.
+
+some() checks whether at least one element satisfies the predicate and returns a boolean.
+
+every() checks whether all elements satisfy the predicate and returns a boolean.
+
+find, findIndex, some, and every can short-circuit, meaning they stop iterating as soon as the final answer is known.
+
+```js
+const numbers = [1, 2, 3, 4, 5, 6];
+
+const result = numbers
+    .filter(x => x % 2 === 0)
+    .map(x => x * x)
+    .reduce((sum, x) => sum + x, 0);
+
+console.log(result);
+
+
+const arr = [1, , 3];
+console.log(arr.length);
+
+const result = arr.map(x => x * 2);
+
+console.log(result);//[2, empty, 6]
+
+// Output:3
+
+// There is a "hole" at index 1.
+
+// Array iteration methods such as map() generally skip holes rather than treating them as an explicit undefined element.
+```
+
+# sort()
+
+```javascript 
+const number = [1,2,10,5];
+number.sort();
+console.log(number)//[1,10,2,5]
+// Why ? because Javascript Does not sort numbers by default it Convert everything into String first
+
+// Javascript internally convert Them to String 
+// "1"
+//"10"
+//"2"
+//"5"
+
+// using compare function 
+// [30,10,20]
+number.sort((a,b)=>a-b)//
+//30-10=  20  positive  swap them [10,30]
+//return 10 30
+//now compare  30-20=10 positive  swap them [20 30]
+// return [10,20,30]
+// If
+// Negative
+// Keep order
+
+
+const  fruits = ["banana", "apple", "mango"];
+fruits.sort()// apple, banana,mango
+// String are already sorted Alphabetically
+
+const users=[
+    { name: "Priti", age: 24 },
+{ name: "Rahul", age: 18 },
+{ name: "Aman", age: 30 },
+]
+
+users.sort((a,b)=>a.age-b.age)
+
+```
+
+# includes()
+includes() checks whether an array or string contains a specified value. It iterates through the elements and returns
+true as soon as it finds a match; otherwise it returns false. Unlike indexOf(), it returns a boolean instead of an index. 
+
+```javascript
+const  fruits = ["apple", "banana", "orange"];
+console.log(fruits.includes("banana"))//true
+
+const users = [{ id: 1 }, { id: 2 }];
+console.log(users.includes({ id: 1 })); // object are compare by refrence not value  false
+```
+
+
+# flat()
+flat() creates a new array by removing nested array levels. By default, it flattens one level (depth = 1). You can pass
+a depth such as flat(2) or flat(Infinity) to flatten deeper nested arrays. It does not modify the original array.
+
+```javascript
+const  strings = ["Hello World", ["JavaScript is Awesome"]];
+const flatArr= strings.flat();
+
+console.log(flatArr)//[ 'Hello World', 'JavaScript is Awesome' ]
+
+const users = [
+  {
+    name: "Priti",
+    skills: ["JavaScript", "React"]
+  },
+  [
+    {
+    name: "Vipin",
+    skills: ["Node.js", "MongoDB"]
+  }
+  ]
+];
+
+const flatUsers= users.flat()
+
+console.log(flatUsers)
+```
+
+# flatMap()
+flatMap() combines the behavior of map() and flat(1). It applies a callback to every element, expects the callback to
+return an array or value, and then automatically flattens the result by one level. It returns a new array and does not
+modify the original array.
+
+```javascript
+// flatMap() is a combination of map() and one-level flat(). It transforms each element and then flattens the resulting array by one level.
+
+
+const users = [
+  {
+    name: "Priti",
+    skills: ["JavaScript", "React"]
+  },
+  {
+    name: "Vipin",
+    skills: ["Node.js", "MongoDB"]
+  }
+];
+const skills = users.map((user) => user.skills);
+
+console.log(skills);//
+ [
+   ["JavaScript", "React"],
+   ["Node.js", "MongoDB"]
+ ]
+
+// but we want 
+[
+  "JavaScript",
+  "React",
+  "Node.js",
+  "MongoDB"
+]
+// With flatMap()
+const skills = users.flatMap((user) => user.skills);
+console.log(skills);
+```
+
+# What is the difference between map(), flat(), and flatMap()?
+map() transforms every element and returns an array with the same number of elements. flat() removes nested array levels up to the specified depth and returns a new array. flatMap() combines mapping with flattening by one level, so it is useful when each input element can produce zero, one, or multiple output elements. Conceptually, arr.flatMap(fn) is equivalent to arr.map(fn).flat(1).
+
+
+```js
+const users = ["Priti", "Vipin"];
+
+const a = users.flatMap(name => [name, name.length]);
+
+const b = users.map(name => [name, name.length]).flat();
+
+console.log(a);
+console.log(b);
+
+// [
+//     "Priti",
+//     5,
+//     "Vipin",
+//     5
+// ]
+```
+# Objects Are Not Flattened
+
+flat() only knows about arrays
+```js
+const arr = [
+    [1, 2],
+    { name: "Priti" }
+];
+
+console.log(arr.flat());// 
+
+[
+    1,
+    2,
+    { name: "Priti" }
+]
+
+// It doesn't somehow flatten object properties.
+
+// flattening doesn't perform a deep clone.
+const obj = {
+    name: "Priti"
+};
+
+const arr = [[obj]];
+
+const result = arr.flat(2);
+
+result[0].name = "Vipin";
+
+console.log(obj.name);//Vipin
+// Because flat() creates a new array, but object references inside it are still references to the same object.
+
+
+
+const users = [
+    {
+        name: "Priti",
+        tags: ["JS", "React"]
+    },
+    {
+        name: "Rahul",
+        tags: ["Node", "MongoDB"]
+    }
+];
+// You want all tags in one array
+const tags = users.flatMap(user => user.tags);
+
+console.log(tags);//[ "JS",  "React",  "Node",  "MongoDB"]
+
+
+// Without flatMap():
+
+const tags = users
+    .map(user => user.tags)
+    .flat();
+
+
+
+    const sentences = [
+    "hello world",
+    "javascript is awesome"
+];
+
+// Convert every sentence into its individual words:
+const words = sentences.flatMap(sentence => sentence.split(" "));
+
+console.log(words);
+[
+    "hello",
+    "world",
+    "javascript",
+    "is",
+    "awesome"
+]
+```
+# What is the difference between map() and forEach()?
+
+forEach() is primarily used when I want to execute a function for every element, especially when I'm performing side effects. It returns undefined, so it isn't intended for chaining.
+
+map() is used when I want to transform every element of an array. It returns a new array containing the callback's return values, so it can be chained with other array methods.
+
+For example, if I want to log every value, I'd use forEach(). If I want to double every number and get a new array, I'd use map().
+
+I avoid using map() only for side effects because that doesn't use its return-value semantics correctly."
+
+```js
+const users = [
+    { name: "Priti", age: 22 },
+    { name: "Rahul", age: 17 },
+    { name: "Aman", age: 25 },
+    { name: "Neha", age: 16 }
+];
+
+let names=[]
+users.forEach(user=>{
+names.push(user.name)
+})
+```
+
+# Array.from()
+Array.from(iterable, mapFunction)
+
+imagine you have something that looks like an array but isn't actually an array.
+
+Array.from() creates a new array from an iterable (like a string, Set, or Map) or an array-like object (such as { length:n }). It can also take an optional mapping function that transforms each element while creating the new array. It
+returns a new array without modifying the original source.
+
+```javascript
+"Hello".map(s=>s)//  TypeError "Hello".map is not a function
+
+const string = "Hello"
+console.log(typeof string) //string
+const newStr = Array.from(string);
+console.log(newStr)//[ 'H', 'e', 'l', 'l', 'o' ]]
+console.log(typeof newStr) //object
+
+const number = Array.from({length:5});
+console.log(number)// [ undefined, undefined, undefined, undefined, undefined ]]
+
+const  numbers = Array.from({length:10},(_,i)=>i+1) 
+console.log(numbers)//Array.from() also accepts a mapping function, just like map()
+[
+  1, 2, 3, 4,  5,
+  6, 7, 8, 9, 10
+]
+
+// Set to array 
+const set = new Set([10, 20, 30]);
+
+const result = Array.from(set);
+
+console.log(result);
+
+// NodeList to Array 
+const elements = document.querySelectorAll("div");
+
+const arr = Array.from(elements);
+
+console.log(arr);
+
+
+// Array.from() also accepts a mapping function, just like map()
+const result = Array.from([1, 2, 3], (num) => {
+  return num * 2;
+});
+
+console.log(result);
+
+// Similar to 
+Array.from([1, 2, 3]).map((num) => num * 2);
+```
+
+
+
+# Array.isArray()
+Array.isArray() is a static method used to check whether a value is actually an Array. It returns true for arrays and false for other values.
+
+```javascript
+const arr= [1,2,3];
+console.log(typeof arr==="Array")// false
+
+// solution 
+console.log(Array.isArray(arr))//true
+console.log(Array.isArray({})) //false
+console.log(Array.isArray("Hello"));//false
+console.log(Array.isArray(100));//false
+console.log(Array.isArray(true));//false
+
+```
+
+
+
+Partial application means pre-filling some arguments of a function now, producing a new function that needs fewer arguments later
+```js
+function add(a, b, c) {
+  return a + b + c;
+}
+
+const add10 = partial(add, 10);
+
+add10(20, 30); // 60
+// Here 10 is fixed in advance. The new function only needs b and c.
+
+```
+# How Partial Application Works Internally
+
+JavaScript doesn't have a special partial keyword.
+
+We usually implement partial application using:
+
+Higher-order functions
+Closures
+Function.prototype.apply() / call()
+Argument collection using ...args
+
+```js
+function partial(fn, ...fixedArgs) {
+  return function (...remainingArgs) {
+    return fn(...fixedArgs, ...remainingArgs);
+  };
+}
+
+function add(a, b, c) {
+  return a + b + c;
+}
+
+const add10 = partial(add, 10);
+
+console.log(add10(20, 30));
+```
+
+```js
+function createUser(role, country, name, age) {
+  return {
+    role,
+    country,
+    name,
+    age
+  };
+}
+
+function partial(fn, ...fixedArgs) {
+  return function (...remainingArgs) {
+    return fn(...fixedArgs, ...remainingArgs);
+  };
+}
+
+const createIndianUser = partial(
+  createUser,
+  "developer",
+  "India"
+);
+
+console.log(
+  createIndianUser("Priti", 25)
+);
+```
+
+# What is the difference between partial application and currying?"
+
+Partial application is the technique of pre-filling some arguments of a function and returning a new function that requires the remaining arguments.
+
+Currying, on the other hand, transforms a function that takes multiple arguments into a sequence of functions, where each function generally accepts one argument.
+
+For example, if we have add(a, b, c), partial application could produce add10 = partial(add, 10), so add10(20, 30) works.
+
+With currying, the function would be transformed into something like add(10)(20)(30).
+
+So the key difference is: partial application fixes arguments, while currying transforms the function's calling structure.
+
+
+
+
+# Currying
+
+Currying is a technique of transforming a function that takes multiple arguments into a sequence of functions, where each function takes one argument.
+
+
+# What is currying in JavaScript, and how would you implement it?"
+
+Currying is a functional programming technique where a function that accepts multiple arguments is transformed into a sequence of functions, with each function accepting one argument and returning another function until all required arguments have been collected.
+
+For example, add(a, b, c) can be transformed into add(a)(b)(c).
+
+In JavaScript, currying is commonly implemented using closures because each returned function needs to remember the arguments passed during previous calls.
+
+```javascript
+// Normal function
+function add(a, b, c) {
+  return a + b + c;
+}
+
+add(10, 20, 30);
+
+// Currying 
+function add(a) {
+  return function (b) {
+    return function (c) {
+      return a + b + c;
+    };
+  };
+}
+
+add(10)(20)(30);
+//60
+Currying allows us to provide arguments gradually and create reusable, specialized functions.
+```
+
+Suppose we have:
+```javascript
+function multiply(a, b) {
+  return a * b;
+}
+
+```
+We frequently want to multiply something by 10.
+
+Without currying:
+```javascript
+multiply(10, 5);
+multiply(10, 8);
+multiply(10, 20);
+```
+with Currying
+
+```javascript
+function multiply(a) {
+  return function (b) {
+    return a * b;
+  };
+}
+const multiplyBy10 = multiply(10);
+multiplyBy10(5);  // 50
+multiplyBy10(8);  // 80
+multiplyBy10(20); // 200
+
+
+
+multiply(10)
+     ↓
+returns function
+     ↓
+multiplyBy10
+     ↓
+multiplyBy10(5)
+     ↓
+50
+```
+Real Use Of Currying
+```javascript
+// Instead of repeatedly writing:
+fetch("/api/users", {
+  headers: {
+    Authorization: "Bearer TOKEN"
+  }
+});
+
+fetch("/api/orders", {
+  headers: {
+    Authorization: "Bearer TOKEN"
+  }
+});
+// We can create a reusable curried function:
+function createApiRequest(token){
+    return function(url){
+        return fetch(url,{
+            headers:{
+                Authorization:`Bearer ${token}`
+            }
+        })
+    }
+}
+
+const apiRequest = createApiRequest("MY_TOKEN");
+
+apiRequest("/api/users");
+apiRequest("/api/orders");
+apiRequest("/api/products");
+```
+
+
+
+# Debouncing
+Debounce = "Keep resetting the timer; execute only when the calls stop.
+
+Both are performance optimization techniques used when an event fires many times, such as:
+input
+scroll
+resize
+mousemove
+keyup
+```Debouncing ensures that a function executes only after a specified amount of time has passed since the last event.```
+
+🧠 Remember   - Debounce = "Wait until the user stops."
+
+```js
+User types:   H → He → Hel → Hell → Hello
+              ↓    ↓     ↓      ↓      ↓
+Timer:        reset reset reset  reset  wait 500ms
+                                             ↓
+                                         API call
+```
+So instead of making 5 API calls, we make 1 API call for "Hello".
+
+Debounce is built mainly using:
+
+Closures
+setTimeout()
+clearTimeout()
+Function arguments
+this handling
+```js
+// Step 1 — Closure stores the timer
+let timer;
+
+// timer belongs to the outer debounce() function.
+
+// But the returned function can still access it.
+// The timer variable survives after debounce() has finished because the returned function closes over it.
+
+// Step 2 — Every call cancels the previous timer
+clearTimeout(timer);
+
+// Suppose:
+
+// Call 1 → timer A
+// Call 2 → cancel A → timer B
+// Call 3 → cancel B → timer C
+// Call 4 → cancel C → timer D
+
+// Only the last timer survives.
+
+// Step 3 — Start a new timer
+timer = setTimeout(() => {
+    fn.apply(this, args);
+}, delay);
+
+// The function doesn't execute immediately.
+
+// It says:
+// "Wait delay milliseconds. If nobody calls me again, execute."
+
+// Step 4 — Why closure is essential
+
+// Imagine:
+
+const search = debounce(function (value) {
+    console.log(value);
+}, 500);
+
+// Then:
+
+search("r");
+search("re");
+search("rea");
+search("reac");
+search("react");
+
+// All calls share the same timer.
+```
+# What is debounce and how would you implement it?"
+Debouncing is a technique used to ensure a function executes only after a certain period of inactivity. Every time the debounced function is called, we clear the previous timer and create a new one. The timer is stored in a closure, so all calls to the same debounced function share that timer. It's commonly used for search inputs, autocomplete, validation, and resize events. The key difference from throttling is that debounce waits until activity stops, whereas throttle limits execution to a fixed frequency
+```js
+
+const debouncedSearch = debounce(search, 500);
+
+input.addEventListener("input", (event) => {
+    debouncedSearch(event.target.value);
+});
+
+
+function debounce(fn, delay) {
+    let timer;
+
+    return function (...args) {
+        clearTimeout(timer);
+
+        timer = setTimeout(() => {
+            fn.apply(this, args);
+        }, delay);
+    };
+}
+```
+```javascript
+function debounce(fn, delay) {
+    let timer;
+
+    return function (...args) {
+        clearTimeout(timer);
+
+        timer = setTimeout(() => {
+            fn(...args);
+        }, delay);
+    };
+}
+
+function searchAPI(query) {
+    console.log("Calling API for:", query);
+}
+
+const debouncedSearch = debounce(searchAPI, 500);
+
+const input = document.querySelector("#search");
+
+input.addEventListener("input", function (event) {
+    debouncedSearch(event.target.value);
+});
+```
+The function returns a new function that closes over a timer variable. Every time the returned function is called, it clears the previous timeout and creates a new one. Therefore, the original function executes only when there has been no invocation for the specified delay.
+
+# Throttling
+
+Throttle guarantees that a function executes at most once during every N milliseconds, even if the function is called hundreds of times.
+
+We build it using:
+
+Closures
+Date.now()
+timers such as setTimeout
+function invocation using fn()
+sometimes this and arguments
+
+ ```javascript
+function handleScroll() {
+  console.log("Scroll event");
+}
+
+function throttle(callback, delay) {
+  let lastCall = 0;
+
+  return function (...args) {
+    const now = Date.now();
+
+    if (now - lastCall >= delay) {
+      lastCall = now;
+      callback(...args);
+    }
+  };
+}
+const handleScrollThrottled = throttle(handleScroll, 1000);
+  ```
+
+  ```js
+  // this + arguments
+  function throttle(fn, delay) {
+    let lastTime = 0;
+
+    return function (...args) {
+        const now = Date.now();
+
+        if (now - lastTime >= delay) {
+            lastTime = now;
+            fn.apply(this, args);
+        }
+    };
+}
+const user = {
+    name: "Priti",
+
+    handleMove(x, y) {
+        console.log(this.name, x, y);
+    }
+};
+
+user.handleMove = throttle(user.handleMove, 1000);
+
+user.handleMove(100, 200);
+
+// Why do we use:
+// fn.apply(this, args);
+
+// instead of:
+// fn();
+
+// Because we want to preserve the original call context.
+obj.method();
+
+// normally gives:
+
+this === obj
+
+// But if we lose that context inside our wrapper, this may no longer refer to obj.
+  ```
+
+Throttle
+
+Throttle ensures a function executes at most once within a specified time interval, even if it is invoked repeatedly.
+
+Debounce
+
+Debounce delays function execution until a specified amount of time has passed since the last invocation.
+
+Memoization
+
+Memoization caches function results based on inputs so repeated calls can avoid recomputation.
+
+
+# Implement debounce and explain how leading and trailing execution works.
+Debouncing ensures that a function executes only after calls to it have stopped for a specified amount of time. Internally, I keep a timer in a closure. Every invocation clears the previous timer and creates a new setTimeout. This gives us trailing-edge debounce because the function executes only after the final call has been followed by the delay. For leading-edge debounce, I execute immediately when there is no active timer, then suppress calls until the timer expires. The leading option is useful when I want immediate responsiveness, while trailing is useful when I care about the final value, such as search input.
+
+```js
+function debounce(fn, delay, options = {}) {
+    let timer;
+
+    const {
+        leading = false,
+        trailing = true
+    } = options;
+
+    return function (...args) {
+        const callNow = leading && !timer;
+
+        clearTimeout(timer);
+
+        timer = setTimeout(() => {
+            timer = null;
+
+            if (trailing && !callNow) {
+                fn.apply(this, args);
+            }
+        }, delay);
+
+        if (callNow) {
+            fn.apply(this, args);
+        }
+    };
+}
+
+// Trailing mode
+const search = debounce(
+    (query) => {
+        console.log("Search:", query);
+    },
+    500,
+    {
+        leading: false,
+        trailing: true
+    }
+);
+
+search("j");
+search("ja");
+search("jav");
+
+// Result:
+
+// 500ms after final call:
+// Search: jav
+
+
+// Leading mode
+const save = debounce(
+    () => {
+        console.log("Saving...");
+    },
+    1000,
+    {
+        leading: true,
+        trailing: false
+    }
+);
+
+save();
+save();
+save();
+
+// Result:
+
+// Immediately:
+// Saving...
+
+// The next calls during the 1-second window are ignored.
+```
+
+
+# Memoization
+
+Memoization is an optimization technique where we cache the result of a function based on its input arguments. When the function is called again with the same arguments, we return the cached result instead of recalculating it.
+
+It is most effective for pure and expensive functions because the same inputs should always produce the same output. In JavaScript, memoization is commonly implemented using a closure to keep a cache private and persistent between function calls.
+
+```javascript
+function square(n) {
+  console.log("Calculating...");
+  return n * n;
+}
+square(5);
+square(5);
+square(5);
+// Calculating...
+// Calculating...
+// Calculating...
+// Same calculation 3 times ho rahi hai.
+function memoize(fn) {
+    const cache = new Map();
+
+    return function (...args) {
+        const key = JSON.stringify(args);
+
+        if (cache.has(key)) {
+            return cache.get(key);
+        }
+
+        const result = fn(...args);
+
+        cache.set(key, result);
+
+        return result;
+    };
+}
+
+function square(n) {
+  return n * n;
+}
+const memoizedSquare = memoize(square);
+console.log(memoizedSquare(5));
+console.log(memoizedSquare(5));
+console.log(memoizedSquare(10));
+console.log(memoizedSquare(5));
+```
+
+# Memoize with WeakMap
+If a function receives an object as an argument, you can use that object itself as the cache key in a WeakMap. When that object is no longer referenced anywhere else, JavaScript can garbage-collect it along with the cached entry.
+
+```js
+// Suppose our function receives an object:
+function calculateUser(user) {
+    console.log("Calculating...");
+
+    return user.age * 2;
+}
+
+//  you might want 
+
+const user={
+  name:"priti",
+  age:24
+}
+//  as the cache key.
+
+// A Map can do that:
+const cache = new Map();
+
+cache.set(user, 50);
+
+
+// The problem is:
+
+Map
+ ↓
+object key
+ ↓
+cache keeps reference to object
+ ↓
+object cannot be garbage collected
+
+// So if you create thousands of temporary objects, the Map can keep those objects alive.
+
+
+// WeakMap solves this
+const cache = new WeakMap();
+
+cache.set(user, 50);
+
+  WeakMap
+           │
+           │ weak reference
+           ↓
+        user object
+           │
+           ↓
+        cached result
+
+// If the object is no longer referenced anywhere else:
+let user = {
+    name: "Priti",
+    age: 25
+};
+
+const cache = new WeakMap();
+
+cache.set(user, 50);
+
+user = null;
+
+// Then the object becomes eligible for garbage collection.
+
+user variable
+     ↓
+    null
+
+WeakMap
+  - - -→ old object
+
+// Object can be GC'd
+// WeakMap does not prevent its object keys from being garbage-collected.
+// WeakMap keys must be objects or non-registered symbols.
+const cache = new WeakMap();
+
+const obj = {};
+
+cache.set(obj, 100);
+
+// This doesn't:
+
+cache.set("hello", 100);  // Nor:   
+
+cache.set(10, 100);  // Nor:
+
+cache.set(true, 100);  // Nor:
+
+// Because WeakMap needs an object identity that can become unreachable.
+
+```
+
+```js
+// Memoizing an Object Argument
+const cache= new WeakMap();
+function expensiveCalculation(obj){
+  if(cache.has(obj)){
+    console.log("Returning cached result")
+    return cache.get(obj)
+  }
+  console.log("Calculatiing...");
+  const result = obj.a+obj.b;
+  cache.set(obj,result)
+  return result;
+}
+
+const data={
+  a:10,
+  b:20
+}
+console.log(expensiveCalculation(data))//
+//Calculatiing..
+//30
+console.log(expensiveCalculation(data))//
+//Returning cached result
+//30
+```
+
+```js
+// create a reusable memoization function.
+function memoizeWeak(fn){
+  const cache= new WeakMap();
+  return function (obj){
+    if(cache.has(obj)){
+      return cache.get(obj);
+    }
+    const result = fn(obj);
+    cache.set(obj,result);
+    return result;
+  }
+}
+
+
+// use it 
+function calculate(obj) {
+    console.log("Expensive calculation...");
+
+    return obj.price * obj.quantity;
+}
+
+const memoizedCalculate = memoizeWeak(calculate);
+
+const product = {
+    price: 100,
+    quantity: 5
+};
+
+console.log(memoizedCalculate(product));
+// Expensive calculation...
+// 500
+
+console.log(memoizedCalculate(product));
+// 500
+
+console.log(memoizedCalculate(product));
+// 500
+
+// Only the first call performs the calculation 
+// WeakMap Is NOT Iterable
+// WeakMap intentionally does'nt provied itreation 
+const cache = new WeakMap();
+
+cache.set({}, 100);
+cache.set({}, 200);
+
+console.log(cache.size);//undefined
+```
+
+# Why would you use WeakMap instead of Map when memoizing functions that accept objects as arguments?
+When memoizing a function that accepts objects, WeakMap allows us to use the object itself as the cache key. Unlike Map, WeakMap does not keep a strong reference to its object keys. Therefore, when an object is no longer referenced elsewhere in the application, it can be garbage-collected along with its cached entry. This helps prevent the cache from unnecessarily retaining objects and causing memory growth.
+```js
+const cache = new WeakMap();
+
+function memoizedFunction(obj) {
+    if (cache.has(obj)) {
+        return cache.get(obj);
+    }
+
+    const result = expensiveFunction(obj);
+
+    cache.set(obj, result);
+
+    return result;
+}
+```
+
+# WeakMap Does NOT Automatically Make Every Memoization Safe
+```js
+function memoizeWeak(fn) {
+    const cache = new WeakMap();
+
+    return (obj) => {
+        if (cache.has(obj)) {
+            return cache.get(obj);
+        }
+
+        const result = fn(obj);
+
+        cache.set(obj, result);
+
+        return result;
+    };
+}
+// this assumes  : 
+// input->object
+// if someone does
+memoizedFunction(10)
+// you will get an error because primitive value can not  be WeakMap keys
+```
+valid version 
+```js
+function memoizeWeak(fn){
+  const cache= new WeakMap();
+  return function(obj){
+    if((typeof obj !=="object" || obj===null) && typeof obj !=="function"){
+      throw new TypeError("WeakMap key must be  an object ")
+    }
+    if(cache.has(obj)){
+      return cache.get(obj);
+    }
+    const result = fn(obj);
+    cache.set(obj,result);
+    return result ;
+  }
+}
+
+```
+
+
+# Implement a once() function in JavaScript
+Execute only one time
+once is a higher-order function that accepts a function and returns a wrapper function. The wrapper creates a closure over called and result. On the first invocation, called is false, so the original function executes and its return value is stored in result. Then called becomes true. On subsequent invocations, the original function isn't executed; the cached result is returned. I use a separate boolean flag instead of checking result, because the original function may legitimately return falsy values such as 0, false, null, or undefined. apply preserves the caller's this and forwards the arguments.
+
+```js
+
+function once(fn){
+  let called= false;
+  let result ;
+  return function(...args){
+    if(!called){
+      // result= fn(...args);
+      rersult= fn.apply(this,args)
+      called=true
+    }
+    return result
+  }
+}
+
+// If your once() implementation doesn't preserve this, you can lose the object's context.
+
+const user = {
+    name: "Priti",
+
+    greet(city) {
+        return `Hello ${this.name} from ${city}`;
+    }
+};
+
+user.greetOnce = once(user.greet);
+
+console.log(user.greetOnce("Indore"));
+console.log(user.greetOnce("Delhi"));
+
+// Call → Execute
+// Call → Ignore
+// Call → Ignore
+// Call → Ignore
+```
