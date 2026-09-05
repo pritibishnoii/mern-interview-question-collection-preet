@@ -3557,6 +3557,14 @@ console.log("role" in proxyUser);
 
 ```
 
+# "Explain Proxy and Reflect in JavaScript.
+"Proxy is a meta-programming feature that allows us to intercept fundamental operations on an object or function, such as getting or setting properties, checking properties, deleting properties, calling functions, and constructing objects. These interceptions are implemented using traps like get, set, has, apply, and construct.
+
+Reflect is a built-in object that provides methods corresponding to many of these fundamental operations. In Proxy traps, I generally use Reflect to forward the operation to the target while preserving normal JavaScript behavior, especially around getters, prototypes, and this.
+
+So the simple mental model is: Proxy intercepts the operation, while Reflect performs or forwards the operation."
+
+
 # What does instanceof actually do?
 obj instanceof Constructor checks whether Constructor.prototype is found anywhere in obj's prototype chain.
 
@@ -5829,13 +5837,59 @@ If a microtask continuously schedules another microtask, the microtask queue may
 sort :👇
 Yes. setTimeout(fn, 0) only makes the callback eligible to run in a future task; it doesn't give it priority. The event loop processes the current task and then drains the microtask queue. If microtasks keep adding more microtasks, the queue never becomes empty, so the event loop can starve subsequent tasks and, in a browser, delay rendering and user events.
 
+# What problem does Map solve?
+Normal JavaScript objects can store key-value pairs:
+```js
+const user = {
+  name: "Priti",
+  age: 25
+};
+```
+But object keys have limitations.
 
+For example:
+```js
+const obj = {};
+
+const user = { name: "Priti" };
+
+obj[user] = "Developer";
+
+console.log(obj);//
+// { '[object Object]': 'Developer' }
+```
+The object gets converted to a string key:
+
+{ '[object Object]': 'Developer' }
+
+So objects aren't designed for arbitrary object keys.
+
+Map solve this :
+```js
+const map = new Map();
+
+const user = { name: "Priti" };
+
+// The object itself is the key.
+map.set(user, "Developer");
+
+console.log(map.get(user));//Developer
+```
 
 # Map() Data Structure
 
 Map is a built-in JavaScript data structure used to store key-value pairs.    Unlike regular objects, Map allows keys of any data type and provides methods such as set, get, has, delete, and clear. It is commonly used for frequency counting, caching, lookup tables, and DSA problems such as Two Sum."
 ```JS
+// map accept any value as key 
 const map = new Map();
+
+map.set("name", "Priti");
+map.set(10, "number");
+map.set(true, "boolean");
+map.set(null, "null");
+map.set({}, "object");
+
+
 // Map keys can be ANY type.
 map.set("name", "Priti");
 map.set("age", 25);
@@ -5873,8 +5927,92 @@ users.set("user2", "Rahul");
 for (const [key, value] of users) {
   console.log(key, value);
 }
+
+
+
+const metadata = new WeakMap();
+
+const button = document.querySelector("#button");
+
+metadata.set(button, {
+  clicks: 0,
+  createdAt: Date.now()
+});
+
+Now:
+
+console.log(metadata.get(button));
+// could gives 
+{
+  clicks: 0,
+  createdAt: 123456789
+}
 ```
 
+# What does "Strong Reference" mean?
+```js
+const map = new Map();
+
+let user = {
+  name: "Priti"
+};
+
+map.set(user, "Developer");
+
+// There are now references:
+
+user ───────────────→ Object
+                                            ↑
+                                            │
+Map ──────────────────┘
+
+// now  
+user=null;
+
+// The Map still references it:👇
+user = null
+
+Map
+ │
+ └────────→ Object
+//  Therefore the object remains rechable
+// That's a strong reference.
+
+
+// WeakMap changes this👇👇
+
+const weakMap = new WeakMap();
+
+let user = {
+  name: "Priti"
+};
+
+weakMap.set(user, "Developer");
+
+user ──────────────────→ Object
+                                               ↑
+                                                :
+                                                :
+WeakMap ──────────────→ Object
+       weak reference
+
+// Now 
+user=null;
+
+// There may be no strong reference to the object anymore.
+
+// Therefore:
+
+// Object
+//   ↓
+// Unreachable
+//   ↓
+// Garbage Collector
+//   ↓
+// Can remove it
+
+// The WeakMap entry effectively disappears along with the key.
+```
 
 #  Map vs Object
 Both Map and Object can store key-value pairs, but Map is specifically designed as a key-value collection, while Object is primarily used to represent structured data.
@@ -5967,12 +6105,175 @@ loggedInUsers.delete(102);
 
 console.log(loggedInUsers.has(102));
 // false
+
+
+// set can store any type of values 
+const set = new Set();
+
+set.add(10);            // number
+set.add("hello");       // string
+set.add(true);          // boolean
+set.add(null);          // null
+set.add(undefined);     // undefined
+
+const obj = {};
+set.add(obj);           // object
+
+const fn = () => {};
+set.add(fn);            // function
+
+
+// Set is Iterable
+const set = new Set([10, 20, 30]);
+
+for (const value of set) {
+  console.log(value);
+}
+//10
+//20
+//30
+// can also do this like 
+const iterator = set.values();
+
+console.log(iterator.next());
+console.log(iterator.next());
+console.log(iterator.next());
+console.log(iterator.next());
+
+// { value: 10, done: false }
+// { value: 20, done: false }
+// { value: 30, done: false }
+// { value: undefined, done: true }
+```
+
+# What is the difference between Set and WeakSet?"
+
+Set is a collection of unique values and can contain both primitive values and objects. It is iterable, has a size property, and strongly references its objects.
+
+WeakSet is designed to store objects only. It holds those objects weakly, so if an object has no other strong references, it can become eligible for garbage collection. WeakSet is not iterable and doesn't have a size property.
+
+WeakSet is useful when we want to track objects, such as tracking which objects have already been processed, without the tracking mechanism preventing those objects from being garbage collected.
+
+WeakSet is a special collection that stores objects only.
+
+```js
+
+// The object identity trap 
+const weakSet = new WeakSet();
+
+weakSet.add({
+  name: "Priti"
+});
+
+console.log(
+  weakSet.has({
+    name: "Priti"
+  })
+);//false 
+
+// because {name:"priti"}  creates a new object every time 
+// so these are different:
+a={
+  name:"priti"
+}
+b={
+  name:"priti"
+}
+a==b   / // false
+// Therefore :
+weakSet.add(a);
+
+weakSet.has(b);  //false 
+// Their contents are the same, but their references are different.
+
+// Correct Version
+
+const weakSet = new WeakSet();
+
+const user = {
+  name: "Priti"
+};
+
+weakSet.add(user);
+// weakSet.add(10);// invalid
+
+console.log(weakSet.has(user));
+```
+
+# What is the difference between Map and WeakMap?
+Map can use any JavaScript value as a key, including primitives and objects. It is iterable, provides a size property, and maintains strong references to its object keys. Therefore, if a key is stored in a Map, that Map can prevent the key object from being garbage collected.
+
+WeakMap only accepts objects as keys. It does not support iteration or size, and its references to keys are weak. If an object has no other strong references, it becomes eligible for garbage collection even if it is a key in a WeakMap.
+
+WeakMap is therefore useful for object-associated metadata, DOM node metadata, caches, and private data where we don't want the storage mechanism to keep objects alive.
+```js
+const weakMap = new WeakMap();
+
+const user = {};
+
+weakMap.set(user, "Developer");
+
+console.log(weakMap.has(user));
+// true
+
+console.log(weakMap.get(user));
+// Developer
+
+weakMap.delete(user);
+
+console.log(weakMap.has(user));
+// false
+
+
+// MAP
+const map = new Map();
+
+map.set("name", "Priti");
+map.set("age", 25);
+
+console.log(map.get("name"));
+
+console.log(map.has("age"));
+
+console.log(map.size);
+
+map.delete("age");
+
+map.clear();
+
+for (const [key, value] of map) {
+  console.log(key, value);
+}
+```
+# 
+# Which object can be garbage collected?
+```js
+const map = new Map();
+const weakMap = new WeakMap();
+
+let user = {
+  name: "Priti"
+};
+
+map.set(user, "Map Data");
+weakMap.set(user, "WeakMap Data");
+
+// the Map still strongly references the object.
+// The object is still reachable.
+// So it cannot be garbage collected merely because the external user reference became null.
+
+user = null;
+
+// WeakMap's object can be GC'd.
 ```
 
 # Generator Functions
 A Generator Function is a special JavaScript function that can pause its execution using yield and resume later. It is declared using function* and returns a Generator object when called.
+//
+
 
 ```javascript
+// A generator is a lazy, resumable function: function* creates a Generator object, .next() starts/resumes execution, yield pauses it, and each step produces { value, done }.
 function* numbers() {
   yield 1;
   yield 2;
@@ -6008,9 +6309,88 @@ console.log(generator.next().value);
 console.log(generator.next().value);
 console.log(generator.next().value);
 ```
+# What is a Generator Function, and how is it different from a normal function?
+A generator function is declared using function* and returns a Generator object when called. Unlike a normal function, calling a generator function does not immediately execute its body.
+
+The generator starts executing when .next() is called and pauses whenever it reaches a yield. Each .next() resumes execution from where the previous yield paused and returns an object containing { value, done }.
+
+A Generator object is both an iterator and an iterable, so it can be manually consumed using .next() or used with for...of.
+
+```js
+function* numbers() {
+    yield 10;
+    yield 20;
+}
+
+const gen = numbers();
+
+console.log(gen.next());
+// { value: 10, done: false }
+
+console.log(gen.next());
+// { value: 20, done: false }
+
+console.log(gen.next());
+// { value: undefined, done: true }
+```
+They are useful for producing values lazily, creating custom iterators, handling potentially large or infinite sequences, and controlling execution by pausing and resuming a function.
+
+
+# What is an async generator, and how is it different from a normal generator?
+An async generator is declared using async function*. It combines generator semantics with asynchronous iteration. Calling it returns an async iterator, and its next() method returns a Promise that resolves to an iteration result { value, done }. Values can be produced using yield, and asynchronous operations can be handled with await. Consumers typically use for await...of to consume the values. Unlike a normal generator, which implements synchronous iteration and whose next() returns an iteration result directly, an async generator implements the async iteration protocol through Symbol.asyncIterator and returns Promises from next(). It's especially useful for paginated APIs, streams, and large datasets because values can be produced lazily rather than loading everything into memory.
+
+
+```js
+// Normal generator
+iterator.next()
+
+→ object
+
+{ value: 10, done: false }
+
+
+// Async generator
+iterator.next()
+
+→ Promise
+
+Promise<{
+    value: 10,
+    done: false
+}>
+```
+
+```js
+async function* numbers() {
+    yield 10;
+    yield 20;
+}
+
+async function main() {
+    const iterator = numbers();
+
+    console.log(await iterator.next());
+    console.log(await iterator.next());
+    console.log(await iterator.next());
+}
+
+main();
+```
+Async Generator
+
+An async generator is a generator that supports asynchronous operations and produces an async iterator whose next() returns a Promise.
+
+Async Iterator
+
+An object implementing Symbol.asyncIterator, where next() returns a Promise resolving to { value, done }.
+
+
+
 
 # Iterators
 An iterator is an object that follows the iterator protocol by providing a next() method. Each call to next() returns an object containing value and done. Iterators are used by constructs such as for...of to consume iterable data one value at a time.
+
+An iterable is an object that implements [Symbol.iterator]() and returns an iterator. An iterator is an object with a next() method that returns an object containing value and done.
 ```javascript
 const users = ["Priti", "Vipin", "Ram"];
 
@@ -6025,8 +6405,194 @@ console.log(iterator.next());
 // { value: "Ram", done: false }
 // { value: undefined, done: true }
 
+const numbers = [10, 20, 30];
+
+const iterator = numbers[Symbol.iterator]();
+
+console.log(iterator.next().value);
+console.log(iterator.next().value);
+```
+```js
+// Map and Set are iterable
+const set = new Set([10, 20, 30]);
+
+for (const value of set) {
+    console.log(value);
+}
+// Map
+const map = new Map([
+    ["name", "Priti"],
+    ["age", 25]
+]);
+
+for (const entry of map) {
+    console.log(entry);
+}
+```
+
+```js
+// {} is NOT iterable
+const user={
+  name:"priti:,
+  age:23
+}
+for(const value of user){
+  console.log(value)
+}
+// This throws:
+
+// TypeError: user is not iterable
+// Because a normal object doesn't automatically have:
+
+// obj[Symbol.iterator]
+console.log(user[Symbol.iterator]);//undefined
+
+// But you can make it iterable
+const obj={
+  values:[10,20,30],
+  [symbol.iterator](){
+    return this.values[symbol.iterator]();
+  }
+}
+for(const value of obj){
+  console.log(value)
+}//10, 20 , 30
+```
+Iterable tells JavaScript "how to get an iterator"; iterator tells JavaScript "how to get the next value." for...of, spread, destructuring, and generators are all built around this protocol.
+
+
+
+# What is the difference between an Iterable and an Iterator?
+An iterable is an object that implements the [Symbol.iterator]() method. Calling this method returns an iterator.
+
+An iterator is an object that implements a next() method. Each call to next() returns an object like { value, done }.
+
+Arrays, strings, Maps and Sets are examples of built-in iterables. for...of, spread syntax, and destructuring consume iterables using this protocol.
+
+# What is the difference between yield and yield*?
+yield pauses the current generator and produces a single value to the caller. yield*, on the other hand, delegates iteration to another iterable. It forwards each value from that iterable until the iterable is exhausted, after which the original generator continues.
+
+yield* can delegate to another generator, an array, string, Set, or any other iterable.
+
+# yield & yield*
+```js
+
+// yield pauses a generator and produces one value; yield* pauses the current generator and delegates iteration to another iterable, forwarding its values until it is exhausted.
+
+
+function* colors() {
+    yield "red";
+    yield "green";
+    yield "blue";
+}
+
+const gen = colors();
+
+console.log(gen.next());
+console.log(gen.next());
+console.log(gen.next());
+console.log(gen.next());
+// output
+// { value: "red", done: false }
+
+// { value: "green", done: false }
+
+// { value: "blue", done: false }
+
+// { value: undefined, done: true }
+
+// yield* becomes really useful.
+function* frontend() {
+    yield "HTML";
+    yield "CSS";
+    yield "JavaScript";
+}
+
+function* backend() {
+    yield "Node.js";
+    yield "Express";
+}
+
+function* fullStack() {
+    yield* frontend();
+    yield* backend();
+    yield "MongoDB";
+}
+
+console.log([...fullStack()]);
+
+// [
+//     "HTML",
+//     "CSS",
+//     "JavaScript",
+//     "Node.js",
+//     "Express",
+//     "MongoDB"
+// ]
+
+// This is called delegation.
+
+// You can compose smaller generators into a larger generator.
 
 ```
+
+
+
+
+# What happens after the delegated iterable finishes?"
+
+Execution resumes immediately after the yield* expression. If the delegated iterator has a return value, the yield* expression evaluates to that return value.
+
+
+
+# Symbol is a primitive data type introduced in ES6.
+
+A Symbol is a unique, immutable primitive value, commonly used as a property key to avoid naming collisions and to customize JavaScript's built-in behavior.
+
+```js
+// const id = Symbol("id");
+// console.log(id)
+
+// you can optionally provied description 
+const id = Symbol("user id");
+console.log(id.description)
+// But the description does not determine identity.
+
+console.log(Symbol("id")!=Symbol("id")) //true   Because every call to Symbol() creates a new unique Symbol value.
+
+// Because every call to Symbol() creates a new unique Symbol value.
+const user= {
+    name:"priti",
+    [id]:101
+}
+
+console.log(user[id])
+
+// now create 
+user.id=999
+console.log(user[id])
+console.log(user.id)
+
+
+// Symbol.toPrimitive👇
+
+// It controls how an object is converted into a primitive.
+const user = {
+    name: "Priti",
+
+    [Symbol.toPrimitive](hint) {
+        if (hint === "string") {
+            return this.name;
+        }
+
+        return 100;
+    }
+};
+
+console.log(String(user));
+console.log(Number(user));
+```
+
 
 #  Modules
 A module is a self-contained unit of JavaScript code that encapsulates related functionality. Modules allow us to organize applications into separate files and explicitly share functionality using mechanisms such as ES module export and import. This improves maintainability, reusability, and encapsulation.
@@ -7455,6 +8021,24 @@ users.forEach(user => {
 ul.appendChild(fragment);
 ```
 
+
+# What happens when a function returns?
+Its execution frame is removed from the call stack.
+
+# Can an object survive after its function returns?
+Yes.
+
+If something outside the function still references it.
+
+The object survives because user references it.
+
+
+# Does const mean the object cannot change?
+No.
+This is allowed.
+const prevents reassignment of the binding:
+It does not make the object immutable.
+
 #  Stack vs Heap?'
 The Stack stores fixed-size primitive values and execution frames, while the Heap stores dynamic, complex reference types (objects, arrays, functions).
 
@@ -7493,6 +8077,28 @@ Stack Push: The variable name player and its assigned memory address pointer are
 
 # What is Garbage Collection?
 Garbage Collection (GC) is an automated memory management process in JavaScript that frees up memory by deleting objects that are no longer needed.
+
+Suppose you create an object:
+
+The object lives somewhere in memory.
+
+As long as user points to it, the object is reachable:
+
+Now:
+
+There is no longer a reference from your program to that object:
+
+The garbage collector can eventually reclaim that memory.
+
+Important
+
+Garbage collection does not mean:
+
+"Delete every object that isn't currently being used."
+
+It means approximately:
+
+Find objects reachable from GC roots. Everything else is eligible for collection.
 ```JS
 function createUser() {
   let user = { name: "Alex" }; // 1. Allocated in Heap; point in Stack
@@ -7504,6 +8110,197 @@ activeUser = null;
 // 3. The link is broken. The object { name: "Alex" } is now completely unreachable.
 // 4. During the next GC cycle, it will be swept from the Heap.
 ```
+
+
+# Why Does JavaScript Need Garbage Collection?
+
+JavaScript constantly creates objects.
+
+These values require memory.
+
+Without garbage collection, memory would continuously increase:
+
+GC automatically identifies memory that can no longer be reached and reclaims it.
+
+
+# Does obj = null Cause GC?
+No, assigning null does not directly trigger garbage collection. It removes that particular reference. If no other references remain, the object becomes unreachable and eligible for collection. The engine decides when to actually perform GC.
+
+
+# Explain Stack vs Heap in JavaScript in 30 seconds
+
+"The call stack manages currently executing JavaScript code by maintaining function execution frames, and frames are automatically removed when functions return. The heap is used for dynamically allocated data such as objects and arrays, whose lifetime can extend beyond a function call. Garbage collection manages unreachable heap objects. The stack is limited, so deep recursion can cause a stack overflow, while excessive retained heap objects can cause memory problems. Also, stack-versus-heap placement is an implementation detail rather than a strict JavaScript rule.
+
+# Heap + Memory Leaks
+Garbage collection doesn't mean memory leaks are impossible.
+
+For example:
+
+The array keeps references to every object.
+
+Therefore:
+
+The garbage collector cannot remove those objects because they are still reachable.
+
+So memory keeps increasing.
+
+
+# Closures Make This More Interesting
+
+Consider:
+
+What happens?
+
+You might think:
+
+But inner() still needs message.
+
+So the captured environment must remain reachable.
+
+Conceptually:
+
+This is one reason closures are closely related to memory management.
+
+The stack frame of outer() can disappear, while the captured lexical environment remains alive as long as the returned function can reach it.
+
+
+# What is the difference between Stack and Heap memory in JavaScript?
+The stack is primarily used to manage the execution of JavaScript code, including function call frames, local execution state, and references. It follows a last-in-first-out model and is automatically cleaned up when functions return. The heap is used for dynamically allocated data such as objects, arrays, and other values whose lifetime can extend beyond a particular function call. The garbage collector manages heap memory and reclaims objects that are no longer reachable.
+
+The stack is generally fast and has limited space, so excessive recursion can cause a stack overflow. Heap allocation is more flexible, but garbage collection introduces some memory-management overhead.
+
+
+# Memory Leaks
+A memory leak is not simply “using a lot of memory.”
+It is memory that is no longer logically needed but remains reachable, so the garbage collector cannot reclaim it.
+
+If users keeps growing forever:
+
+Even if your application no longer needs old users, they're still reachable through users.
+
+Therefore:
+
+That's the fundamental pattern behind almost every JavaScript memory leak.
+
+① Accidental Globals
+
+Bad:
+
+In sloppy-mode JavaScript, this can create a property on the global object.
+
+Conceptually:
+
+Because the global object stays alive for the lifetime of the application, the reference can remain alive.
+
+
+Forgotten Event Listeners
+
+Consider:
+
+The browser maintains the listener registration.
+
+If the listener or its closure references other objects, those objects may remain reachable as long as the listener remains registered.
+
+Common problem:
+
+Later you don't need it—but forget:
+
+Important
+
+The removal must generally use the same function reference:
+
+Not:
+
+Those are two different function objects.
+
+Closures Holding Large Data
+
+Closures are extremely important for interviews.
+
+Example:
+
+The returned function closes over hugeData.
+
+Conceptually:
+
+As long as handler is reachable, the closure may keep hugeData reachable too.
+
+Important nuance
+
+Closures themselves are not memory leaks.
+
+This is a common interview trap.
+
+A closure causes a leak only when something unnecessarily keeps the closure—and therefore its captured objects—alive.
+
+Detached DOM Nodes
+
+This is especially important for browser interviews.
+
+Suppose:
+
+Now remove the button:
+
+The DOM node is detached from the document.
+
+But:
+
+The node can still be reachable through JavaScript.
+
+So:
+
+Therefore the garbage collector cannot necessarily reclaim it.
+
+Fix
+
+Remove unnecessary references:
+
+Timers and Intervals
+
+Classic problem:
+
+If the interval is no longer needed but isn't cleared:
+
+then the timer continues running.
+
+In React this becomes particularly important with useEffect.
+
+For example:
+
+Your uploaded material specifically emphasizes that cleanup is needed for resources such as intervals and event listeners
+
+Infinite Cache Growth
+
+This is one of the easiest leaks to accidentally create.
+
+Looks efficient.
+
+But imagine:
+
+Your cache becomes:
+
+If entries are never removed, memory can continuously grow.
+
+Solutions
+
+Depending on the use case:
+
+or use:
+
+maximum cache size
+TTL expiration
+LRU cache
+WeakMap where appropriate
+
+# What is a memory leak in JavaScript, and how does garbage collection relate to it?"
+
+A memory leak occurs when an application keeps references to objects that are no longer needed, preventing the garbage collector from reclaiming their memory. JavaScript garbage collection is primarily based on reachability: objects that are reachable from GC roots, such as global references and active execution contexts, are considered live. Common causes include accidental global variables, forgotten event listeners, uncleared timers, closures retaining unnecessary data, detached DOM nodes that are still referenced, and caches that grow indefinitely. To prevent leaks, we should properly clean up event listeners and timers, avoid accidental globals, release unnecessary references, and use bounded or expiring caches.
+
+
+# What is the difference between Map and WeakMap, and why would you use WeakMap for caching?
+Map and WeakMap both store key-value pairs, but their reference behavior is different. A normal Map strongly references its keys, so even if the rest of the application no longer references a key object, the Map can keep that object alive. WeakMap holds object keys weakly, so if there are no other strong references to a key, the garbage collector can reclaim that object and the corresponding entry no longer remains accessible. This makes WeakMap useful for object metadata, private data, and caches where the cached data should have the same lifetime as the object. WeakMap keys must be objects, and WeakMap is intentionally not iterable because exposing all keys would conflict with its garbage-collection semantics.`
+
+````WeakMap does not prevent garbage collection of its object keys. If an object has no other strong references, it can be collected, making WeakMap ideal for caches and metadata that should not extend an object's lifetime.````
 
 # What is Reflect?
 Reflect is a built-in global object in JavaScript that provides static methods for intercepting, inspecting, and manipulating object operations at runtime.
@@ -10797,4 +11594,2891 @@ console.log(user.greetOnce("Delhi"));
 // Call → Ignore
 // Call → Ignore
 // Call → Ignore
+```
+
+# Explain the V8 JavaScript engine pipeline."
+
+V8 is a JavaScript engine used by Chrome and Node.js. When JavaScript source code is executed, V8 first parses the source and builds an AST representing its structure. It then uses Ignition, V8's bytecode interpreter, to execute the code and collect runtime feedback. Frequently executed or "hot" code can become a candidate for optimization. TurboFan, V8's optimizing compiler, uses runtime feedback and assumptions about the code to generate optimized machine code. If those assumptions later become invalid, for example because the runtime behavior changes, V8 can deoptimize the optimized code and fall back to a safer execution path. This combination of interpretation, profiling, JIT optimization, and deoptimization allows JavaScript to remain dynamic while achieving high performance.
+
+
+# What is the V8 Pipeline?
+
+V8 is Google's JavaScript engine used primarily by Chrome and Node.js.
+
+It takes JavaScript source code and ultimately turns it into instructions that the CPU can execute.
+
+For example:
+
+The CPU cannot directly execute the JavaScript source:
+
+V8 has to process it through several stages.
+
+High-level pipeline
+Modern JavaScript engines are adaptive.
+
+They watch how your code behaves at runtime and optimize code that appears to be hot.
+
+Step 1 — JavaScript Source Code
+
+You write:
+
+This is just source text.
+
+V8 first needs to understand its syntax and structure.
+
+Step 2 — Parser
+
+The parser reads the JavaScript source and checks its syntax.
+
+For example:
+
+The parser understands:
+
+If the syntax is invalid:
+
+V8 cannot continue normally because the source cannot be parsed as valid JavaScript.
+
+Step 3 — AST
+
+AST means:
+
+Abstract Syntax Tree
+
+The parser converts source code into a tree representing the structure of the program.
+
+For:
+
+Conceptually:
+
+The AST is much easier for the engine to reason about than raw source text.
+
+Important interview point
+
+Don't say:
+
+"The AST is executed."
+
+That's not the correct mental model.
+
+The AST is an intermediate representation used during the compilation pipeline. V8 then generates executable representations such as bytecode.
+
+
+Step 4 — Ignition
+
+This is one of the most important V8 concepts.
+
+Ignition is V8's bytecode interpreter.
+
+It takes the parsed program and generates/executes bytecode.
+
+Instead of immediately generating highly optimized machine code for everything, V8 can start execution using bytecode.
+
+Conceptually:
+
+Why?
+
+Because JavaScript is dynamic.
+
+Consider:
+
+At compile time, V8 may not know whether:
+
+or:
+
+will happen.
+
+JavaScript allows both.
+
+
+# Why not compile everything directly to machine code?
+JavaScript is highly dynamic, so many useful optimization decisions depend on actual runtime behavior. V8 can first execute code and gather type and shape feedback, then optimize hot code based on what it observes. Optimizing everything upfront would also waste compilation effort on code that may never execute or execute only once.
+
+
+JIT compilation runtime par frequently executed JavaScript code ko analyze karke optimized machine code mein compile karta hai, taaki hot code faster execute ho sake.
+
+
+
+# What is JIT compilation in JavaScript, and how does it improve performance?
+
+JIT stands for Just-In-Time compilation. Modern JavaScript engines initially execute JavaScript using an intermediate representation such as bytecode, while profiling the code at runtime. When the engine identifies frequently executed or "hot" code, it can use an optimizing compiler to generate optimized native machine code for that code path.
+
+The optimizer can use runtime information, such as observed value types, to make speculative assumptions. For example, if a function repeatedly receives numbers, the engine may optimize the numeric path. If those assumptions later become invalid, the engine can deoptimize and fall back to a more general execution path.
+
+This allows JavaScript to retain its dynamic nature while achieving much better performance for frequently executed code.
+
+
+# What is performance profiling in JavaScript?"
+Performance profiling is the process of measuring a JavaScript application's CPU, execution, rendering, and memory behavior to identify bottlenecks. In Chrome DevTools, I can use the Performance tab to inspect timelines, flame charts, and call trees to find expensive functions or long tasks. For memory issues, I can use heap snapshots and allocation profiling. I can also use the Performance API, such as performance.mark() and performance.measure(), to create custom application-level metrics. The important workflow is to measure a baseline, identify the bottleneck, optimize that specific area, and profile again to verify the improvement.
+
+# How would you identify and fix a performance problem in a JavaScript application?
+First, I reproduce the performance problem consistently and measure it instead of guessing. I would open Chrome DevTools Performance, record the problematic interaction, and inspect the timeline and flame chart to identify long-running JavaScript functions or expensive rendering work. I would then use the Call Tree to find which functions consume the most execution time.
+
+If the problem appears to be memory-related, I would use the Memory tab and take heap snapshots or use allocation profiling to identify objects that are being unnecessarily retained or repeatedly allocated.
+
+For application-specific measurements, I can use performance.mark() and performance.measure() to measure individual operations such as data processing or rendering preparation.
+
+After identifying the bottleneck, I would optimize that specific area—for example by reducing unnecessary computation, avoiding repeated work, memoizing expensive calculations, batching operations, virtualizing large lists, or moving suitable CPU-heavy work off the main thread. Finally, I would profile again to verify that the optimization actually improved performance.
+
+
+
+
+# What is the difference between TypeError, ReferenceError and SyntaxError?
+A TypeError occurs when a value exists but an operation is not valid for that value or its type. For example, trying to access a property on null or calling a non-function.
+
+A ReferenceError occurs when JavaScript cannot resolve an identifier, such as accessing a variable that has not been declared.
+
+A SyntaxError occurs when JavaScript cannot parse the source code because the syntax is invalid, such as a missing bracket or malformed declaration.
+
+The key difference is that SyntaxError is related to parsing, ReferenceError is related to identifier resolution, and TypeError is related to performing an invalid operation on a value.
+
+
+JavaScript's built-in error types classify different failure conditions: SyntaxError indicates invalid syntax, ReferenceError indicates an unresolved identifier, TypeError indicates an invalid operation on a value, RangeError indicates an out-of-range value, URIError indicates invalid URI encoding/decoding, and Error is the general base error type.
+
+
+# What is try / catch / finally?
+JavaScript uses it for exception handling.
+try contains risky code, catch handles or propagates the error, and finally performs cleanup before control leaves the construct—even when try/catch returns or rethrows; however, a return or throw in finally can override the previous control flow.
+
+No error occurred, so catch is skipped.
+But finally still executes.
+
+throw  Creates an exception:
+try  Defines code where an exception may occur:
+catch Handles an exception:
+finally Runs cleanup:
+
+
+```js
+class AuthenticationError extends Error {
+  constructor(message) {
+    super(message);
+
+    this.name = "AuthenticationError";
+    this.statusCode = 401;
+  }
+}
+
+function login(password) {
+  if (password !== "secret") {
+    throw new AuthenticationError("Invalid password");
+  }
+
+  return "Login successful";
+}
+
+try {
+  console.log(login("wrong"));
+
+} catch (error) {
+
+  if (error instanceof AuthenticationError) {
+    console.log(error.statusCode);
+    console.log(error.message);
+  }
+
+} finally {
+
+  console.log("Cleanup");
+}
+```
+
+
+# What is the error object?
+
+# Does finally always execute in JavaScript? What happens if try contains a return?
+Normally, yes. The finally block executes when control leaves the try/catch, including when there is a return or a thrown exception. If try has a return, JavaScript preserves the return result while executing finally, and then completes the return afterward. If finally itself has a return, however, it overrides the previous return or thrown exception.
+what is finally actually usefull for ?
+close files
+release locks
+close connections
+remove temporary resources
+cleanup subscriptions
+reset temporary state
+
+# Custom Error Classes in JavaScript
+A custom error class is a normal JavaScript class that extends the built-in Error class, allowing you to create meaningful error types and attach structured information to them.
+```js
+class ValidationError extends Error {
+  constructor(msg) {
+    super(msg);//super() calls the parent class constructor.
+    this.name = "ValidationError";
+        this.field = field;
+    this.statusCode = 400;
+  }
+}
+// This lets us distinguish errors using instanceof, rather than checking strings like error.message.
+
+const error = new ValidationError("Invalid email");
+
+console.log(error instanceof ValidationError); // true
+console.log(error instanceof Error);           // true
+console.log(error instanceof Object);          // true
+console.log(error.message);
+console.log(error.name);
+console.log(error.stack);
+
+// So ValidationError inherits from Error.
+ValidationError.prototype
+        ↓
+Error.prototype
+        ↓
+Object.prototype
+        ↓
+null
+```
+
+```js
+class ValidationError extends Error {
+  constructor(message, field) {
+    super(message);
+
+    this.name = "ValidationError";
+    this.field = field;
+    this.statusCode = 400;
+  }
+}
+
+class NotFoundError extends Error {
+  constructor(message) {
+    super(message);
+
+    this.name = "NotFoundError";
+    this.statusCode = 404;
+  }
+}
+
+try {
+  throw new ValidationError("Invalid email", "email");
+
+} catch (error) {
+
+  if (error instanceof ValidationError) {
+    console.log("Return 400");
+  }
+
+  if (error instanceof NotFoundError) {
+    console.log("Return 404");
+  }
+}
+```
+
+# Why would you create a custom Error class instead of just using new Error()?
+Custom Error classes allow us to create specific error types that inherit from the built-in Error class. This gives us normal Error behavior such as message and stack, while also allowing us to distinguish errors using instanceof. We can additionally attach structured properties such as statusCode, field, or an error code. This makes error handling more reliable and maintainable, especially in backend applications where different errors need different responses.
+
+Custom errors give errors a type, not just a message.
+
+
+# How do you handle errors with async/await, and what happens when an awaited Promise rejects?"
+In Promise-based code, handle rejections with .catch(). With async/await, an awaited rejection can be handled using try/catch; if it isn't handled, the async function returns a rejected Promise, and if that rejection has no handler, it becomes an unhandled rejection.
+
+With async/await, I normally use try/catch around the awaited operation. If the Promise passed to await rejects, the rejection is propagated as an exception at the await expression, so control moves to the nearest matching catch block. If the rejection isn't handled inside the function, the async function itself returns a rejected Promise, which must be handled by its caller using another await inside try/catch or .catch(). If nobody handles the rejection, it can become an unhandled Promise rejection.
+```js
+async function getUser() {
+  const response = await fetch("/api/user");
+
+  if (!response.ok) {
+    throw new Error("Request failed");
+  }
+
+  return response.json();
+}
+
+async function main() {
+  try {
+
+    const user = await getUser();
+
+    console.log(user);
+
+  } catch (error) {
+
+    console.error("Failed:", error.message);
+  }
+}
+
+main();
+```
+
+
+# Explain Custom Error Classes
+"Custom Error Classes are classes that extend JavaScript's built-in Error class. We call super(message) to initialize the parent Error, and we can set a custom name and add fields such as statusCode, field, or an error code. The major advantage is that we can use instanceof to reliably distinguish different error types and handle them differently. They're especially useful for centralized error handling in Node.js and Express applications."
+```js
+// Custom Errors + async/await
+class DatabaseError extends Error {
+  constructor(message) {
+    super(message);
+
+    this.name = "DatabaseError";
+    this.statusCode = 500;
+  }
+}
+
+async function getUser() {
+  try {
+    // Imagine database operation
+    throw new Error("MongoDB connection failed");
+
+  } catch (error) {
+
+    throw new DatabaseError(
+      "Unable to fetch user"
+    );
+  }
+}
+async function main() {
+  try {
+    await getUser();
+
+  } catch (error) {
+
+    if (error instanceof DatabaseError) {
+      console.log("Database problem");
+    }
+  }
+}
+
+main();
+```
+
+
+```js
+class ValidationError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "ValidationError";
+    this.statusCode = 400;
+  }
+}
+
+class AuthenticationError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "AuthenticationError";
+    this.statusCode = 401;
+  }
+}
+
+class AuthorizationError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "AuthorizationError";
+    this.statusCode = 403;
+  }
+}
+
+class NotFoundError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "NotFoundError";
+    this.statusCode = 404;
+  }
+}
+
+function errorHandler(error) {
+
+  if (error instanceof ValidationError) {
+    return {
+      status: 400,
+      message: error.message
+    };
+  }
+
+  if (error instanceof AuthenticationError) {
+    return {
+      status: 401,
+      message: error.message
+    };
+  }
+
+  if (error instanceof AuthorizationError) {
+    return {
+      status: 403,
+      message: error.message
+    };
+  }
+
+  if (error instanceof NotFoundError) {
+    return {
+      status: 404,
+      message: error.message
+    };
+  }
+
+  return {
+    status: 500,
+    message: "Internal Server Error"
+  };
+}
+```
+
+```js
+// 1. Create Custom Error Class
+class ValidationError extends Error {
+  constructor(message) {
+    super(message);
+
+    this.name = "ValidationError";
+  }
+}
+
+
+// 2. Create a function that uses Custom Error
+function validateUser(name, age) {
+
+  if (!name) {
+    throw new ValidationError("Name is required");
+  }
+
+  if (age < 18) {
+    throw new ValidationError("Age must be 18 or above");
+  }
+
+  return "User is valid";
+}
+
+
+// 3. Call the function
+try {
+
+  const result = validateUser("Priti", 15);
+
+  console.log(result);
+
+} catch (error) {
+
+  // 4. Check whether it is our Custom Error
+  if (error instanceof ValidationError) {
+
+    console.log("Custom Error:", error.name);
+    console.log("Message:", error.message);
+
+  } else {
+
+    console.log("Unknown Error:", error.message);
+  }
+}
+```
+
+# What's the difference between window.onerror and window.onunhandledrejection?
+onerror handles uncaught exceptions; onunhandledrejection handles unhandled Promise rejections.
+
+window.onerror is used to handle uncaught JavaScript exceptions, primarily synchronous errors. window.onunhandledrejection is used to detect Promise rejections for which no rejection handler has been attached. They represent two different error paths in JavaScript. In production applications, both can be used as a last-resort error-monitoring layer to report unexpected failures to systems such as Sentry or Datadog.
+
+```js
+window.onerror = function (
+  message,
+  source,
+  line,
+  column,
+  error
+) {
+  console.log("Message:", message);
+  console.log("Source:", source);
+  console.log("Line:", line);
+  console.log("Column:", column);
+  console.log("Error:", error);
+};
+
+
+
+window.onunhandledrejection = function (event) {
+  console.log("Promise failed");
+  console.log("Reason:", event.reason);
+};
+
+Promise.reject(
+  new Error("API request failed")
+);
+
+// Synchronous error
+setTimeout(() => {
+  throw new Error("Timer error");
+}, 1000);
+
+```
+
+```js
+// ========================================
+// GLOBAL ERROR HANDLING
+// ========================================
+
+
+// 1. Handle uncaught synchronous errors
+window.onerror = function (
+  message,
+  source,
+  line,
+  column,
+  error
+) {
+  console.error("❌ Global Error");
+
+  console.error("Message:", message);
+  console.error("Source:", source);
+  console.error("Line:", line);
+  console.error("Column:", column);
+  console.error("Stack:", error?.stack);
+};
+
+
+// 2. Handle unhandled Promise rejections
+window.onunhandledrejection = function (event) {
+  console.error("❌ Unhandled Promise Rejection");
+
+  console.error("Reason:", event.reason);
+  console.error("Stack:", event.reason?.stack);
+};
+
+
+// ========================================
+// TEST 1: Synchronous Error
+// ========================================
+
+function testSyncError() {
+  throw new Error("Something went wrong!");
+}
+
+testSyncError();
+
+
+// ========================================
+// TEST 2: Unhandled Promise Rejection
+// ========================================
+
+function testAsyncError() {
+  return Promise.reject(
+    new Error("API request failed!")
+  );
+}
+
+testAsyncError();
+```
+
+
+# Why would you catch an error only to re-throw it?"
+Catch when you can add value; otherwise let the error propagate.
+
+We catch and re-throw an error when we need to add context, perform logging, cleanup, transform the error into a more meaningful application-specific error, or attach additional information. We should preserve the original error using cause when creating a new error. If the current layer cannot meaningfully handle the error, it should let the error propagate rather than swallowing it.
+```js
+function divide(a, b) {
+  if (b === 0) {
+    throw new Error("Cannot divide by zero");
+  }
+
+  return a / b;
+}
+
+function calculate() {
+  try {
+    return divide(10, 0);
+
+  } catch (error) {
+
+    console.log("Logging error:", error.message);
+
+    // Re-throw the same error 
+    throw error;
+  }
+}
+
+try {
+  calculate();
+
+} catch (error) {
+
+  console.log("Final handler:", error.message);
+}
+```
+```js
+async function getUser() {
+  try {
+
+    return await database.getUser();
+
+  } catch (error) {
+
+// Create new error with cause
+    throw new Error("Failed to load user", {
+      cause: error
+    });
+  }
+}
+try {
+
+  const user = await getUser();
+
+} catch (error) {
+
+  console.error(error.message);
+
+  console.error(
+    "Original:",
+    error.cause
+  );
+}
+```
+
+# What is Error Propagation?
+Error propagation means:
+
+When an error happens in one function and that function doesn't handle it, the error moves upward to the caller until some catch block handles it.
+
+Errors Can Propagate Upward
+```js
+/** @format */
+
+async function database() {
+  throw new Error("Database failed");
+}
+
+async function service() {
+  await database();
+}
+
+async function controller() {
+  await service();
+}
+
+async function main() {
+  try {
+    await controller();
+  } catch (error) {
+    console.log("Handled:", error.message);
+  }
+}
+
+main();
+
+```
+
+# finally vs return Interaction
+If try returns a value and finally also returns a value, finally wins.
+```js
+function test() {
+  try {
+    return "Try";
+  } finally {
+    console.log("Finally executed");
+  }
+}
+
+console.log(test());
+// Output
+// Finally executed
+// Try
+```
+Why?
+
+finally executes before the function actually returns.
+
+But because finally does not have a return, the original try return value is preserved.
+
+  ```js
+  // finally overrides try 
+  function test() {
+  try {
+    return "Try";
+  } finally {
+    return "Finally";
+  }
+}
+
+console.log(test());//finaly
+
+// try
+//  ↓
+// return "Try"
+//  ↓
+// finally executes
+//  ↓
+// return "Finally"
+//  ↓
+// "Finally" wins
+```
+```js
+function test() {
+  try {
+    console.log("Try");
+    return 10;
+  } catch (error) {
+    return 20;
+  } finally {
+    console.log("Finally");
+    return 30;
+  }
+}
+
+console.log("Result:", test());
+// Try
+// Finally
+// Result: 30
+
+// try executes
+//  ↓
+// console.log("Try")
+//  ↓
+// return 10
+//  ↓
+// finally MUST execute
+//  ↓
+// console.log("Finally")
+//  ↓
+// return 30
+//  ↓
+// 30 becomes final return value
+```
+
+```js
+function test() {
+  const obj = {
+    value: 10
+  };
+
+  try {
+    return obj;
+  } finally {
+    obj.value = 20;
+  }
+}
+
+console.log(test());
+
+// Output:
+
+// {
+//   value: 20
+// }
+
+// Why?
+
+// Because the return value is a reference to the object
+```
+
+finally always gets a chance to execute before a try/catch return, throw, or normal completion finishes. If finally itself performs a return, that return overrides the previous completion.
+
+
+
+
+
+
+
+
+# TypeScript 
+# What are type and interface?
+Both are TypeScript features used to describe types.
+
+```js
+interface User{
+  name:string,
+  age:number
+}
+
+type User={
+  name:string,
+  age:number
+}
+
+// Both allow
+const user:User={
+  name:"priti",
+  age:23
+}
+
+// TypeScript types do NOT exist at runtime.
+// TypeScript uses User while checking your code.
+
+// But after TypeScript compiles to JavaScript:
+
+const user = {
+  name: "Priti",
+  age: 25,
+  email:string
+};
+
+// The interface disappeared.
+// same for type
+
+// type and interface are compile-time constructs, not runtime JavaScript constructs.
+
+if (user instanceof User) {
+}
+
+// because User doesn't exist as a JavaScript constructor at runtime.
+
+
+// if we do 
+const user:User={
+  name:"priti"
+}
+
+// Typescript complains because : age is required
+
+
+
+// we want an admin 
+interface Admin extends User{
+  permission:string[];
+}
+
+const admin:Admin={
+  name:"priti",
+  email:"priti@gmail.com",
+  permisssion:["delete","edit"]
+}
+
+// The same thing with type 
+// you can also use intersection 
+
+type User={
+  name:string,
+  email:string
+}
+
+type Admin= User &{
+  permission:string[]
+}
+
+// means: User+ permission
+
+
+
+// A type can represent things that an interface cannot directly represent.
+
+// Union
+type ID= string | number;
+
+let id:ID;
+id="abc"//valid
+id=12// this also valid
+
+// YOU CAN NOT WRITE 
+interface ID extends string | number{} // invalid 
+
+
+// Primitive Aliases
+type UserId= string;
+type Age= number;
+type isActive=boolean;
+
+
+
+// Tuple
+type Coordinates = [number,number];
+const location:Coordinates= [22.7,78.4]
+
+// Function Type 
+type Add= (a:number,b:number)=>number;
+
+const add:Add=(a,b)=>a+b
+
+
+
+// But an interface describes object-like structures rather than simply aliasing a primitive.
+
+
+// Interfaces support declaration merging
+interface User {
+  name: string;
+}
+
+interface User {
+  age: number;
+}
+
+// Typescript effectively combines them  👇
+interface User{
+  name:string,
+  age:number
+}
+
+
+// BUT Type doesn't merge
+type Use={
+  name:string,
+}
+type User={
+  age:number
+}
+// causes an error because the identifier User cannot be redeclared like that.
+
+
+interface User {
+  name: string;
+  age: number;
+}
+
+// or:
+
+type User = {
+  name: string;
+  age: number;
+};
+
+// Both allow:
+
+const user: User = {
+  name: "Priti",
+  age: 25
+};
+
+
+interface User {
+  name: string;
+  email: string;
+}
+
+// We want an Admin.
+
+interface Admin extends User {
+  permissions: string[];
+}
+
+// Now:
+
+const admin: Admin = {
+  name: "Priti",
+  email: "priti@example.com",
+  permissions: ["delete", "edit"]
+};
+
+
+type User = {
+  name: string;
+  email: string;
+};
+
+type Admin = User & {
+  permissions: string[];
+};
+
+So:
+
+type Admin = User & {
+  permissions: string[];
+};
+
+// means:
+
+// User
+// +
+// permissions
+// Important interview distinction
+
+
+// Both can achieve extension-like behavior.
+
+// 6. The BIG advantage of type
+
+// A type can represent things that an interface cannot directly represent.
+
+// Union
+type ID = string | number;
+
+// Now:
+
+let id: ID;
+
+id = "abc"; // ✅
+id = 123;   // ✅
+
+// This means:
+
+// ID
+//  ↓
+// string OR number
+
+// You cannot write:
+
+interface ID extends string | number {}
+
+// That's not what interfaces are designed for.
+
+// Primitive aliases
+
+// You can do:
+
+type UserId = string;
+type Age = number;
+type IsActive = boolean;
+
+// But an interface describes object-like structures rather than simply aliasing a primitive.
+
+
+interface User {
+  name: string;
+  age: number;
+}
+
+// So:
+
+const user: User = {
+  name: "Priti",
+  age: 25
+};
+
+// works.
+
+// But type doesn't merge
+
+// This:
+
+type User = {
+  name: string;
+};
+
+type User = {
+  age: number;
+};
+
+// causes an error because the identifier User cannot be redeclared like that.
+
+// . Why is declaration merging useful?
+interface Request{
+  user?:User;
+}
+// Another part of your application can augment it:
+interface Request{
+  requestId:string
+}
+
+// Typescript can merge them 
+
+
+// extends vs & 
+
+interface User{
+  name:string
+}
+interface Admin extends User{
+  role:string
+}
+
+// Type 
+type User={
+  name:string
+}
+type Admin = User&{
+  role:string
+}
+
+// Both produce something like 
+{
+  name: string;
+  role: string;
+}
+
+// But don't assume extends and & are identical in every edge case.
+
+
+type Status = "loading" | "success" | "error";
+
+function handleStatus(status: Status) {
+  if (status === "loading") {
+    // ...
+  }
+}
+
+type ID = string | number;
+type Handler = (event: Event) => void;
+```
+
+
+# # What is the difference between type and interface in TypeScript, and when would you use each?
+interface and type can both describe object shapes, but they have different capabilities. I generally prefer interface when defining object-oriented or extendable object shapes because interfaces support extends and declaration merging. I use type when I need more flexibility, such as union types, intersection types, primitive aliases, tuples, or function types. Both are compile-time TypeScript constructs and are erased when the code is compiled to JavaScript. So for a normal object model I would usually choose interface, while for unions or more complex type composition I would choose type
+
+
+I prefer interface for extensible object contracts and type when I need unions, intersections, tuples, primitives, or other complex type composition.
+
+
+# What are generics in TypeScript, and why would you use them instead of any?
+Generics allow us to write reusable and type-safe code that works with different types. Instead of fixing a function to one specific type or using any, we introduce a type parameter such as T. TypeScript can then infer or receive the actual type when the function is used.
+
+For example, function identity<T>(arg: T): T accepts any type but preserves the relationship between the argument and return value. If we pass a string, TypeScript knows the return value is a string; if we pass a number, it knows the return value is a number.
+
+Generics can also have constraints, such as <T extends object> or <K extends keyof T>, which restrict what types are allowed while maintaining type safety. They're commonly used in reusable utilities, API wrappers, collections, and React hooks.
+
+At runtime, the generic type parameter doesn't exist because TypeScript erases type information when compiling to JavaScript.
+
+
+# What are Generics?
+Generics = type parameters.
+They let you write code once and make it work safely with many different types.
+
+Without generics, you might lose information:
+```js
+function identity(arg: any): any {
+  return arg;
+}
+```
+
+Problem: any turns off useful type checking.
+
+With Genrics:
+```js
+function identity<T>(arg: T): T {
+  return arg;
+}
+
+// T means : i don't know the type yet . The Caller will provide it 
+const result1 = identity<string>("Priti");
+const result2 = identity<number>(100);
+const result3 = identity<boolean>(true);
+
+// After TypeScript compilation, conceptually:
+
+function identity(arg) {
+  return arg;
+}
+
+const result = identity("hello");
+
+// The  < T> disappears
+
+
+// Generic Array Function
+function getFirst<T>(items:T[]):T{
+  return items[0]
+}
+
+// now
+const firstNumber = getFirst([10,20,30]);
+const firstName=getFirst(["priti","vipin"])
+
+
+// sometimes you don't want to accept every possible  types
+
+function printName<T>(value:T){
+  console.log(value.name)
+}
+
+// TypeScript complains
+// because T could be :👇👇 
+// number
+// string
+// boolean
+// array 
+// Nothing guarantee that T has a name 
+// So we add a constraint
+
+
+function printName<T extends {name:string}>(value:T):string{
+  return value.name
+}
+
+const user={
+  name:"priti",
+  age:24
+}
+
+printName(user)// priti
+
+<T extends object> 
+// T must be an object like type 
+function process<T extends object>(value:T):T{
+  return value;
+}
+
+process({name:"priti"})// 
+process([1,2,3])//
+// object means non-primitive, not necessarily a plain {} object.
+// Arrays and functions are also objects in this sense.
+
+// BUT 
+process(10)//this won't work
+process("hello")//this won't work
+process(true)//this won't work
+
+<T, K extends keyof T>
+
+function getProperty<T, K extends keyof T>(
+  obj:T,
+  key:K
+){
+  return obj[key]
+}
+
+const user={
+  name:"priti",
+  age:23
+}
+// typescript sees
+// T={name:string,age:number}
+// // then
+// keyof T becomes: "name"| "age"
+
+getProperty(user,"name");
+getProperty(user,"age");
+// bUT
+getProperty(user,"email")// invalid because email isnt key of user
+
+
+function getLength<T extends {length:number}>(value:T):number{
+  return value.length;
+}
+getLength("priti")//
+getLength([1,2,3])
+// because both have length
+
+// Multiple Generic Parameters
+
+function pair<T, U>(first:T,second:U){
+  return [first,second]
+}
+const result = pair("priti",23)
+
+// Genric interface 
+
+interface ApiResponse<T>{
+  data:T;
+  success:boolean
+}
+
+const response:ApiResponse<User>={
+  data:{
+    name:"priti",
+    age:23
+  },
+  success:true
+}
+
+// or 
+const response:ApiResponse<string>={
+  data:"hello",
+  success:true
+}
+
+
+
+// Genric Api Wrapper 
+interface ApiResponse<T>{
+  data:T;
+  message:string,
+  success:boolean;
+}
+
+async function fetchData<T>(url:string):Promise<ApiResponse<T>>{
+  const response= await fetch(url);
+  return response.json()
+}
+
+interface User{
+  id:number;
+  name:string
+}
+
+const response =await  fetchData<User>("/api/users")
+
+
+
+// Genric React Hook
+function useFetch<T>(url:string){}
+const {data}= useFetch<User>("/api/users")
+
+
+// Default Genric Types
+<T= string> // this provides a default type
+
+interface Box<T=string>{
+  value:T;
+}
+// if no type is supplied
+const box:Box={
+  value:"Hello"
+}
+
+// Tou can override it 
+const numberBox:Box<number>={
+  value:100
+}
+
+// T extends object does NOT mean "plain JavaScript objec
+
+function process<T extends object>(value: T) {
+  return value;
+}
+
+allows:
+
+process({ name: "Priti" }); // ✅
+process([1, 2, 3]);         // ✅
+process(() => {});          // ✅
+// because arrays and functions are also non-primitive objects from TypeScript's perspective.
+
+// If you specifically need a particular shape, constrain that shape:
+
+function process<T extends { name: string }>(value: T) {
+  return value.name;
+}
+
+function identity<T>(value: T) {
+  if (T === string) {
+    // ❌
+  }
+}
+
+// You can't do this.
+
+// T is not a runtime JavaScript value.
+
+// If you need runtime checking, JavaScript mechanisms are required:
+
+function process(value: unknown) {
+  if (typeof value === "string") {
+    console.log(value.toUpperCase());
+  }
+}
+// unknown is safer than any because you must narrow it before using it.
+
+// T is a placeholder for a type that will be determined later."
+function getProperty<T, K extends keyof T>(
+  obj: T,
+  key: K
+): T[K] {
+  return obj[key];
+}
+
+const product={
+  title:"Laptop",
+  price:5000,
+  inStock:true
+}
+getProperty(product,"title")// string
+getProperty(product,"price")// number
+getProperty(product,"inStock")// boolean
+
+
+// Constraint
+<T extends object>
+// Restricts T.
+
+// Property constraint
+<T extends { name: string }>
+
+// Key constraint
+<K extends keyof T>
+
+// K must be a valid key of T.
+// indexed access
+// T[K] // gets the type of property K
+```
+
+
+Generics do not create runtime type information. They help TypeScript perform compile-time type checking while preserving relationships between input and output types.
+
+
+
+# What is the difference between Union and Intersection types in TypeScript?
+Union types use | and represent an OR relationship. A value of a union type can be one of several possible types, such as string | number. Because TypeScript doesn't know which member of the union it has at a particular point, we often need type narrowing using typeof, in, instanceof, or discriminated unions.
+
+Intersection types use & and represent an AND relationship. The resulting value must satisfy all the combined types. For example, Admin & User requires all properties from both Admin and User.
+
+Both are primarily compile-time TypeScript constructs and are erased when TypeScript is compiled to JavaScript.
+
+
+# TypeScript Union (|) & Intersection (&) Types
+Union means the value must be valid as at least one type.
+
+Intersection means the value must satisfy all combined types.
+
+Union ( | )        → OR
+Intersection ( & ) → AND
+
+```js
+let id:string | number;
+// means : id can be  string or number 
+
+id="user_101";
+id=101;
+
+
+let value:string | number="hello";
+
+// After type script compilation 
+let value = "hello";
+
+// The information  string | number is removed  so js doesn't have a runtime unionType object
+
+value.toUpperCase()
+
+// Union Requires Type Narrowing
+// suppose 
+function printValue(value:string | number){
+console.log(value)//fine
+}
+
+// BUT
+function printValue(value:string | number){
+  console.log(value.toUpperCase())//error because value could be string  could be number toUpperCase() exist on string ,but not number
+}
+
+// So we narrow the type
+function printValue(value:string | number){
+  if(typeof value==="string"){
+    console.log(value.toUpperCase())
+  }else{
+    console.log(value.toFixed(2))
+  }
+}
+
+
+
+function formatId(id: string | number): string {
+    if (typeof id === "string") {
+        return `ID: ${id.toUpperCase()}`;
+    }
+
+    return `ID: ${id.toFixed(0)}`;
+}
+
+console.log(formatId("abc")); // ID: ABC
+console.log(formatId(123));   // ID: 123
+
+
+// Common narrowing techniques:
+
+typeof
+instanceof
+in
+equality checks
+custom type guards
+discriminated unions
+
+
+// intersection Types &
+type Admin={
+  name:string;
+  permission:string[]
+};
+type User={
+  name:string;
+  email:string;
+}
+
+type AdminUser= Admin & User;//AdminUser must satisfy both 
+
+const user:AdminUser={
+  name:"priti",
+  email:"priti@gmail.com",
+  permisssion:["read","write"]
+}
+
+
+type A = {
+    name: string;
+};
+
+type B = {
+    age: number;
+};
+
+// Union:
+
+type Union = A | B; // An object must have either name or age 
+
+type Intersection = A & B;
+
+type Person = A | B
+const person:Person={
+  name:"priti"
+}
+
+// And
+const person:Person={
+age:23
+}
+
+type User = {
+    id: number;
+    name: string;
+};
+
+type Employee = {
+    department: string;
+    salary: number;
+};
+
+type EmployeeUser = User & Employee;
+
+
+const employee:EmployeeUser={
+  id:101,
+  name:"priti",
+  department:"Engineering",
+  salary:5000
+}
+
+
+
+type Success={
+  status:"success";
+  data:string;
+};
+type ErrorResponse={
+  status:"error";
+  message:string;
+}
+type ApiResponse= Success | ErrorResponse
+
+function handleResponse(response:ApiResponse){
+  if(response.status==="success"){
+    console.log(response.data)
+  }else{
+    console.log(response.message)
+  }
+}
+
+
+// You can still narrow using:
+
+if ("data" in response) {
+    console.log(response.data);
+}
+
+
+type Response =
+    | {
+        status: "success";
+        data: string;
+      }
+    | {
+        status: "error";
+        message: string;
+      };
+```
+
+```js
+// Type Narrowing Cheat Sheet
+
+// When you have 
+string | number 
+
+// you can narrow using: typeof
+typeof
+if(typeof value=="string"){}
+
+instanceof
+if(value instanceof Date){}
+
+in 
+if("email" in user){}
+
+Equality
+if(value==="success"){
+  // value is success
+}
+
+// Custom type quard
+function isString(value:unknown):value is stirng{
+  return typeof value ==="string"
+}
+
+
+// React 
+type ButtonProps=
+| {
+  type:"link";
+  href:string;
+}
+| {
+  type:"button";
+  onClick:()=>void;
+};
+
+function Button(props:ButtonProps){
+  if(props.type==="link"){
+    return <a href={props.href} >Click</a>
+  }
+  return <button onClick={props.onClick}>click</button>
+
+  type: "link" | "button"
+}
+
+
+// | asks "which type could this be?", while & asks "what requirements must this satisfy?"
+```
+
+# What is a Type Guard in TypeScript, and what is the difference between built-in and user-defined Type Guards?
+
+A Type Guard is a runtime check that allows TypeScript to narrow a value from a broader type, such as a union, into a more specific type. Type Guards are based on JavaScript runtime mechanisms like typeof, instanceof, and in.
+
+TypeScript also supports user-defined Type Guards using a type predicate such as value is User. The function returns a boolean at runtime, but the predicate tells the TypeScript compiler that when the function returns true, the value should be treated as that specific type.
+```js
+type User = {
+    name: string;
+};
+
+function isUser(value: unknown): value is User {
+    return (
+        typeof value === "object" &&
+        value !== null &&
+        "name" in value
+    );
+}
+
+function process(value: unknown) {
+
+    if (isUser(value)) {
+        console.log(value.name);
+    }
+}
+```
+
+# What is a Type Guard?
+A Type Guard is a runtime check that TypeScript uses to narrow a variable from a broader type into a more specific type.
+
+```js
+// Suppose TypeScript says a variable can be two different types:
+//
+function print(value:string | number){
+  //value could be string 
+  // oor
+  // value could be number 
+}
+
+// If you try:
+
+function print(value: string | number) {
+    console.log(value.toUpperCase());
+}
+
+// TypeScript complains because:
+
+// string → has toUpperCase()
+// number → does NOT have toUpperCase()
+
+// So we need to narrow the type.
+
+// That's where a Type Guard comes in.
+
+
+function print(value: string | number) {
+
+    if (typeof value === "string") {
+        console.log(value.toUpperCase());
+    } else {
+        console.log(value.toFixed(2));
+    }
+
+}
+
+
+let value: string | number = "hello";
+// After TypeScript is compiled to JavaScript, the type annotation disappears:
+
+// So Type Guards use actual JavaScript runtime information.
+typeof value ==="string";
+
+// typeof is a real javascript operator
+
+
+// Built-in Type Guards
+typeof
+instanceof
+in
+Equality checks
+Truthiness checks
+
+
+
+// User-Defined Type Guard
+
+type User={
+  id:number;
+  name:string;
+}
+
+type Admin={
+  id:number;
+  name:string;
+  permission:string[];
+}
+
+// we can create our own type guard
+function isUser(value:User | Admin):value is User{
+  return !("permission" in value);
+}
+
+function print(value:User | Admin){
+  if(isUser(value)){
+    console.log(value.name);
+  }else{
+    console.log(value.permission)
+  }
+}
+
+value is User 
+// This is called a type  predicate.
+
+// What does value is User mean ?
+
+
+function isUser(value: unknown): value is User {
+    return "name" in value;
+}
+
+// doesn't mean the function literally returns a User.
+
+// The actual JavaScript return value is:
+
+// true
+// or
+// false
+
+// value is User  : tells the typescript compiller 
+// If this function returns true, treat value as a User in this branch.
+
+if (isUser(value)) {
+    // TypeScript knows:
+    // value is User
+}
+
+
+// Discriminated Unions
+type SuccessResponse={
+  data:string[];
+}
+
+type ErrorResponse={
+  error:string;
+}
+
+type Response = SuccessResponse | ErrorResponse;
+
+
+// create a guard
+function isSuccessResponse(response:Response):response is SuccessResponse{
+return "data" in response;
+}
+
+// use it 
+
+function handleResponse(response:Response){
+  if(isSuccessResponse(response)){
+    //response-> SuccessResponse
+    console.log(response.data);
+  }else{
+    //response -> ErrorResponse
+    console.log(response.error);
+  }
+}
+
+// Without a guard:
+
+response.data
+
+// is unsafe because ErrorResponse doesn't have data.
+
+
+// typeof cannot distinguish arbitrary object shapes
+
+type User = {
+    name: string;
+};
+
+type Product = {
+    price: number;
+};
+
+function print(value: User | Product) {
+
+    if (typeof value === "object") {
+        console.log(value);
+    }
+
+}
+
+User | Product
+
+// It still can't determine whether it's:
+
+// User
+
+// or:
+
+// Product
+
+// because both are JavaScript objects.
+
+// Use in instead:
+
+
+function print(value: User | Product) {
+
+    if ("name" in value) {
+
+        // value → User
+        console.log(value.name);
+
+    } else {
+
+        // value → Product
+        console.log(value.price);
+
+    }
+}
+
+// typeof distinguishes primitive categories, but it does not distinguish object shapes.
+
+// Safe check is 
+function isUser(value: unknown): value is User {
+
+    return (
+        typeof value === "object" &&
+        value !== null &&
+        "name" in value
+    );
+}
+
+// asserts value is User
+
+// An assertion function doesn't normally return true/false.
+
+// Instead, it throws if the condition isn't satisfied.
+
+type user={
+  name:string;
+}
+
+function assertIsUser(value:unknown): asserts  value is User{
+  if(
+    typeof value !=="object" ||
+    value ===null || 
+    !("name" in value)
+  ){
+    throw new Error("Not a USer")
+  }
+}
+
+function process(value: unknown) {
+
+    assertIsUser(value);
+
+    // TypeScript knows:
+    // value → User
+
+    console.log(value.name);
+}
+
+// Type predicate
+function isUser(value: unknown): value is User  //true / false
+
+function assertIsUser(
+    value: unknown
+): asserts value is User
+
+// does:👇
+// valid → continue
+// invalid → throw
+
+
+
+```
+
+# What are TypeScript Utility Types, and can you explain Partial, Pick, Omit, Record, ReturnType, and Awaited?
+Utility Types are built-in TypeScript type transformations that allow us to derive new types from existing types without manually rewriting them. They work primarily at compile time and don't add runtime behavior to JavaScript.
+
+Partial<T> makes all properties optional, which is useful for update objects.
+
+Required<T> makes all properties required.
+
+Readonly<T> prevents reassignment of properties through TypeScript's type system.
+
+Pick<T, K> creates a type containing only selected properties, while Omit<T, K> creates a type excluding selected properties.
+
+Record<K, V> creates an object type where keys have type K and values have type V.
+
+ReturnType<F> extracts a function's return type, and Parameters<F> extracts its parameter types as a tuple.
+
+Awaited<T> unwraps Promise-like types. A common pattern is Awaited<ReturnType<typeof fetchData>> to obtain the resolved value returned by an async function."
+
+
+
+# What are Utility Types?
+
+Utility Types are built-in TypeScript helpers that let you transform existing types into new types.
+
+TypeScript Utility Types operate at compile time. They transform or derive types for static type checking, and generally have no runtime JavaScript behavior.
+
+
+```js
+// Instead of writing:
+
+type User = {
+  name: string;
+  age: number;
+  email: string;
+};
+
+// and manually creating many variations:
+
+type PartialUser = {
+  name?: string;
+  age?: number;
+  email?: string;
+};
+
+// typescript gives us 
+type partialUser= Partial<User>
+
+Partial<T>
+Required<T>
+Readonly<T>
+Pick<T, K>
+Omit<T, K>
+Record<K, V>
+ReturnType<F>
+Parameters<F>
+Awaited<T>
+
+
+Partial<T>  // Makes every property optional
+type User = {
+  name: string;
+  age: number;
+  email: string;
+};
+
+type PartialUser = Partial<User>;
+
+// Equivalent to :
+type PartialUser = {
+  name?: string;
+  age?: number;
+  email?: string;
+};
+
+// useful for update function
+function updateUser(id:string,update:Partial<User>){
+  //update only provided properties
+}
+
+updateUser("123",{
+  name:"priti"
+})
+updateUser("123",{
+  age:23
+})
+
+// You don't need to provide all properties
+
+
+Required<T>  // The opposite of Partial
+//It makes every property required
+
+type User = {
+  name?: string;
+  age?: number;
+};
+
+type CompleteUser = Required<User>;
+
+// Equivalent to :👇
+type CompleteUser={
+  name:string;
+  age:number;
+}
+
+const user:ComleterUser={
+  name:"priti",
+  age:23
+}
+// BUT 
+const user:CompleteUser={
+  name:"priti"
+}// this is invalid because age is required 
+
+
+
+Readonly<T> // Makes properties readonly
+type User = {
+  name: string;
+  age: number;
+};
+
+type ReadonlyUser = Readonly<User>;
+
+const user: ReadonlyUser = {
+  name: "Priti",
+  age: 25
+};
+// this is allowed 👇👇 
+console.log(user.name)
+// BUT
+user.name="vipin"// typescript gives error
+
+
+// Readonly does not make the object deeply immutable.
+
+type User = {
+  name: string;
+  skills: string[];
+};
+
+const user: Readonly<User> = {
+  name: "Priti",
+  skills: ["JS"]
+};
+
+// this is forbidden
+user.name="vipin"
+
+// But this can still be allowed👇👇 
+user.skills.push("React")
+
+// Because the property reference is readonly , not necessarily the nested object.
+
+
+
+Pick<T, K> // select only specific propertes.
+
+
+type User ={
+  id:number;
+  name:string;
+  email:string;
+  password:string;
+}
+
+type PublicUser= Pick<User, "id" | "name" | "email" >
+
+
+type PublicUser={
+  id:number;
+  name:string;
+  email:string;
+}
+
+// password is excluded
+
+
+Omit<T , K> // opposite of Pick 
+// Give me everything except these properties.
+
+type User ={
+  id:number;
+  name:string;
+  email:string;
+  password:string;
+}
+
+const  SafeUser= Omit<User, "password">;
+
+type SafeUser={
+    id:number;
+  name:string;
+  email:string;
+}
+
+// Pick vs Omit 
+// pick keeps specificed  properties
+// omit removes specified properties
+
+
+Record<K, V> // Record creates an object type whose keys have  a specific type and whose values have another type.
+
+
+type UserRoles = Record<string, string>;
+
+const role:UserRole={
+  priti:"admin";
+  vipin:"user";
+  amit:"editor"
+}
+
+type Role = "admin" | "user" | "editor";
+
+type Permissions = Record<Role, boolean>;
+
+const permissions: Permissions = {
+  admin: true,
+  user: true,
+  editor: false
+};//This is extremely useful for dictionaries/maps/configuration objects.
+
+
+ReturnType<F> //Extracts the return type of a function
+
+function getUser(){
+  return {
+    id:1,
+    name:"priti"
+  }
+}
+
+type User = ReturnType<typeof getUser>
+
+// Typescript infers
+type User={
+  id:number;
+  name:string;
+}
+
+// why typeof ? ReturnType expects a function type,
+
+Parameters<F> //Extracts the function's parameter types as a tuple
+
+function createUser(
+  name:string,
+  age:number,
+  isAdmin:boolean
+){}
+
+type Params= Parameters<typeof createUser>;
+
+type Params = [
+  name: string,
+  age: number,
+  isAdmin: boolean
+];// Parameters returns a tuple, not an object.
+
+// use it like 
+onst args: Parameters<typeof createUser> = [
+  "Priti",
+  25,
+  true
+];
+
+Awaited<T> // Awaited<T> unwraps Promise-like types.
+
+type A = Awaited<Promise<string>>;
+
+string
+
+type B = Awaited<Promise<number>>;
+
+// Result:
+
+number
+
+// Nested Promise:
+
+type C = Awaited<Promise<Promise<string>>>;
+
+// Result:
+
+string
+
+async function getUser() {
+  return {
+    id: 1,
+    name: "Priti"
+  };
+}
+
+type User = Awaited<ReturnType<typeof getUser>>;
+```
+
+
+# What are Conditional Types in TypeScript, and what is distributive behavior?
+Conditional Types allow TypeScript to choose one type or another based on whether a type satisfies a constraint. Their syntax is T extends U ? X : Y, which is similar to a ternary operator but operates at the type level rather than runtime.
+
+When the checked type is a naked generic type parameter and receives a union, the conditional type becomes distributive. For example, T extends U ? X : Y applied to A | B is evaluated separately for A and B, and the results are combined into a union.
+
+This behavior is used by built-in utility types such as Exclude, Extract, and NonNullable.
+
+If we don't want distribution, we can wrap the type parameter, commonly as [T] extends [U], which causes TypeScript to evaluate the union as a whole.
+
+
+```js
+// condition ? valueIfTrue : valueIfFalse
+
+// Typescript 
+T extends U ? X: Y
+
+
+
+// Does type T satisfy/extend type U?"
+
+// If yes → return X.
+
+// If no → return Y.
+
+type IsString<T>= T extends string ? true: false;
+
+type A = IsString<string>//true
+
+type B = IsString<number>//false
+
+// There is essentially no runtime code generated for the conditional type.
+
+// here extends does not mean class inheritance
+
+// it asks whether T is assignable to U 
+
+type Test<T> = T extends string ? "Yes" : "No";
+
+type A= Test<"hello">// Yes
+
+
+
+// let's build a type that check wether something is an array 
+
+type IsArray<T> = T extends any[] ? "Arrary" : "Not Array";
+
+type A = IsArray<string[]>// Array;
+type A = IsArray<number>// Not Array;
+type A = IsArray<[string,number]>// Array ;
+
+
+
+type MyExclude<T, U> = T extends U ? never: T;
+
+type Role = "admin" | "user"  | "guest";
+type Result =  MyExclude<Role, "guest">// 
+
+
+
+// MyExclude<"admin" | "user" | "guest", "guest">
+
+// ↓
+
+// MyExclude<"admin", "guest">
+// |
+// MyExclude<"user", "guest">
+// |
+// MyExclude<"guest", "guest">
+
+
+
+type Test<T > = T extends string ? "String" : "Other" ;
+
+type Result = Test<string | number>//
+//"String" | "Other"
+
+
+// BUT 
+type Test<T> = [T] extends [string] ? "String" :"Other";
+
+type Result = Test<string | number>
+//Other  
+//Because we wrapped T in a tuple:
+
+
+// Distributive
+T extends U ? X: Y;
+
+//Non- Distributive
+[T] extends [U] ? X:Y
+
+
+
+type Message<T> = T extends {message:string} ? T["message"]: never;
+
+type A Message<
+{message:"Hello"} |
+{message:"world"} |
+{error:number}
+>;
+
+```
+
+# What are mapped types in TypeScript, and how are they different from JavaScript's map()?
+
+Mapped types are a TypeScript type-system feature that allows us to create a new type by iterating over the keys of an existing type and transforming their properties.
+
+```js
+type NewType<T> = {
+  [K in keyof T]: SomeTransformation;
+};
+```
+keyof T gets the keys of the type, K in keyof T iterates over those keys, and T[K] accesses the corresponding property's type.
+
+Mapped types can also modify property modifiers using readonly, -readonly, ?, and -?.
+
+They are evaluated at compile time and do not exist in the generated JavaScript.
+For example, Partial<T> is conceptually implemented as:
+```js
+type Partial<T> = {
+  [K in keyof T]?: T[K];
+};
+```
+
+This is different from JavaScript's Array.prototype.map(), which operates on actual runtime array values. Mapped types operate on TypeScript types at compile time
+
+
+# TypeScript Mapped Types
+A Mapped Type takes an existing type and transforms each property according to a rule.
+
+```js
+type NewType<T> = {
+  [K in keyof T]: NewType;
+};
+```
+
+```js
+type User={
+  name:string;
+  age:number;
+}
+type UserOptional= {
+  [K in  keyof User]?: User[K]
+}
+// Result 
+type UserOptional = {
+  name?: string;
+  age?: number;
+};
+
+
+// keyof 
+type User={
+  name:string;
+  age:number;
+  email:string;
+}
+
+// keyof User produces a union of the property names:
+
+type Keys=  keyof User;
+
+// type Keys= "name" | "age" | "email"
+
+// because mapped types iterate over these keys.
+
+//K in keyof User👇
+//K = "name"
+// K = "age"
+
+//T[K]
+//User["name"] // string
+//User["age"]// gives number
+
+// type UserOptional = {
+//   name?: string;
+//   age?: number;
+// };/ is erased when TypeScript compiles to JavaScript.
+
+// There is no runtime equivalent like:
+
+for (const key of User) {
+   ...
+}
+
+// because User is a type, not a runtime object.
+
+
+
+type User = {
+  name: string;
+  age: number;
+  email: string;
+};
+
+type UserFlags = {
+  [K in keyof User]: boolean;
+};
+
+// The result is:
+
+type UserFlags = {
+  name: boolean;
+  age: boolean;
+  email: boolean;
+};
+// usage👇 
+const flags: UserFlags = {
+  name: true,
+  age: false,
+  email: true
+};
+
+
+
+type User = {
+  id: number;
+  name: string;
+  email: string;
+};
+
+type UpdateUser = {
+  [K in keyof User]?: User[K];
+};
+
+// Result:
+
+type UpdateUser = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+const update:UpdateUser={
+  name:"priti"
+}// valid 
+
+
+function updateUser(id:number,updates:UpdateUser){
+  //update only supplied fields
+}
+
+// you could call
+updateUser(10,{
+  name:"priti"
+})
+// or
+updateUser(10, {
+  email: "new@email.com"
+});
+// or
+updateUser(10, {
+  name: "Priti",
+  email: "new@email.com"
+});
+
+
+// The ? modifier
+
+// Mapped types allow you to manipulate property modifiers.
+
+// Add optional
+type Optional<T> = {
+  [K in keyof T]?: T[K];
+};
+
+
+
+// Remove optional
+
+// Use:   -->  -?
+type User = {
+  name?: string;
+  age?: number;
+};
+
+type RequiredUser = {
+  [K in keyof User]-?: User[K];
+};
+// Result 
+type RequiredUser={
+  name:string;
+  age:number;
+}
+
+
+
+// Add readonly
+type ReadonlyUser<T> = {
+  +readonly [K in keyof T]: T[K];
+};
+
+// The + is optional.
+
+// This is equivalent to:👇
+
+type ReadonlyUser<T> = {
+  readonly [K in keyof T]: T[K];
+};
+
+// Remove readonly 
+// use-->  -readonly
+
+type User = {
+  readonly id: number;
+  readonly name: string;
+};
+
+type MutableUser = {
+  -readonly [K in keyof User]: User[K];
+};
+
+const user:MutableUser={
+  id:1,
+  name:"priti",
+}
+user.name="vipin"
+```
+
+
+# What are Template Literal Types in TypeScript, and how do they work with union types?
+Template Literal Types allow TypeScript to construct string literal types using template-string syntax at the type level. They are similar in syntax to JavaScript template literals, but they operate during type checking rather than runtime execution.
+
+# Template Literal
+
+```js
+type EventName = `on${string}`;
+
+// EventName can be any string that starts with "on"
+
+let event:EventName;
+
+event= "onClick" //
+event= "onMouseMove"
+event="onSomething"
+
+
+// javascript template literal creats a VALUE at Runtime typeScript templete literal creares a TYPE at complie time
+
+
+type Method= "get" | "post";
+type Resource= "user" | "post";
+
+type APIEndpoint= `${Method}/${Resource}`
+
+// typescript effectivly genrates:
+"get/user"
+"get/post"
+"post/user"
+"post/post"
+
+const endpoint:APIEndpoint="get/user"// 
+
+
+// Capitalize<T> is a built-in TypeScript utility type.
+
+// It capitalizes the first character of a string literal type.
+
+type A= Capitalize<"user">;
+//User
+
+type Methods= `get${Capitalize<"user" | "post">}`;
+
+//"getUser" | "getPost"
+
+const resource = "user";
+
+const method = `get${resource[0].toUpperCase()}${resource.slice(1)}`;
+
+console.log(method);
+
+
+type Result = Uppercase<"hello">;
+
+type Result = Lowercase<"HELLO">;
+type Result = Uncapitalize<"Hello">;
+
+type Event = "click" | "change" | "submit";
+type EventHandler = `on${Capitalize<Event>}`;
+
+```
+
+
+
+
+# enum vs const enum vs Union Types
+enum exists at runtime. const enum is usually erased and inlined. Union types exist only at compile time.
+
+# What's the difference between enum, const enum, and union types in TypeScript?
+
+A regular enum generates a JavaScript object at runtime, so it has runtime overhead but can be useful when I need an actual runtime value or namespace.
+
+A const enum is designed to be erased at compile time, with its members generally inlined into the generated JavaScript, so it avoids the runtime enum object and can reduce generated code.
+
+A union type such as "up" | "down" exists only at compile time. It is completely erased from JavaScript and therefore has no runtime overhead.
+
+In modern TypeScript, I generally prefer literal union types when I only need type safety because they are simpler, tree-shakeable, and work well with modern module tooling. I would use a regular enum when I specifically need a runtime object, and use const enum carefully because some toolchains and configurations have compatibility limitations.
+
+
+```js
+enum Direction {
+  Up,
+  Down,
+  Left,
+  Right
+}
+// const enum
+const enum Direction {
+  Up,
+  Down,
+  Left,
+  Right
+}
+// Union type
+type Direction = "up" | "down" | "left" | "right";
+
+// They look similar conceptually, but their runtime behavior is very different.
+
+// TypeScript complies this roughly into 
+var Direction;
+
+(function (Direction) {
+    Direction[Direction["Up"] = 0] = "Up";
+    Direction[Direction["Down"] = 1] = "Down";
+    Direction[Direction["Left"] = 2] = "Left";
+    Direction[Direction["Right"] = 3] = "Right";
+})(Direction || (Direction = {}));
+
+console.log(Direction.Up);
+
+// So at runtime
+
+Direction.up // 0
+Direction.down//1
+
+
+enum Direction {
+  Up,
+  Down,
+  Left,
+  Right
+}
+
+function move(direction: Direction) {
+  console.log(direction);
+}
+
+move(Direction.Up);//0
+
+Direction.Up
+
+// is a real runtime value.
+
+// Conceptually:
+
+Direction = {
+  Up: 0,
+  Down: 1,
+  Left: 2,
+  Right: 3
+};
+
+
+
+// String Enums
+
+// You can also use strings:
+
+enum Direction {
+  Up = "up",
+  Down = "down",
+  Left = "left",
+  Right = "right"
+}
+
+console.log(Direction.Up);//up
+
+
+// The runtime object still exists.
+
+// So:
+
+// Direction.Up
+
+// is available in JavaScript.
+
+// This is useful when you genuinely need a runtime namespace/object of constants.
+
+
+// const enum
+
+const enum Direction {
+  Up,
+  Down,
+  Left,
+  Right
+}
+
+console.log(Direction.Up);
+// becomes:👇
+
+console.log(0);
+
+// There is no need to create the Direction JavaScript object.
+
+// TypeScript can replace Direction.Up with its actual value during compilation.
+
+
+enum Status {
+  Loading,
+  Success,
+  Error
+}
+
+console.log(Status.Success);
+
+
+const enum Status {
+  Loading,
+  Success,
+  Error
+}
+
+console.log(Status.Success);
+// becomes 
+console.log(1)
+
+
+
+enum Role {
+  Admin = "admin",
+  User = "user"
+}
+
+// Exists:
+
+TypeScript compile time ✅
+JavaScript runtime      ✅
+
+
+
+const enum Role {
+  Admin = "admin",
+  User = "user"
+}
+
+TypeScript compile time ✅
+JavaScript runtime      ❌
+
+
+
+
+enum Direction {
+  Up = "up",
+  Down = "down",
+  Left = "left",
+  Right = "right"
+}
+
+console.log(Object.values(Direction));//["up", "down", "left", "right"]
+//works because Direction is a javascript object 
+
+// ["up", "down", "left", "right"]
+
+
+
+// If you need to iterate over the values at runtime, a plain union type alone isn't enough.
+
+// You could instead explicitly create a runtime array:
+
+
+const directions = ["up", "down", "left", "right"] as const;
+
+type Direction = typeof directions[number];
+
+console.log(directions);
+
+// Now you get both:
+
+// Runtime values
+//        +
+// Compile-time union
+
+
+
+enum Status {
+  Loading,
+  Success,
+  Error
+}
+
+console.log(Status.Success);//1 
+console.log(Status[1]);// Success
+
+// Numeric enums generate reverse mappings.
+
+// Conceptually:
+
+Status = {
+  Loading: 0,
+  Success: 1,
+  Error: 2,
+
+  0: "Loading",
+  1: "Success",
+  2: "Error"
+};
+
+Object.keys(Status);
+
+
+// Use regular enum when you genuinely need a runtime object 
+
+enum Permission {
+  Read = "read",
+  Write = "write",
+  Delete = "delete"
+}
+
+function hasPermission(permission: Permission) {
+  return Object.values(Permission).includes(permission);
+}
+```
+
+regular enum
+→ runtime object
+→ runtime lookup
+→ extra emitted JS
+
+const enum
+→ compile-time replacement
+→ no enum object
+→ less emitted JS
+
+
+
+
+
+
+# What is the difference between any, unknown, and never in TypeScript?
+
+any disables TypeScript's type checking for a value, so I can access properties and call methods without narrowing, but it sacrifices type safety.
+
+unknown is the type-safe alternative to any. It can hold any value, but I cannot use that value until I narrow or validate its type.
+
+never represents values that can never occur. It is commonly used for functions that never return, such as functions that always throw, and for exhaustive checks in discriminated unions.
+
+So my mental model is: any means trust me, unknown means prove it, and never means impossible.
+
+
+```js
+function process(value: unknown) {
+    if (
+        typeof value === "object" &&
+        value !== null &&
+        "name" in value
+    ) {
+        console.log(value.name);
+    }
+}
+
+
+
+function print(value: unknown) {
+    if (typeof value === "string") {
+        console.log(value.length);
+    }
+}
+
+function handle(value: unknown) {
+    if (value instanceof Date) {
+        console.log(value.getTime());
+    }
+}
+
+
+function handle(value: unknown) {
+    if (
+        typeof value === "object" &&
+        value !== null &&
+        "name" in value
+    ) {
+        console.log(value.name);
+    }
+}
+
+// custom type guard
+type User = {
+    name: string;
+    age: number;
+};
+
+function isUser(value: unknown): value is User {
+    if (typeof value !== "object" || value === null) {
+        return false;
+    }
+
+    return (
+        "name" in value &&
+        "age" in value
+    );
+}
+function printUser(value: unknown) {
+    if (isUser(value)) {
+        console.log(value.name);
+        console.log(value.age);
+    }
+}
+
+
+
+
 ```
