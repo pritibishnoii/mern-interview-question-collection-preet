@@ -1,161 +1,346 @@
-## 📚  Questions
-## 📚 Table of Contents
- 
-1. [What is JavaScript?](#what-is-javascript)
-2. [What are the var vs let vs const](#what-are-the-var-vs-let-vs-const)
-3. [What is Hoisting](#what-is-hoisting-)
-  [What is variable shadowing?](#what-is-variable-shadowing)
-4. [What is Temporal Dead Zone?](#what-is-temporal-dead-zone)
-5. [Scope & Lexical Scope](#scope-lexical-scope)
-6. [What is Closures](#what-is-closures)
-7. [why is a closure?](#why-is-a-closure)
-    [Does closure capture a snapshot?](#does-closure-capture-a-snapshot)
-8. [Why does Closure preserve variables?](#why-does-closure-preserve-variables)
-    [What is IIFI](#what-is-iifi)
-    [How does JavaScript execute code](#how-does-javaScript-execute-code)
-9. [Execution Context](#execution-context)
-10. [What is the Lexical Environment?](#what-is-the-lexical-environment)
-11. [What is the Variable Environment?](#what-is-the-variable-environment)
-12. [Objects, Prototypes & this](#objects-prototypes-this)
-13. [Why Prototype?](#why-prototype)
-14. [Prototype  vs  __proto__ ?](#prototype-vs-__proto__)
-15. [Why does it exist?](#why-does-it-exist)
-16. [🧬 Prototype Chain](#prototype-chain)
-17. [Difference between __proto__ and prototype?](#difference-between-__proto__-and-prototype)
-18. [Constructor function vs Class?](#constructor-function-vs-class)
-19. [What is Object.create()?](#what-is-objectcreate)
-20. [Object.create() vs {}](#objectcreate-vs)
-21. [Object.create() vs new?](#objectcreate-vs-new)
-22. [What happens when a property doesn't exist on an object?](#what-happens-when-a-property-doesnt-exist-on-an-object)
-23. [Property Lookup Process How does property lookup work?](#property-lookup-process-how-does-property-lookup-work)
-24. [Object.freeze() vs Object.seal()?](#objectfreeze-vs-objectseal)
-25. [Object.preventExtensions()?](#objectpreventextensions)
-26. [How do getters and setters work?](#how-do-getters-and-setters-work)
-27. [What is a Proxy?](#what-is-a-proxy)
-28. [Call() Apply(), Bind ()](#call-apply-bind)
-29. [== vs ===](#vs)
-30. [Type Coercion](#type-coercion)
-31. [Difference between Type Conversion and Type Coercion](#difference-between-type-conversion-and-type-coercion)
-32. [Pass by values pass by reference](#pass-by-values-pass-by-reference)
-33. [Is JavaScript pass-by-reference?](#is-javascript-pass-by-reference)
-34. [Mutation vs Reassignment (Object  Reference type)](#mutation-vs-reassignment-object-reference-type)
-35. [Primitive](#primitive)
-36. [NaN](#nan)
-37. [Shallow vs Deep Copy](#shallow-vs-deep-copy)
-   - [Shallow Copy -- creates a new object, but nested objects are still shared between the original and copied object.](#shallow-copy-creates-a-new-object-but-nested-objects-are-still-shared-between-the-original-and-copied-object)
-38. [Deeep Copy](#deeep-copy)
-   - [--  creates a completely independent copy, including nested objects.](#creates-a-completely-independent-copy-including-nested-objects)
-39. [Spread vs Rest](#spread-vs-rest)
-40. [Destructuring](#destructuring)
-41. [Higher-Order Functions](#higher-order-functions)
-42. [Callback](#callback)
-43. [Callback Hell](#callback-hell)
-44. [Promises](#promises)
-45. [Pomise Chain](#pomise-chain)
-46. [async/await](#asyncawait)
-47. [Asynchronous JavaScript](#asynchronous-javascript)
-48. [Call Stack](#call-stack)
-49. [Event Loop](#event-loop)
-50. [Microtask vs Macrotask](#microtask-vs-macrotask)
-51. [Debouncing](#debouncing)
-52. [Throttling](#throttling)
-53. [Event Propagation](#event-propagation)
-54. [Event Bubbling/Capturing](#event-bubblingcapturing)
-55. [stopPropagation() vs stopImmediatePropagation()](#stoppropagation-vs-stopimmediatepropagation)
-56. [Event Delegation](#event-delegation)
-57. [Currying](#currying)
-58. [Array Methods](#array-methods)
-59. [map, filter, reduce](#map-filter-reduce)
-60. [filter()](#filter)
-61. [reduce()](#reduce)
-62. [slice()](#slice)
-63. [splice()](#splice)
-64. [find()](#find)
-65. [lastIndexOf()](#lastindexof)
-66. [indexOf()](#indexof)
-67. [findIndex()](#findindex)
-68. [some()](#some)
-69. [every()](#every)
-70. [sort()](#sort)
-71. [includes()](#includes)
-72. [flat()](#flat)
-73. [flatMap()](#flatmap)
-74. [Array.from()](#arrayfrom)
-75. [Array.isArray()](#arrayisarray)
-76. [Map() Data Structure](#map-data-structure)
-77. [Map vs Object](#map-vs-object)
-78. [Set](#set)
-79. [Memoization](#memoization)
-80. [Generator Functions](#generator-functions)
-81. [Iterators](#iterators)
-82. [Modules](#modules)
-83. [How does the JavaScript engine manage memory?](#how-does-the-javascript-engine-manage-memory)
-84. [What causes Stack Overflow?](#what-causes-stack-overflow)
-85. [DOM](#dom)
-86. [1. What is DOM?](#1-what-is-dom)
-   - [Definition](#definition)
-87. [2. DOM Tree](#2-dom-tree)
-   - [Definition](#definition-1)
-88. [3. querySelector vs querySelectorAll](#3-queryselector-vs-queryselectorall)
-   - [Definition](#definition-2)
-89. [4. getElementById](#4-getelementbyid)
-   - [Definition](#definition-3)
-90. [5. textContent vs innerHTML](#5-textcontent-vs-innerhtml)
-   - [textContent](#textcontent)
-   - [innerHTML](#innerhtml)
-91. [6. createElement](#6-createelement)
-   - [Definition](#definition-4)
-92. [7. append vs appendChild](#7-append-vs-appendchild)
-   - [append()](#append)
-   - [appendChild()](#appendchild)
-93. [8. remove()](#8-remove)
-   - [Definition](#definition-5)
-94. [9. setAttribute/getAttribute](#9-setattributegetattribute)
-   - [setAttribute()](#setattribute)
-   - [getAttribute()](#getattribute)
-95. [10. classList](#10-classlist)
-   - [Definition](#definition-6)
-96. [11. addEventListener](#11-addeventlistener)
-   - [Definition](#definition-7)
-97. [Event Object](#event-object)
-   - [Definition](#definition-8)
-   - [Definition](#definition-9)
-   - [event.target](#eventtarget)
-   - [event.currentTarget](#eventcurrenttarget)
-98. [19. DOM Traversal](#19-dom-traversal)
-   - [Definition](#definition-10)
-99. [DOMContentLoaded vs load](#domcontentloaded-vs-load)
-   - [DOMContentLoaded](#domcontentloaded)
-   - [load](#load)
-100. [Reflow vs Repaint](#reflow-vs-repaint)
-   - [Reflow](#reflow)
-   - [Repaint](#repaint)
-101. [DocumentFragment](#documentfragment)
-   - [Definition](#definition-11)
-102. [Real DOM vs Virtual DOM](#real-dom-vs-virtual-dom)
-   - [Real DOM](#real-dom)
-   - [Virtual DOM](#virtual-dom)
-103. [Stack vs Heap?'](#stack-vs-heap)
-104. [How are objects stored in memory?](#how-are-objects-stored-in-memory)
-105. [What is Garbage Collection?](#what-is-garbage-collection)
-106. [What is Reflect?](#what-is-reflect)
-107. [What is ToPrimitive?](#what-is-toprimitive)
-108. [What is ToString?](#what-is-tostring)
-109. [What is ToNumber?](#what-is-tonumber)
-110. [What is Symbol.toPrimitive?](#what-is-symboltoprimitive)
-111. [What is Function Composition?](#what-is-function-composition)
-112. [Why Use It?](#why-use-it)
-113. [What is Pure Function?](#what-is-pure-function)
-114. [What is Immutability?](#what-is-immutability)
-115. [First-Class Function in JavaScript](#first-class-function-in-javascript)
-116. [1. Function Stored in a Variable](#1-function-stored-in-a-variable)
-117. [2. Function Passed as an Argument](#2-function-passed-as-an-argument)
-118. [3. Function Returned from Another Function](#3-function-returned-from-another-function)
-119. [Implement an Event Emitter.](#implement-an-event-emitter)
+# JavaScript + TypeScript Interview Questions — Master Index
+
+Click any question below to jump straight to it. Click **Back to top** under each question to return here.
+
+## Table of Contents
+
+- **[Basics, var/let/const, Hoisting](#basics-varletconst-hoisting)**
+  - [1. What is JavaScript?](#1-what-is-javascript)
+  - [2. What are var vs let vs const](#2-what-are-var-vs-let-vs-const)
+  - [3. What is hoisting?](#3-what-is-hoisting)
+  - [4. What is hoisting in JavaScript, and what happens when you access a var variable before its declaration?](#4-what-is-hoisting-in-javascript-and-what-happens-when-you-access-a-var-variable-before-its-declaration)
+  - [5. What is variable shadowing?](#5-what-is-variable-shadowing)
+  - [6. Function Declaration vs Function Expression Hoisting](#6-function-declaration-vs-function-expression-hoisting)
+  - [7. Function Declaration vs Function Expression](#7-function-declaration-vs-function-expression)
+  - [8. Function Declaration Hoisting](#8-function-declaration-hoisting)
+  - [9. Function Expression + var](#9-function-expression-var)
+  - [10. What is the difference between function declaration and function expression in terms of hoisting?](#10-what-is-the-difference-between-function-declaration-and-function-expression-in-terms-of-hoisting)
+- **[Scope, Lexical Scope, Closures](#scope-lexical-scope-closures)**
+  - [11. Scope & Lexical Scope](#11-scope-lexical-scope)
+  - [12. What is lexical scope in JavaScript?](#12-what-is-lexical-scope-in-javascript)
+  - [13. How Lexical Scope Works Internally](#13-how-lexical-scope-works-internally)
+  - [14. Why Is It Called "Lexical"?](#14-why-is-it-called-lexical)
+  - [15. Lexical Scope vs Shadowing](#15-lexical-scope-vs-shadowing)
+  - [16. Lexical Scope vs Closure](#16-lexical-scope-vs-closure)
+  - [17. Is scope the same as lexical scope?](#17-is-scope-the-same-as-lexical-scope)
+  - [18. Types of Scopes](#18-types-of-scopes)
+  - [19. What is the scope chain in JavaScript?](#19-what-is-the-scope-chain-in-javascript)
+  - [20. Scope Chain ≠ Call Stack](#20-scope-chain-call-stack)
+  - [21. What is Closures](#21-what-is-closures)
+  - [22. Why is a closure?](#22-why-is-a-closure)
+  - [23. Closure Captures a Reference, Not a Snapshot](#23-closure-captures-a-reference-not-a-snapshot)
+  - [24. Why does Closure preserve variables?](#24-why-does-closure-preserve-variables)
+  - [25. Does closure capture a snapshot?](#25-does-closure-capture-a-snapshot)
+  - [26. What is IIFE](#26-what-is-iife)
+  - [27. IIFE with Argument](#27-iife-with-argument)
+  - [28. IIFE Can Return a Value](#28-iife-can-return-a-value)
+  - [29. Why the Parentheses?](#29-why-the-parentheses)
+- **[Execution Context & Environments](#execution-context-environments)**
+  - [30. How does JavaScript execute code?](#30-how-does-javascript-execute-code)
+  - [31. Execution Context](#31-execution-context)
+  - [32. What is the Lexical Environment?](#32-what-is-the-lexical-environment)
+  - [33. What is the Variable Environment?](#33-what-is-the-variable-environment)
+- **[Objects, Prototypes, `this`](#objects-prototypes-this)**
+  - [34. Objects, Prototypes & this](#34-objects-prototypes-this)
+  - [35. What is [[Prototype]]?](#35-what-is-prototype)
+  - [36. Why does [[Prototype]] exist?](#36-why-does-prototype-exist)
+  - [37. Property Shadowing](#37-property-shadowing)
+  - [38. prototype vs [[Prototype]]](#38-prototype-vs-prototype)
+  - [39. Prototype Chain](#39-prototype-chain)
+  - [40. What happens internally when you access obj.property?](#40-what-happens-internally-when-you-access-objproperty)
+  - [41. Define prototype chain lookup](#41-define-prototype-chain-lookup)
+  - [42. Difference between __proto__ and prototype?](#42-difference-between-proto-and-prototype)
+  - [43. Explain constructor functions and prototypes](#43-explain-constructor-functions-and-prototypes)
+  - [44. Constructor function vs Class?](#44-constructor-function-vs-class)
+  - [45. Is an ES6 class really different from constructor functions and prototypes? Explain how classes work internally.](#45-is-an-es6-class-really-different-from-constructor-functions-and-prototypes-explain-how-classes-work-internally)
+  - [46. Why Does .prototype Exist?](#46-why-does-prototype-exist)
+  - [47. Why don't we simply put methods inside the constructor?](#47-why-dont-we-simply-put-methods-inside-the-constructor)
+  - [48. What is default binding of this in JavaScript?](#48-what-is-default-binding-of-this-in-javascript)
+  - [49. JavaScript this — Default Binding](#49-javascript-this-default-binding)
+  - [50. this Inside a Method](#50-this-inside-a-method)
+  - [51. How bind() Fixes It](#51-how-bind-fixes-it)
+  - [52. Call(), Apply(), Bind()](#52-call-apply-bind)
+  - [53. What is implicit binding in JavaScript, and what happens when you detach a method from its object?](#53-what-is-implicit-binding-in-javascript-and-what-happens-when-you-detach-a-method-from-its-object)
+  - [54. JavaScript Explicit Binding — call(), apply(), bind()](#54-javascript-explicit-binding-call-apply-bind)
+  - [55. What happens internally when you use new with a constructor function?](#55-what-happens-internally-when-you-use-new-with-a-constructor-function)
+  - [56. What is Object.create()?](#56-what-is-objectcreate)
+  - [57. What is the difference between this in a regular function and an arrow function?](#57-what-is-the-difference-between-this-in-a-regular-function-and-an-arrow-function)
+  - [58. What is the precedence of this binding rules in JavaScript?](#58-what-is-the-precedence-of-this-binding-rules-in-javascript)
+  - [59. Why does this get lost when a class method is passed as a callback, and how do you fix it?](#59-why-does-this-get-lost-when-a-class-method-is-passed-as-a-callback-and-how-do-you-fix-it)
+  - [60. What does new actually do?](#60-what-does-new-actually-do)
+  - [61. What does Object.create() do?](#61-what-does-objectcreate-do)
+  - [62. Object.create() vs {}](#62-objectcreate-vs)
+  - [63. Object.create() vs new?](#63-objectcreate-vs-new)
+  - [64. What happens when a property doesn't exist on an object?](#64-what-happens-when-a-property-doesnt-exist-on-an-object)
+  - [65. Property Lookup Process — How does property lookup work?](#65-property-lookup-process-how-does-property-lookup-work)
+  - [66. Object.freeze() vs Object.seal()?](#66-objectfreeze-vs-objectseal)
+  - [67. Object.preventExtensions()?](#67-objectpreventextensions)
+  - [68. How do getters and setters work?](#68-how-do-getters-and-setters-work)
+  - [69. What is a Proxy?](#69-what-is-a-proxy)
+  - [70. Explain Proxy and Reflect in JavaScript](#70-explain-proxy-and-reflect-in-javascript)
+  - [71. What does instanceof actually do?](#71-what-does-instanceof-actually-do)
+  - [72. How does instanceof work in JavaScript?](#72-how-does-instanceof-work-in-javascript)
+  - [73. What is the difference between instanceof and typeof in JavaScript?](#73-what-is-the-difference-between-instanceof-and-typeof-in-javascript)
+  - [74. hasOwnProperty() vs in](#74-hasownproperty-vs-in)
+  - [75. Where does this property come from — the object itself, or its prototype chain](#75-where-does-this-property-come-from-the-object-itself-or-its-prototype-chain)
+  - [76. What is prototype pollution, and why is it dangerous?](#76-what-is-prototype-pollution-and-why-is-it-dangerous)
+- **[Equality & Type Coercion](#equality-type-coercion)**
+  - [77. == vs ===](#77-vs)
+  - [78. Type Coercion](#78-type-coercion)
+  - [79. Difference between Type Conversion and Type Coercion](#79-difference-between-type-conversion-and-type-coercion)
+- **[Pass by Value / Reference, Copying](#pass-by-value-reference-copying)**
+  - [80. Pass by value vs pass by reference](#80-pass-by-value-vs-pass-by-reference)
+  - [81. Is JavaScript pass-by-reference?](#81-is-javascript-pass-by-reference)
+  - [82. Mutation vs Reassignment (Object Reference type)](#82-mutation-vs-reassignment-object-reference-type)
+  - [83. Primitive](#83-primitive)
+  - [84. NaN](#84-nan)
+  - [85. Shallow vs Deep Copy](#85-shallow-vs-deep-copy)
+  - [86. Deep Copy](#86-deep-copy)
+- **[ES6+ Features](#es6-features)**
+  - [87. ES6 + Modern JavaScript](#87-es6-modern-javascript)
+  - [88. Arrow function](#88-arrow-function)
+  - [89. What is the difference between normal functions and arrow functions?](#89-what-is-the-difference-between-normal-functions-and-arrow-functions)
+  - [90. Spread vs Rest](#90-spread-vs-rest)
+  - [91. Destructuring](#91-destructuring)
+  - [92. What is the difference between array and object destructuring?](#92-what-is-the-difference-between-array-and-object-destructuring)
+  - [93. Computed property names [ ]](#93-computed-property-names)
+  - [94. Optional Chaining ?.](#94-optional-chaining)
+  - [95. Nullish Coalescing (??) vs OR (||)](#95-nullish-coalescing-vs-or)
+  - [96. What is the difference between || and ?? in JavaScript? When would you use one over the other?](#96-what-is-the-difference-between-and-in-javascript-when-would-you-use-one-over-the-other)
+  - [97. Template Literal](#97-template-literal)
+  - [98. What are tagged template literals, and what arguments does the tag function receive?](#98-what-are-tagged-template-literals-and-what-arguments-does-the-tag-function-receive)
+  - [99. What is the difference between ||=, &&=, and ??=?](#99-what-is-the-difference-between-and)
+  - [100. What's the difference between property shorthand and computed property names?](#100-whats-the-difference-between-property-shorthand-and-computed-property-names)
+  - [101. What are Object Shorthand & Computed Keys?](#101-what-are-object-shorthand-computed-keys)
+- **[Functions & Async: HOFs, Callbacks, Promises](#functions-async-hofs-callbacks-promises)**
+  - [102. Higher-Order Functions](#102-higher-order-functions)
+  - [103. Callback](#103-callback)
+  - [104. Callback Hell](#104-callback-hell)
+  - [105. Promises](#105-promises)
+  - [106. Promise Chain](#106-promise-chain)
+  - [107. Can a Promise change its state after it is fulfilled or rejected?](#107-can-a-promise-change-its-state-after-it-is-fulfilled-or-rejected)
+  - [108. What happens when you return a value, return a Promise, or throw an error inside .then()?](#108-what-happens-when-you-return-a-value-return-a-promise-or-throw-an-error-inside-then)
+  - [109. What is the difference between sequential await and Promise.all()? When would you use each?](#109-what-is-the-difference-between-sequential-await-and-promiseall-when-would-you-use-each)
+  - [110. What's the difference between .catch() and try/catch with async/await, and what happens if you forget to await a Promise inside a try block?](#110-whats-the-difference-between-catch-and-trycatch-with-asyncawait-and-what-happens-if-you-forget-to-await-a-promise-inside-a-try-block)
+  - [111. What actually happens with async/await?](#111-what-actually-happens-with-asyncawait)
+  - [112. Is async/await synchronous or asynchronous?](#112-is-asyncawait-synchronous-or-asynchronous)
+  - [113. async/await](#113-asyncawait)
+  - [114. Asynchronous JavaScript](#114-asynchronous-javascript)
+- **[Event Loop & Concurrency Model](#event-loop-concurrency-model)**
+  - [115. JavaScript is single-threaded. Then how does it handle asynchronous operations without blocking?](#115-javascript-is-single-threaded-then-how-does-it-handle-asynchronous-operations-without-blocking)
+  - [116. Call Stack](#116-call-stack)
+  - [117. Are Web APIs part of the JavaScript engine?](#117-are-web-apis-part-of-the-javascript-engine)
+  - [118. Event Loop](#118-event-loop)
+  - [119. Microtask vs Macrotask (task)](#119-microtask-vs-macrotask-task)
+  - [120. Why is Microtask Queue higher priority?](#120-why-is-microtask-queue-higher-priority)
+  - [121. Why doesn't setTimeout(fn, 0) execute immediately?](#121-why-doesnt-settimeoutfn-0-execute-immediately)
+  - [122. Can a Promise or microtask block a setTimeout(..., 0)?](#122-can-a-promise-or-microtask-block-a-settimeout-0)
+- **[Map, Set, WeakMap, WeakSet](#map-set-weakmap-weakset)**
+  - [123. What problem does Map solve?](#123-what-problem-does-map-solve)
+  - [124. Map() Data Structure](#124-map-data-structure)
+  - [125. What does "Strong Reference" mean?](#125-what-does-strong-reference-mean)
+  - [126. Map vs Object](#126-map-vs-object)
+  - [127. Set](#127-set)
+  - [128. What is the difference between Set and WeakSet?](#128-what-is-the-difference-between-set-and-weakset)
+  - [129. What is the difference between Map and WeakMap?](#129-what-is-the-difference-between-map-and-weakmap)
+  - [130. Which object can be garbage collected?](#130-which-object-can-be-garbage-collected)
+- **[Generators & Iterators](#generators-iterators)**
+  - [131. Generator Functions](#131-generator-functions)
+  - [132. What is a Generator Function, and how is it different from a normal function?](#132-what-is-a-generator-function-and-how-is-it-different-from-a-normal-function)
+  - [133. What is an async generator, and how is it different from a normal generator?](#133-what-is-an-async-generator-and-how-is-it-different-from-a-normal-generator)
+  - [134. Iterators](#134-iterators)
+  - [135. What is the difference between an Iterable and an Iterator?](#135-what-is-the-difference-between-an-iterable-and-an-iterator)
+  - [136. What is the difference between yield and yield*?](#136-what-is-the-difference-between-yield-and-yield)
+  - [137. yield & yield*](#137-yield-yield)
+  - [138. What happens after the delegated iterable finishes?](#138-what-happens-after-the-delegated-iterable-finishes)
+  - [139. Symbol (primitive data type introduced in ES6)](#139-symbol-primitive-data-type-introduced-in-es6)
+- **[Modules & Memory](#modules-memory)**
+  - [140. Modules](#140-modules)
+  - [141. How does the JavaScript engine manage memory?](#141-how-does-the-javascript-engine-manage-memory)
+  - [142. What causes Stack Overflow?](#142-what-causes-stack-overflow)
+  - [143. Regular function vs arrow function?](#143-regular-function-vs-arrow-function)
+- **[DOM](#dom)**
+  - [144. DOM](#144-dom)
+  - [145. What is the DOM, and how is the DOM represented internally?](#145-what-is-the-dom-and-how-is-the-dom-represented-internally)
+  - [146. What is DOM?](#146-what-is-dom)
+  - [147. DOM Tree](#147-dom-tree)
+  - [148. What is the difference between querySelectorAll() and getElementsByClassName()?](#148-what-is-the-difference-between-queryselectorall-and-getelementsbyclassname)
+  - [149. querySelector vs querySelectorAll](#149-queryselector-vs-queryselectorall)
+  - [150. getElementById](#150-getelementbyid)
+  - [151. textContent vs innerHTML](#151-textcontent-vs-innerhtml)
+  - [152. createElement](#152-createelement)
+  - [153. append vs appendChild](#153-append-vs-appendchild)
+  - [154. remove()](#154-remove)
+  - [155. setAttribute/getAttribute](#155-setattributegetattribute)
+  - [156. classList](#156-classlist)
+  - [157. addEventListener](#157-addeventlistener)
+  - [158. Event Object (target vs currentTarget, preventDefault)](#158-event-object-target-vs-currenttarget-preventdefault)
+  - [159. DOM Traversal](#159-dom-traversal)
+  - [160. Event Propagation](#160-event-propagation)
+  - [161. Event Bubbling/Capturing](#161-event-bubblingcapturing)
+  - [162. stopPropagation() vs stopImmediatePropagation()](#162-stoppropagation-vs-stopimmediatepropagation)
+  - [163. Event Delegation](#163-event-delegation)
+  - [164. DOMContentLoaded vs load](#164-domcontentloaded-vs-load)
+  - [165. Reflow vs Repaint](#165-reflow-vs-repaint)
+  - [166. DocumentFragment](#166-documentfragment)
+  - [167. Real DOM vs Virtual DOM](#167-real-dom-vs-virtual-dom)
+  - [168. What is MutationObserver and why is it asynchronous?](#168-what-is-mutationobserver-and-why-is-it-asynchronous)
+  - [169. What is MutationObserver?](#169-what-is-mutationobserver)
+  - [170. What is IntersectionObserver?](#170-what-is-intersectionobserver)
+  - [171. Why use IntersectionObserver instead of a scroll event with getBoundingClientRect()?](#171-why-use-intersectionobserver-instead-of-a-scroll-event-with-getboundingclientrect)
+  - [172. What is DocumentFragment, and why is it useful?](#172-what-is-documentfragment-and-why-is-it-useful)
+- **[Stack, Heap, Garbage Collection](#stack-heap-garbage-collection)**
+  - [173. What happens when a function returns?](#173-what-happens-when-a-function-returns)
+  - [174. Can an object survive after its function returns?](#174-can-an-object-survive-after-its-function-returns)
+  - [175. Does const mean the object cannot change?](#175-does-const-mean-the-object-cannot-change)
+  - [176. Stack vs Heap?](#176-stack-vs-heap)
+  - [177. How are objects stored in memory?](#177-how-are-objects-stored-in-memory)
+  - [178. What is Garbage Collection?](#178-what-is-garbage-collection)
+  - [179. Why Does JavaScript Need Garbage Collection?](#179-why-does-javascript-need-garbage-collection)
+  - [180. Does obj = null Cause GC?](#180-does-obj-null-cause-gc)
+  - [181. Explain Stack vs Heap in JavaScript in 30 seconds](#181-explain-stack-vs-heap-in-javascript-in-30-seconds)
+  - [182. Heap + Memory Leaks](#182-heap-memory-leaks)
+  - [183. Closures Make This More Interesting](#183-closures-make-this-more-interesting)
+  - [184. What is the difference between Stack and Heap memory in JavaScript?](#184-what-is-the-difference-between-stack-and-heap-memory-in-javascript)
+  - [185. Memory Leaks](#185-memory-leaks)
+  - [186. What is a memory leak in JavaScript, and how does garbage collection relate to it?](#186-what-is-a-memory-leak-in-javascript-and-how-does-garbage-collection-relate-to-it)
+  - [187. What is the difference between Map and WeakMap, and why would you use WeakMap for caching?](#187-what-is-the-difference-between-map-and-weakmap-and-why-would-you-use-weakmap-for-caching)
+- **[Reflect & Type Conversion Internals](#reflect-type-conversion-internals)**
+  - [188. What is Reflect?](#188-what-is-reflect)
+  - [189. What is ToPrimitive?](#189-what-is-toprimitive)
+  - [190. What is ToString?](#190-what-is-tostring)
+  - [191. What is ToNumber?](#191-what-is-tonumber)
+  - [192. What is Symbol.toPrimitive?](#192-what-is-symboltoprimitive)
+- **[Functional Programming](#functional-programming)**
+  - [193. What is Function Composition?](#193-what-is-function-composition)
+  - [194. What is pipe()?](#194-what-is-pipe)
+  - [195. Why Use It? (composition/pipe)](#195-why-use-it-compositionpipe)
+  - [196. Pure Function Connection](#196-pure-function-connection)
+  - [197. What is a Pure Function?](#197-what-is-a-pure-function)
+  - [198. What is Immutability?](#198-what-is-immutability)
+  - [199. First-Class Function in JavaScript](#199-first-class-function-in-javascript)
+  - [200. Function Stored in a Variable](#200-function-stored-in-a-variable)
+  - [201. Function Passed as an Argument](#201-function-passed-as-an-argument)
+  - [202. Function Returned from Another Function](#202-function-returned-from-another-function)
+  - [203. Function Stored in an Array](#203-function-stored-in-an-array)
+  - [204. Function Stored in an Object](#204-function-stored-in-an-object)
+  - [205. Implement an Event Emitter](#205-implement-an-event-emitter)
+- **[Browser Storage](#browser-storage)**
+  - [206. localStorage vs sessionStorage](#206-localstorage-vs-sessionstorage)
+  - [207. What is the difference between localStorage and sessionStorage?](#207-what-is-the-difference-between-localstorage-and-sessionstorage)
+  - [208. What does "same-origin" mean?](#208-what-does-same-origin-mean)
+  - [209. Cookies in JavaScript](#209-cookies-in-javascript)
+  - [210. How Cookies Work Internally](#210-how-cookies-work-internally)
+  - [211. Cookies vs localStorage — what's the difference](#211-cookies-vs-localstorage-whats-the-difference)
+  - [212. What is IndexedDB?](#212-what-is-indexeddb)
+  - [213. Why is IndexedDB asynchronous?](#213-why-is-indexeddb-asynchronous)
+  - [214. What is IndexedDB, and how is it different from localStorage?](#214-what-is-indexeddb-and-how-is-it-different-from-localstorage)
+- **[Networking, CORS, Workers](#networking-cors-workers)**
+  - [215. Fetch API](#215-fetch-api)
+  - [216. What is the difference between fetch() rejecting and receiving an HTTP error such as 404?](#216-what-is-the-difference-between-fetch-rejecting-and-receiving-an-http-error-such-as-404)
+  - [217. What is CORS?](#217-what-is-cors)
+  - [218. Why does CORS exist?](#218-why-does-cors-exist)
+  - [219. Explain Web Workers](#219-explain-web-workers)
+  - [220. What is a Web Worker, and how is it different from the JavaScript event loop?](#220-what-is-a-web-worker-and-how-is-it-different-from-the-javascript-event-loop)
+  - [221. Does JavaScript become multithreaded?](#221-does-javascript-become-multithreaded)
+  - [222. What is a Service Worker, and how does its lifecycle work?](#222-what-is-a-service-worker-and-how-does-its-lifecycle-work)
+  - [223. What exactly is a Service Worker?](#223-what-exactly-is-a-service-worker)
+  - [224. What is AbortController?](#224-what-is-abortcontroller)
+  - [225. How does it work internally? (AbortController)](#225-how-does-it-work-internally-abortcontroller)
+  - [226. How do you cancel a fetch request in JavaScript?](#226-how-do-you-cancel-a-fetch-request-in-javascript)
+- **[First-Class Functions (revisited)](#first-class-functions-revisited)**
+  - [227. What does it mean that functions are first-class citizens in JavaScript?](#227-what-does-it-mean-that-functions-are-first-class-citizens-in-javascript)
+  - [228. What are First-Class Functions?](#228-what-are-first-class-functions)
+  - [229. How Does It Work Internally?](#229-how-does-it-work-internally)
+  - [230. First-Class Function vs Calling a Function](#230-first-class-function-vs-calling-a-function)
+- **[Array Methods](#array-methods)**
+  - [231. Array Methods](#231-array-methods)
+  - [232. map, filter, reduce](#232-map-filter-reduce)
+  - [233. map()](#233-map)
+  - [234. map() — Transform Every Element](#234-map-transform-every-element)
+  - [235. What is the difference between map(), filter(), and reduce()?](#235-what-is-the-difference-between-map-filter-and-reduce)
+  - [236. Can map() / filter() Mutate Objects?](#236-can-map-filter-mutate-objects)
+  - [237. filter()](#237-filter)
+  - [238. filter() — Select Elements](#238-filter-select-elements)
+  - [239. reduce() — Fold Everything Into a Result](#239-reduce-fold-everything-into-a-result)
+  - [240. reduce()](#240-reduce)
+  - [241. slice()](#241-slice)
+  - [242. splice()](#242-splice)
+  - [243. find()](#243-find)
+  - [244. lastIndexOf()](#244-lastindexof)
+  - [245. indexOf()](#245-indexof)
+  - [246. findIndex()](#246-findindex)
+  - [247. some()](#247-some)
+  - [248. every()](#248-every)
+  - [249. What's the difference between find, findIndex, some, and every?](#249-whats-the-difference-between-find-findindex-some-and-every)
+  - [250. sort()](#250-sort)
+  - [251. includes()](#251-includes)
+  - [252. flat()](#252-flat)
+  - [253. flatMap()](#253-flatmap)
+  - [254. What is the difference between map(), flat(), and flatMap()?](#254-what-is-the-difference-between-map-flat-and-flatmap)
+  - [255. Objects Are Not Flattened](#255-objects-are-not-flattened)
+  - [256. What is the difference between map() and forEach()?](#256-what-is-the-difference-between-map-and-foreach)
+  - [257. Array.from()](#257-arrayfrom)
+  - [258. Array.isArray()](#258-arrayisarray)
+- **[Partial Application, Currying, Debounce, Throttle, Memoization](#partial-application-currying-debounce-throttle-memoization)**
+  - [259. How Partial Application Works Internally](#259-how-partial-application-works-internally)
+  - [260. What is the difference between partial application and currying?](#260-what-is-the-difference-between-partial-application-and-currying)
+  - [261. Currying](#261-currying)
+  - [262. What is currying in JavaScript, and how would you implement it?](#262-what-is-currying-in-javascript-and-how-would-you-implement-it)
+  - [263. Debouncing](#263-debouncing)
+  - [264. What is debounce and how would you implement it?](#264-what-is-debounce-and-how-would-you-implement-it)
+  - [265. Throttling](#265-throttling)
+  - [266. Implement debounce and explain how leading and trailing execution works](#266-implement-debounce-and-explain-how-leading-and-trailing-execution-works)
+  - [267. Memoization](#267-memoization)
+  - [268. Memoize with WeakMap](#268-memoize-with-weakmap)
+  - [269. Why would you use WeakMap instead of Map when memoizing functions that accept objects as arguments?](#269-why-would-you-use-weakmap-instead-of-map-when-memoizing-functions-that-accept-objects-as-arguments)
+  - [270. WeakMap Does NOT Automatically Make Every Memoization Safe](#270-weakmap-does-not-automatically-make-every-memoization-safe)
+  - [271. Implement a once() function in JavaScript](#271-implement-a-once-function-in-javascript)
+- **[V8, JIT, Performance](#v8-jit-performance)**
+  - [272. Explain the V8 JavaScript engine pipeline](#272-explain-the-v8-javascript-engine-pipeline)
+  - [273. What is the V8 Pipeline?](#273-what-is-the-v8-pipeline)
+  - [274. Why not compile everything directly to machine code?](#274-why-not-compile-everything-directly-to-machine-code)
+  - [275. What is JIT compilation in JavaScript, and how does it improve performance?](#275-what-is-jit-compilation-in-javascript-and-how-does-it-improve-performance)
+  - [276. What is performance profiling in JavaScript?](#276-what-is-performance-profiling-in-javascript)
+  - [277. How would you identify and fix a performance problem in a JavaScript application?](#277-how-would-you-identify-and-fix-a-performance-problem-in-a-javascript-application)
+- **[Errors & Exception Handling](#errors-exception-handling)**
+  - [278. What is the difference between TypeError, ReferenceError and SyntaxError?](#278-what-is-the-difference-between-typeerror-referenceerror-and-syntaxerror)
+  - [279. What is try / catch / finally?](#279-what-is-try-catch-finally)
+  - [280. What is the error object?](#280-what-is-the-error-object)
+  - [281. Does finally always execute in JavaScript? What happens if try contains a return?](#281-does-finally-always-execute-in-javascript-what-happens-if-try-contains-a-return)
+  - [282. Custom Error Classes in JavaScript](#282-custom-error-classes-in-javascript)
+  - [283. Why would you create a custom Error class instead of just using new Error()?](#283-why-would-you-create-a-custom-error-class-instead-of-just-using-new-error)
+  - [284. How do you handle errors with async/await, and what happens when an awaited Promise rejects?](#284-how-do-you-handle-errors-with-asyncawait-and-what-happens-when-an-awaited-promise-rejects)
+  - [285. Explain Custom Error Classes](#285-explain-custom-error-classes)
+  - [286. What's the difference between window.onerror and window.onunhandledrejection?](#286-whats-the-difference-between-windowonerror-and-windowonunhandledrejection)
+  - [287. Why would you catch an error only to re-throw it?](#287-why-would-you-catch-an-error-only-to-re-throw-it)
+  - [288. What is Error Propagation?](#288-what-is-error-propagation)
+  - [289. finally vs return Interaction](#289-finally-vs-return-interaction)
+- **[TypeScript](#typescript)**
+  - [290. TypeScript (overview)](#290-typescript-overview)
+  - [291. What are type and interface?](#291-what-are-type-and-interface)
+  - [292. What is the difference between type and interface in TypeScript, and when would you use each?](#292-what-is-the-difference-between-type-and-interface-in-typescript-and-when-would-you-use-each)
+  - [293. What are generics in TypeScript, and why would you use them instead of any?](#293-what-are-generics-in-typescript-and-why-would-you-use-them-instead-of-any)
+  - [294. What are Generics?](#294-what-are-generics)
+  - [295. What is the difference between Union and Intersection types in TypeScript?](#295-what-is-the-difference-between-union-and-intersection-types-in-typescript)
+  - [296. TypeScript Union (|) & Intersection (&) Types](#296-typescript-union-intersection-types)
+  - [297. What is a Type Guard in TypeScript, and what is the difference between built-in and user-defined Type Guards?](#297-what-is-a-type-guard-in-typescript-and-what-is-the-difference-between-built-in-and-user-defined-type-guards)
+  - [298. What is a Type Guard?](#298-what-is-a-type-guard)
+  - [299. What are TypeScript Utility Types (Partial, Pick, Omit, Record, ReturnType, Awaited)?](#299-what-are-typescript-utility-types-partial-pick-omit-record-returntype-awaited)
+  - [300. What are Utility Types?](#300-what-are-utility-types)
+  - [301. What are Conditional Types in TypeScript, and what is distributive behavior?](#301-what-are-conditional-types-in-typescript-and-what-is-distributive-behavior)
+  - [302. What are mapped types in TypeScript, and how are they different from JavaScript's map()?](#302-what-are-mapped-types-in-typescript-and-how-are-they-different-from-javascripts-map)
+  - [303. TypeScript Mapped Types](#303-typescript-mapped-types)
+  - [304. What are Template Literal Types in TypeScript, and how do they work with union types?](#304-what-are-template-literal-types-in-typescript-and-how-do-they-work-with-union-types)
+  - [305. Template Literal (TS)](#305-template-literal-ts)
+  - [306. enum vs const enum vs Union Types](#306-enum-vs-const-enum-vs-union-types)
+  - [307. What's the difference between enum, const enum, and union types in TypeScript?](#307-whats-the-difference-between-enum-const-enum-and-union-types-in-typescript)
+  - [308. What is the difference between any, unknown, and never in TypeScript?](#308-what-is-the-difference-between-any-unknown-and-never-in-typescript)
 
 
 # JavaScript Interview Question Collection
-# What is JavaScript? 
+### 1. What is JavaScript?
+[↑ Back to top](#table-of-contents)
 JavaScript is a high-level, dynamically typed programming language mainly used to add behavior and interactivity to web applications. It runs in browsers using JavaScript engines like V8, and with Node.js it can also run on the server.
 
 **Dynamica type**
@@ -180,7 +365,8 @@ console.log(typeof x); // "boolean"
 ```
 
 
-# What are the <pre><code>var vs let vs const</code></pre>
+### 2. What are var vs let vs const
+[↑ Back to top](#table-of-contents)
 var, let, and const are used to declare variables in JavaScript, but they differ mainly in scope, redeclaration, reassignment, and hoisting behavior.
 
 var is a JavaScript keyword used to declare a variable that is function-scoped and can be redeclared and reassigned.
@@ -202,7 +388,9 @@ const country = "India";
 ```
 
 
-# What is hoisting ?
+### 3. What is hoisting?
+
+[↑ Back to top](#table-of-contents)
 Hoisting is the behavior in JavaScript where declarations are processed before execution. var is initialized with undefined, while let and const are hoisted but remain in the TDZ until initialization. Function declarations can be called before their declaration.
 var       → Hoisted + initialized as undefined
 let       → Hoisted + TDZ
@@ -353,8 +541,10 @@ if (true) {
 }
 console.log(x); // ReferenceError
 ```
-# What is hoisting in JavaScript, and what happens when you access a var variable before its declaration?
 
+### 4. What is hoisting in JavaScript, and what happens when you access a var variable before its declaration?
+
+[↑ Back to top](#table-of-contents)
 Hoisting is the behavior where JavaScript processes declarations before executing the code in their scope. For var, the declaration is hoisted to the top of its function scope and the variable is initialized with undefined. The assignment remains at its original position. Therefore, if we access a var variable before its assignment, we get undefined rather than a ReferenceError.
 
 **var Inside Loops**
@@ -699,7 +889,9 @@ function outer() {
 outer();
 ```
 
-# What is variable shadowing?
+### 5. What is variable shadowing?
+
+[↑ Back to top](#table-of-contents)
 Variable shadowing occurs when a variable declared in an inner scope has the same name as a variable in an outer scope. The inner variable takes precedence within that scope and hides the outer variable.
 
 ```js
@@ -712,10 +904,14 @@ function test() {
 test();
 ```
 
-# Function Declaration vs Function Expression Hoisting
+### 6. Function Declaration vs Function Expression Hoisting
+
+[↑ Back to top](#table-of-contents)
 Function declarations are fully hoisted — both their name and function body are available before the declaration. Function expressions are not fully hoisted; the variable follows the hoisting rules of var, let, or const.
 
-# Function Declaration vs Function Expression**
+### 7. Function Declaration vs Function Expression
+
+[↑ Back to top](#table-of-contents)
 **Function Declaration**
 ```js
 // This is a function declaration.
@@ -750,7 +946,9 @@ const greet = () => {
 };
 ```
 
-# Function Declaration Hoisting
+### 8. Function Declaration Hoisting
+
+[↑ Back to top](#table-of-contents)
 ```js
 // Because the function declaration is fully available when the execution context is initialized.
 foo();
@@ -768,8 +966,9 @@ foo = function foo() {
 
 foo();
 ```
+### 9. Function Expression + var
 
-# Function Expression + var
+[↑ Back to top](#table-of-contents)
 ```js
 foo();
 
@@ -804,7 +1003,10 @@ function test() {
 test();
 ```
 
-# What is the difference between function declaration and function expression in terms of hoisting?
+### 10. What is the difference between function declaration and function expression in terms of hoisting?
+
+[↑ Back to top](#table-of-contents)
+
 A function declaration is fully hoisted, meaning both its function name and complete function body are available during the creation phase of the execution context. Therefore, we can call a function declaration before it appears in the source code.
 
 A function expression does not behave the same way. If it is assigned to a var, only the variable declaration is hoisted and initialized to undefined; the function assignment happens during execution. Calling it before the assignment results in a TypeError.
@@ -834,8 +1036,12 @@ const foo = () => {
 ```
 Hoisting does not mean "the code physically moves to the top." It describes how JavaScript creates and initializes bindings before executing the code.
 
-# Scope & Lexical Scope
-# What is lexical scope in JavaScript?
+## Scope, Lexical Scope, Closures
+
+### 11. Scope & Lexical Scope
+
+### 12. What is lexical scope in JavaScript?
+[↑ Back to top](#table-of-contents)
 Lexical scope means that the scope of a variable or function is determined by where it is written in the source code, rather than where the function is called. When JavaScript looks up a variable, it starts from the function's current lexical environment and moves outward through its lexical scope chain until it finds the variable or reaches the global scope.
 
 Lexical Scope means scope is determined by where the code is written, not where the function is called.
@@ -850,7 +1056,9 @@ greet();
 ```
 greet() can access name because greet was written inside the scope where name exists. This is called lexical scope
 
-# How Lexical Scope Works Internally
+### 13. How Lexical Scope Works Internally
+
+[↑ Back to top](#table-of-contents)
 ```js
 let x = 10;
 function outer() {
@@ -877,7 +1085,9 @@ function outer() {
 // x found    
 // This is the scope chain.
 ```
-# Why Is It Called "Lexical"?
+### 14. Why Is It Called "Lexical"?
+
+[↑ Back to top](#table-of-contents)
 "Lexical" basically means:  Based on where the code is written.
 Look At:
 ```js
@@ -950,7 +1160,10 @@ name = "Global"
 
 Even though: printName() was called inside test()
 
-# Lexical Scope vs Shadowing
+
+### 15. Lexical Scope vs Shadowing
+
+[↑ Back to top](#table-of-contents)
 ```js
 let x = 10;
 function outer() {
@@ -972,12 +1185,16 @@ outer();
 // The global:  x = 10  is shadowed.
 ```
 
-# Lexical Scope vs Closure
+### 16. Lexical Scope vs Closure
+
+[↑ Back to top](#table-of-contents)
 Lexical : Where a function can access variables based on where it was written.
 Closure:When a function retains access to variables from its outer lexical environment even after the outer function has finished executing.
 
 
-# "Is scope the same as lexical scope?"
+### 17. Is scope the same as lexical scope?
+
+[↑ Back to top](#table-of-contents)
 No. Scope is the accessibility region of a variable. Lexical scope is the rule JavaScript uses to determine that accessibility based on where variables and functions are written in the source code. JavaScript uses lexical scoping.
 
 SCOPE
@@ -991,6 +1208,9 @@ which variables it can access.
 
 
 # TYPES OF SCOPS:   ↓
+### 18. Types of Scopes
+
+[↑ Back to top](#table-of-contents)
 
 ```javascript
 Global Scope
@@ -1059,7 +1279,9 @@ outer()
 Module scope
 When working with JavaScript modules (type="module"), variables declared at the top level of a file are private to that file unless they are explicitly exported
 
-# What is the scope chain in JavaScript?
+### 19. What is the scope chain in JavaScript?
+
+[↑ Back to top](#table-of-contents)
 Scope Chain = the path JavaScript follows when it tries to find a variable.
 
 If JavaScript cannot find a variable in the current scope, it searches the outer/enclosing lexical scope, then continues outward until the global scope. If it still cannot find it, you get a ReferenceError
@@ -1156,7 +1378,9 @@ value   Outer scope
  ```
 The scope chain is the chain of lexical environments JavaScript follows when resolving a variable. When a variable is not found in the current scope, JavaScript searches the enclosing lexical scope, then continues outward until it reaches the global scope. If the variable is not found anywhere in the chain, JavaScript throws a ReferenceError. The scope chain is determined by the lexical structure of the code, meaning where a function is defined, not where it is called.
 
-# Scope Chain ≠ Call Stack
+### 20. Scope Chain ≠ Call Stack
+
+[↑ Back to top](#table-of-contents)
 ```js
 let x = 10;
 
@@ -1188,7 +1412,9 @@ bar();
 ```
 🚨 Scope chain follows lexical structure, not the call stack. A function searches the scope where it was defined and its enclosing scopes — not the scope from which it was called.
 
-#  What is Closures
+### 21. What is Closures
+
+[↑ Back to top](#table-of-contents)
 Lexical Scope → Scope Chain → Functions → Closures → Callbacks → setTimeout → Data Privacy
 
 A closure is created when a function retains access to variables from its outer lexical scope even after the outer function has finished executing. The inner function maintains access to the outer lexical environment rather than simply copying the values. Closures are useful for data privacy, maintaining state between function calls, callbacks, event handlers, and asynchronous code.
@@ -1210,7 +1436,9 @@ counter(); // 3
 ```
 The JavaScript engine's garbage collector can reclaim objects/environments that are no longer reachable. But because the returned function still has a reference path to the needed lexical environment, that environment remains reachable.
 
-#  why is a closure?
+### 22. Why is a closure?
+
+[↑ Back to top](#table-of-contents)
 Closures exist because sometimes a function needs to remember and access data from its outer scope even after the outer function has finished executing.
 
 Closure gives a function “memory”.
@@ -1240,7 +1468,9 @@ Why is this useful?
 Because counter remembers count.
 ```
 
-# Closure Captures a Reference, Not a Snapshot
+### 23. Closure Captures a Reference, Not a Snapshot
+
+[↑ Back to top](#table-of-contents)
 
 OUTPUT :
 1
@@ -1280,10 +1510,16 @@ THEN:  returns a function
 NOW : counter() access the same count 
 
 
-# Why does Closure preserve variables?
+
+### 24. Why does Closure preserve variables?
+
+[↑ Back to top](#table-of-contents)
 Because the inner function still has a reference to the lexical environment where those variables were created.
 
-# Does closure capture a snapshot? 
+
+### 25. Does closure capture a snapshot?
+
+[↑ Back to top](#table-of-contents)
 No. It retains access to the variable/binding, so changes to that variable can be observed by the closure
 ```js
 // Closure Captures Variables, Not Values  (variable/binding  ,, X  not  10  closure does not copies 10 ,,  closure  copies  x)
@@ -1330,7 +1566,9 @@ console.log(obj.get()); //50
 🚨 A closure doesn't remember "what the value was"; it remembers how to access the variable from its surrounding lexical environment.
 
 
-# What is IIFI 
+### 26. What is IIFE
+
+[↑ Back to top](#table-of-contents)
 IIFE = Immediately Invoked Function Expression
 An IIFE is a function expression that is created and executed immediately.
 IIFE creates a private function scope an immedetly runs it
@@ -1418,13 +1656,18 @@ The IIFE runs immediately:
 // IIFE + Closure + Private State
 
 ```
-# IIFI with Argument
+### 27. IIFE with Argument
+
+[↑ Back to top](#table-of-contents)
 ```js
 (function (name) {
     console.log("Hello " + name);
 })("Priti");
 ```
-# IIFE Can Return a Value
+
+### 28. IIFE Can Return a Value
+
+[↑ Back to top](#table-of-contents)
 ```js
 const result = (function () {
     const a = 10;
@@ -1435,7 +1678,9 @@ const result = (function () {
 
 console.log(result);
 ```
-# Why the Parentheses?
+### 29. Why the Parentheses?
+
+[↑ Back to top](#table-of-contents)
 he parentheses essentially tell JavaScript:
 "Treat this function as an expression."
 
@@ -1443,8 +1688,12 @@ he parentheses essentially tell JavaScript:
 
 
 
+## Execution Context & Environments
 
-# How does JavaScript execute code?
+### 30. How does JavaScript execute code?
+
+[↑ Back to top](#table-of-contents)
+
 When JavaScript code runs, the JavaScript engine creates an execution context. During the creation phase, it sets up variables, functions, and the lexical environment. During the execution phase, the code is executed. Function calls are managed through the call stack. For asynchronous operations, the event loop coordinates callbacks and queues with the call stack..
 ```javascript 
              JavaScript Code
@@ -1473,7 +1722,9 @@ When JavaScript code runs, the JavaScript engine creates an execution context. D
 
 
 
-#  Execution Context
+### 31. Execution Context
+
+[↑ Back to top](#table-of-contents)
 JavaScript creates an Execution Context to execute code.
 There are mainly:
 
@@ -1562,7 +1813,9 @@ Global Execution Context
 ```
 
 
-# What is the Lexical Environment?
+### 32. What is the Lexical Environment?
+
+[↑ Back to top](#table-of-contents)
 A Lexical Environment is a specification-level structure that stores identifier bindings and maintains a reference to its outer environment, allowing JavaScript to resolve variables through the scope chain."
 
 ```javascript
@@ -1598,7 +1851,9 @@ it doesn't find name in its own environment, so it follows the outer environment
 This is the basis of the scope chain.
 ```
 
-# What is the Variable Environment?
+### 33. What is the Variable Environment?
+
+[↑ Back to top](#table-of-contents)
 A Variable Environment is the execution-context component used for variable and function declarations, traditionally associated with var and function declarations.
 
 ```javascript
@@ -1631,9 +1886,13 @@ Function Execution Context
       └── ...
 ```
 
-# Objects, Prototypes & this
+## Objects, Prototypes, `this`
 
-# What is [[Prototype]]? 
+### 34. Objects, Prototypes & this
+
+### 35. What is [[Prototype]]?
+
+[↑ Back to top](#table-of-contents)
 JavaScript object has an internal [[Prototype]] slot. It stores a reference to another object—or null. When JavaScript can't find a property on the current object, it follows this reference to search the prototype chain
 
 Every JavaScript object has an internal [[Prototype]] slot that points to another object or null. When we access a property, JavaScript first checks the object's own properties. If the property isn't found, it follows the object's [[Prototype]] and continues searching up the prototype chain until the property is found or the chain reaches null. This mechanism enables prototype-based inheritance and property sharing between objects.
@@ -1852,7 +2111,10 @@ console.log(Person.prototype)// { constructor:Person}
 initialy its only contains constructor 
 
 ```
-# Why does it exist? 
+
+### 36. Why does [[Prototype]] exist?
+
+[↑ Back to top](#table-of-contents)
 because later when someone writes 
 ```javascript
 new Person();
@@ -1898,7 +2160,9 @@ p
 // step 3 
 // Person.call(Object,"vipin")
 ```
-# Property Shadowing
+### 37. Property Shadowing
+
+[↑ Back to top](#table-of-contents)
 ```js
 const parent = {
     name: "Parent"
@@ -1952,7 +2216,11 @@ const obj = Object.create(null);
 console.log(Object.getPrototypeOf(obj));//null
 // obj.toString//undefined 
 ```
-# prototype vs [[Prototype]]
+
+
+### 38. prototype vs [[Prototype]]
+
+[↑ Back to top](#table-of-contents)
 Objects have an internal [[Prototype]]; functions used as constructors have a prototype property.
 ```js
 
@@ -1962,7 +2230,9 @@ __proto__	    Accessor for an object's [[Prototype]]
 Prototype     chain	Sequence formed by following [[Prototype]] links
 ```
 
-# 🧬 Prototype Chain
+### 39. Prototype Chain
+
+[↑ Back to top](#table-of-contents)
 "p" object  does not  contain  directly sayHello inside it .
 When new Person() creates p, the new object's internal [[Prototype]] is set to Person.prototype. The sayHello method is stored on Person.prototype, not on every instance. When we call p.sayHello(), JavaScript first searches p, doesn't find the method, and then searches its prototype Person.prototype, where it finds and executes sayHello.
 
@@ -2067,7 +2337,10 @@ dog.sound = "Bark";
 console.log(dog.sound);//Bark   
 ```
 
-# What happens internally when you access obj.property?
+
+### 40. What happens internally when you access obj.property?
+
+[↑ Back to top](#table-of-contents)
 When JavaScript evaluates obj.property, it first checks whether the property exists as an own property of obj. If it exists, JavaScript returns that value immediately. If it doesn't, JavaScript follows the object's internal [[Prototype]] link and checks the prototype. It continues traversing the prototype chain until it finds the property or reaches null. If the property is not found anywhere in the chain, the result is undefined.
 ```js
 const grandParent = {
@@ -2082,10 +2355,16 @@ console.log(child.country);
 
 ```
 
-# Define prototype chain lookup
+### 41. Define prototype chain lookup
+
+[↑ Back to top](#table-of-contents)
 Prototype chain lookup is JavaScript's property-resolution mechanism where it searches an object's own properties first and, if the property isn't found, recursively searches its [[Prototype]] chain until the property is found or the chain reaches null.
 
-#  Difference between __proto__ and prototype?
+
+
+### 42. Difference between __proto__ and prototype?
+
+[↑ Back to top](#table-of-contents)
 Every JavaScript object can have an internal link to another object called its prototype.
 
 __proto__ → belongs to an object → points to its prototype.
@@ -2162,7 +2441,9 @@ Constructor function
 person.__proto__
 
 ```
-#  Explain constructor functions and prototypes."
+### 43. Explain constructor functions and prototypes
+
+[↑ Back to top](#table-of-contents)
 A constructor function is a regular function intended to be called with new. new creates a new object, sets its internal [[Prototype]] to the constructor's .prototype, calls the constructor with this referring to that object, and returns the object. Properties assigned through this become own properties, while methods placed on Constructor.prototype are shared by all instances through the prototype chain
 
 ```js
@@ -2195,7 +2476,9 @@ console.log(dev.constructor === Developer);//true
 // ````A constructor function is a regular JavaScript function that is called with new. The new keyword creates a new object, connects that object to the constructor's .prototype, binds this to the new object, and returns the object.````
 ```
 
-#  Constructor function vs Class?
+### 44. Constructor function vs Class?
+
+[↑ Back to top](#table-of-contents)
 Constructor functions are the traditional way of creating objects and implementing inheritance in JavaScript using functions and prototypes. ES6 classes provide a cleaner syntax for the same prototype-based object model. Classes have stricter behavior, require new, and provide cleaner inheritance using extends and super. Internally, class methods are still stored on the prototype.
 
 ```javascript
@@ -2295,7 +2578,9 @@ class User {
 const user = User("Priti");//TypeError: Class constructor User cannot be invoked without 'new'
 // Class constructor ko new ke saath hi call karna padta hai.
 ```
-# Is an ES6 class really different from constructor functions and prototypes? Explain how classes work internally.
+### 45. Is an ES6 class really different from constructor functions and prototypes? Explain how classes work internally.
+
+[↑ Back to top](#table-of-contents)
 JavaScript classes are built on top of the existing prototype-based object model. A class declaration defines a constructor and methods, but the methods defined in the class body are placed on the class's prototype rather than copied onto every instance. When we create an object using new, the object's internal [[Prototype]] is linked to ClassName.prototype. Therefore, property lookup can traverse from the instance to the class prototype and then further up the prototype chain.
 
 With extends, JavaScript establishes prototype inheritance so that Child.prototype inherits from Parent.prototype. This allows child instances to access methods defined on the parent prototype.
@@ -2325,8 +2610,12 @@ user
 
 ```
 
-# Why Does .prototype Exist?
-# "Why don't we simply put methods inside the constructor?"
+### 46. Why Does .prototype Exist?
+
+
+### 47. Why don't we simply put methods inside the constructor?
+
+[↑ Back to top](#table-of-contents)
 ```js
 function Person(name) {
     this.name = name;
@@ -2396,10 +2685,15 @@ console.log(p2.sayHello);  // p2.sayHello → function
 // Changing:  Person.prototype = newObject;     doesn't magically change the prototype of existing instances.
 ```
 
-# What is default binding of this in JavaScript?
+### 48. What is default binding of this in JavaScript?
+
+[↑ Back to top](#table-of-contents)
 Default binding is the rule applied when a regular function is invoked as a standalone function, without an explicit receiver or explicit this binding. In non-strict mode, this is bound to the global object, such as window in a browser. In strict mode, this is undefined.
 
-# JavaScript this — Default Binding
+
+### 49. JavaScript this — Default Binding
+
+[↑ Back to top](#table-of-contents)
 Default binding applies when a regular function is called as a standalone function.
 
 In non-strict mode → this is the global object (window in browsers).
@@ -2447,7 +2741,9 @@ greet();
 ```
 For a standalone regular-function call, default binding gives the global object in non-strict mode and undefined in strict mode.
 
-# this Inside a Method
+### 50. this Inside a Method
+
+[↑ Back to top](#table-of-contents)
 ```js
 const user = {
     name: "Priti",
@@ -2509,8 +2805,9 @@ setTimeout(user.greet, 1000); //The callback is eventually invoked without the u
 // This is why methods often "lose this" when passed as callbacks.
 ```
 
+### 51. How bind() Fixes It
 
-# How bind() Fixes It
+[↑ Back to top](#table-of-contents)
 bind() doesn't immediately execute the function.
 
 It returns a new function with this bound.
@@ -2580,7 +2877,11 @@ const user = {
 // inherits lexical this
 ```
 
-#  Call() Apply(), Bind ()
+
+### 52. Call(), Apply(), Bind()
+
+[↑ Back to top](#table-of-contents)
+
 call, apply, and bind are used to explicitly set this for a function. call invokes the function immediately with arguments passed individually, apply invokes it immediately with arguments passed as an array, and bind returns a new function with this bound, which can be called later
 
 call() immediately invokes the function and allows us to specify this.
@@ -2625,7 +2926,9 @@ const newGreet = greet.bind(user);
 newGreet();//Hello Priti
 ```
 
-# What is implicit binding in JavaScript, and what happens when you detach a method from its object?
+### 53. What is implicit binding in JavaScript, and what happens when you detach a method from its object?
+
+[↑ Back to top](#table-of-contents)
 Implicit binding occurs when a regular function is called as a method using dot notation, such as obj.method(). In that case, the object before the dot becomes the function's this value. However, if the method is detached and stored in another variable, such as const fn = obj.method, calling fn() becomes a standalone function call, so the original object is no longer the implicit receiver. Default binding rules then apply.
 
 Implicit Binding is the rule used when a regular function is called as an object method.
@@ -2661,7 +2964,9 @@ admin.greet = user.greet;
 user.greet();
 admin.greet();
 ```
-# JavaScript Explicit Binding — call(), apply(), bind()
+### 54. JavaScript Explicit Binding — call(), apply(), bind()
+
+[↑ Back to top](#table-of-contents)
 Explicit binding means we explicitly tell a regular function what this should be.
 
 ```js
@@ -2693,7 +2998,9 @@ greet.call(user)  //That's explicit binding.
 All three methods can explicitly control the this value of a regular function. call() invokes the function immediately and accepts arguments individually. apply() also invokes the function immediately, but accepts arguments as an array or array-like object. bind() does not invoke the function immediately; it returns a new function with this bound to the provided object, and it can also pre-fill arguments.
 
 
-# What happens internally when you use new with a constructor function?
+### 55. What happens internally when you use new with a constructor function?
+
+[↑ Back to top](#table-of-contents)
 When a constructor function is called with new, JavaScript creates a new object, makes that object the function's this, runs the constructor body, and normally returns that object.
 
 When a constructor function is called with new, JavaScript creates a new object, links that object's internal [[Prototype]] to the constructor's prototype, binds this inside the constructor to the newly created object, and executes the constructor body. Normally the newly created object is returned. However, if the constructor explicitly returns an object, that returned object is used instead. Returning a primitive does not replace the newly created object.
@@ -2766,7 +3073,10 @@ const user = new User("Priti");
 console.log(user.name);//priti  
 ```
 
-#  What is Object.create()?
+
+### 56. What is Object.create()?
+
+[↑ Back to top](#table-of-contents)
 Object.create(proto) creates a new object whose internal [[Prototype]] points to the object passed as proto.
 
 Object.create(proto) creates a new object and sets its internal [[Prototype]] to the object passed as proto. The new object doesn't copy the prototype's properties; instead, property lookup follows the prototype chain when a property isn't found directly on the object. Unlike new, Object.create() doesn't invoke a constructor. It's therefore a direct way to create objects with prototype-based inheritance
@@ -2784,11 +3094,17 @@ user.greet(); // Hello!
 ```
 
 
-# What is the difference between this in a regular function and an arrow function?
+### 57. What is the difference between this in a regular function and an arrow function?
+
+[↑ Back to top](#table-of-contents)
 
 A regular function has its own this, and its value is determined by how the function is invoked. For example, when called as obj.method(), this refers to obj. An arrow function does not have its own this; instead, it lexically inherits this from its surrounding scope where the arrow was created. Therefore, call(), apply(), and bind() cannot change an arrow function's this, and arrow functions cannot be used as constructors with new.
 
-# What is the precedence of this binding rules in JavaScript?
+
+
+### 58. What is the precedence of this binding rules in JavaScript?
+
+[↑ Back to top](#table-of-contents)
 For regular functions, the common interview priority is new binding first, then explicit binding through call, apply, or bind, then implicit binding through obj.method(), and finally default binding through a standalone function call. Arrow functions are different because they don't have their own this; they lexically inherit it from their surrounding scope, so the normal binding rules don't override it.
 
 Then add:
@@ -2808,7 +3124,9 @@ foo()
 → default binding
 ```
 
-# Why does this get lost when a class method is passed as a callback, and how do you fix it?
+### 59. Why does this get lost when a class method is passed as a callback, and how do you fix it?
+
+[↑ Back to top](#table-of-contents)
 A class method is not automatically bound to its instance. When the method is called as instance.method(), implicit binding makes this equal to the instance. But when the method is passed as a callback, such as setTimeout(instance.method, 1000), it is later invoked without the original instance as its receiver. Since class bodies run in strict mode, this becomes undefined. We can preserve the instance context by binding the method with bind(this) in the constructor or by using an arrow class field, which lexically captures this.
 
 this in Classes
@@ -2994,7 +3312,9 @@ const user = new User("Priti");
 setTimeout(user.greet, 1000);
 ```
 
-# What does new actually do?
+### 60. What does new actually do?
+
+[↑ Back to top](#table-of-contents)
 it looks like new User() is simply "calling a function."
 
 But internally, JavaScript performs roughly four important steps:
@@ -3126,7 +3446,9 @@ new Constructor(args)
    the new object
 ```
 
-#  What does Object.create() do?"
+### 61. What does Object.create() do?
+
+[↑ Back to top](#table-of-contents)
 Object.create(proto) creates a new object and sets its internal [[Prototype]] to the object passed as proto. It doesn't copy the prototype's properties and it doesn't invoke a constructor. When we access a property that isn't found directly on the object, JavaScript follows this prototype link and continues up the prototype chain. It's therefore a simple way to implement prototype-based inheritance without constructor functions.
 
 Object.create(proto) creates a brand-new object whose internal [[Prototype]] points to proto.
@@ -3225,7 +3547,10 @@ console.log(Object.getPrototypeOf(child) === parent);
 Object.setPrototypeOf(child, anotherObject);
 ```
 
-#  Object.create() vs {}
+
+### 62. Object.create() vs {}
+
+[↑ Back to top](#table-of-contents)
 Object.create(proto) directly creates an object with its internal [[Prototype]] set to proto, without invoking a constructor. new Constructor() creates a new object whose prototype is Constructor.prototype, invokes the constructor with the new object as this, and returns the resulting object according to the constructor-return rules
 
 Object.create(proto) creates a brand-new object whose internal [[Prototype]] points to proto.
@@ -3269,7 +3594,9 @@ dictionary.toString  //undefined
 // because toString() normally comes from Object.prototype.
 ```
 
-#  Object.create() vs new?
+### 63. Object.create() vs new?
+
+[↑ Back to top](#table-of-contents)
 Object.create(proto) directly creates an object with its internal [[Prototype]] set to proto, without invoking a constructor. new Constructor() creates a new object whose prototype is Constructor.prototype, invokes the constructor with the new object as this, and returns the resulting object according to the constructor-return rules
 
 Object.create(proto) creates a brand-new object whose internal [[Prototype]] points to proto.
@@ -3321,7 +3648,10 @@ Object.getPrototypeOf(child)
 Object.setPrototypeOf(child, parent)
 ```
 
-# What happens when a property doesn't exist on an object?
+
+### 64. What happens when a property doesn't exist on an object?
+
+[↑ Back to top](#table-of-contents)
 When a property doesn't exist directly on an object, JavaScript searches for that property in the object's prototype chain. If it finds the property, it returns its value. If the property isn't found anywhere in the prototype chain and the chain reaches null, JavaScript returns undefined.
 ```javascript
 const user = {
@@ -3331,7 +3661,9 @@ const user = {
 console.log(user.age);
 ```
 
-# Property Lookup Process How does property lookup work?
+### 65. Property Lookup Process — How does property lookup work?
+
+[↑ Back to top](#table-of-contents)
 ```javascript
 const parent = {
   age: 25
@@ -3363,7 +3695,9 @@ console.log(child.age);
 ```
 
 
-# Object.freeze() vs Object.seal()?
+### 66. Object.freeze() vs Object.seal()?
+
+[↑ Back to top](#table-of-contents)
 Object.seal() prevents adding and deleting properties, but allows modification of existing property values. Object.freeze() goes one step further and also prevents modification of existing properties. Both are shallow operations.
 
 ```javascript
@@ -3403,7 +3737,9 @@ user.name = "Vipin";
 // but  can change 
 user.address.city = "Delhi";
 ```
-# Object.preventExtensions()?
+### 67. Object.preventExtensions()?
+
+[↑ Back to top](#table-of-contents)
 Object.preventExtensions() is a static JavaScript method that prevents new properties from ever being added to an object.It stops the object from growing, but it does not protect existing properties from being deleted or modified.
 Blocks additions: Any attempt to add new properties will fail (silently in non-strict mode, or throw a TypeError in strict mode).
 Allows deletions: Existing properties can still be completely removed.
@@ -3423,7 +3759,9 @@ delete user.name;
 
 ```
 
-# How do getters and setters work?
+### 68. How do getters and setters work?
+
+[↑ Back to top](#table-of-contents)
 Getters and setters are special methods that let you control how a property is read and updated.
 
 Getters and setters are accessor properties in JavaScript. A getter is automatically executed when a property is read, while a setter is automatically executed when a property is assigned a value. They are commonly used for computed properties, validation, transformation, and controlling access to internal data.
@@ -3468,7 +3806,9 @@ user.age = 25;
 console.log(user.age);
 ```
 
-#  What is a Proxy?
+### 69. What is a Proxy?
+
+[↑ Back to top](#table-of-contents)
 A Proxy is a JavaScript object that wraps another object or function and allows us to intercept and customize operations such as property access, assignment, deletion, and function calls using traps like get, set, deleteProperty, and apply.
 ```javascript
 const proxy = new Proxy(target, handler);
@@ -3557,7 +3897,9 @@ console.log("role" in proxyUser);
 
 ```
 
-# "Explain Proxy and Reflect in JavaScript.
+### 70. Explain Proxy and Reflect in JavaScript
+
+[↑ Back to top](#table-of-contents)
 "Proxy is a meta-programming feature that allows us to intercept fundamental operations on an object or function, such as getting or setting properties, checking properties, deleting properties, calling functions, and constructing objects. These interceptions are implemented using traps like get, set, has, apply, and construct.
 
 Reflect is a built-in object that provides methods corresponding to many of these fundamental operations. In Proxy traps, I generally use Reflect to forward the operation to the target while preserving normal JavaScript behavior, especially around getters, prototypes, and this.
@@ -3565,7 +3907,9 @@ Reflect is a built-in object that provides methods corresponding to many of thes
 So the simple mental model is: Proxy intercepts the operation, while Reflect performs or forwards the operation."
 
 
-# What does instanceof actually do?
+### 71. What does instanceof actually do?
+
+[↑ Back to top](#table-of-contents)
 obj instanceof Constructor checks whether Constructor.prototype is found anywhere in obj's prototype chain.
 
 ```js
@@ -3605,15 +3949,23 @@ console.log(dog instanceof Animal);
 console.log(dog instanceof Object);
 ```
 
-# How does instanceof work in JavaScript?
+
+### 72. How does instanceof work in JavaScript?
+
+[↑ Back to top](#table-of-contents)
 instanceof checks whether the prototype property of a constructor exists anywhere in the prototype chain of an object. For obj instanceof Constructor, JavaScript starts from the object's internal [[Prototype]] and walks upward until it finds Constructor.prototype or reaches null. If it finds it, the result is true; otherwise it's false. It's therefore a prototype-chain check rather than simply a check of which constructor created the object. Its behavior can also be customized using Symbol.hasInstance
 
-# What is the difference between instanceof and typeof in JavaScript?
+### 73. What is the difference between instanceof and typeof in JavaScript?
+
+[↑ Back to top](#table-of-contents)
 typeof tells us the general JavaScript type/category of a value, while instanceof checks whether an object's prototype chain contains a particular constructor's prototype.
 
 
-# hasOwnProperty() vs in
-# Where does this property come from — the object itself, or its prototype chain
+### 74. hasOwnProperty() vs in
+
+### 75. Where does this property come from — the object itself, or its prototype chain
+
+[↑ Back to top](#table-of-contents)
 
 hasOwnProperty() checks only own properties, while in checks both own and inherited properties.
 
@@ -3775,7 +4127,9 @@ Object.keys(child);  //["name"]
 ```
 
 
-# What is prototype pollution, and why is it dangerous?
+### 76. What is prototype pollution, and why is it dangerous?
+
+[↑ Back to top](#table-of-contents)
 Prototype pollution means changing Object.prototype.
 
 Prototype Pollution is a JavaScript security vulnerability where an attacker is able to modify a shared prototype, commonly Object.prototype. Since normal JavaScript objects inherit from Object.prototype, polluted properties can become visible on many unrelated objects.
@@ -3918,7 +4272,12 @@ console.log(data.name);
 I prevent prototype pollution by never modifying Object.prototype, validating or allowlisting keys from untrusted input, blocking dangerous keys such as __proto__, constructor, and prototype, avoiding unsafe recursive merge operations, and using Object.create(null) or Map for dictionary-like data. I also use Object.hasOwn() when I need to distinguish own properties from inherited properties.
 
 
-# == vs ===
+## Equality & Type Coercion
+
+### 77. == vs ===
+
+[↑ Back to top](#table-of-contents)
+
 == performs loose equality comparison and can convert types before comparing. === performs strict equality comparison, so both the type and value must match. In modern JavaScript, === is generally preferred because it avoids unexpected type coercion.
 
 ==  → value comparison + type coercion
@@ -3941,7 +4300,12 @@ false === 0    // false
 null == undefined   // true
 null === undefined  // false
 ```
-#  Type Coercion
+
+
+
+### 78. Type Coercion
+
+[↑ Back to top](#table-of-contents)
 Type coercion is the automatic or implicit conversion of a value from one data type to another by JavaScript.
 ```javascript
 console.log("5" + 2);
@@ -3959,7 +4323,10 @@ console.log("5" - 2);//3
 5==="5"//false --because === doesn't perform this coercion.
 ```
 
-# Difference between Type Conversion and Type Coercion 
+
+### 79. Difference between Type Conversion and Type Coercion
+
+[↑ Back to top](#table-of-contents)
 
 Type conversion is the explicit conversion of a value from one type to another by the developer, while type coercion is the implicit conversion automatically performed by JavaScript during certain operations.
 
@@ -3986,13 +4353,21 @@ console.log("5" - 2);
 console.log(5 == "5");
 ```
 
-# Pass by values pass by reference
+
+
+## Pass by Value / Reference, Copying
+
+### 80. Pass by value vs pass by reference
+
+[↑ Back to top](#table-of-contents)
 Pass by value means a copy of the value is passed to a function, so changing the parameter does not change the original variable.
 
 Pass by reference means the reference to the same object is passed, so changes can affect the original object.
 
 
-# Is JavaScript pass-by-reference?
+### 81. Is JavaScript pass-by-reference?
+
+[↑ Back to top](#table-of-contents)
 JavaScript uses pass-by-value. For objects, the value passed to a function is a reference to the object. Therefore,
 mutating the object's properties inside the function affects the original object, but reassigning the parameter does
 not change the caller's variable.
@@ -4087,7 +4462,12 @@ changeName(Person);
 console.log(Person.name)//priti
 ```
 why? 
-# Mutation vs Reassignment (Object  Reference type)
+
+
+
+### 82. Mutation vs Reassignment (Object Reference type)
+
+[↑ Back to top](#table-of-contents)
 initially :
 ```javascript
 person ───────┐
@@ -4128,7 +4508,9 @@ Local variable gets new reference
 ```
 
 
-# Primitive  
+### 83. Primitive
+
+[↑ Back to top](#table-of-contents)
 ```javascript
 function change(x){
     // x gets its own copy of the value
@@ -4168,7 +4550,9 @@ JavaScript is pass-by-value. For primitive values, the actual value is copied. F
 ```
 
 
-#  NaN
+### 84. NaN
+
+[↑ Back to top](#table-of-contents)
 NaN stands for Not-a-Number. It is a special value of the JavaScript number type that represents an invalid or undefined numeric result. Interestingly, NaN is not equal to itself, so we use Number.isNaN() to check for it.
 NaN is actually of type number.
 ```javascript
@@ -4192,7 +4576,9 @@ Number.isNaN(10);
 ```
 
 
-#  Shallow vs Deep Copy
+### 85. Shallow vs Deep Copy
+
+[↑ Back to top](#table-of-contents)
 A shallow copy creates a new top-level object, but nested objects and arrays still share their references with the original object. For example, the spread operator and Object.assign() perform shallow copies. Therefore, modifying a nested object in the copy can also modify the original. A deep copy recursively creates independent copies of nested objects as well, so changes to the copy don't affect the original. In modern JavaScript, structuredClone() can be used for deep cloning of supported values.
 
 ```javascript 
@@ -4208,6 +4594,8 @@ const user2=user1;// same object ,two labels
 user2.name= "vipin";
 console.log(user1.name)// vipin--  They were never sesparte object
 ```
+
+
 ##  Shallow Copy -- creates a new object, but nested objects are still shared between the original and copied object.
 ```javascript
 const user1= {
@@ -4226,7 +4614,8 @@ console.log(user1.address.city)// Mumbai" — leaked! nested object is shared
 
 ```
 
-# Deeep Copy
+### 86. Deep Copy
+[↑ Back to top](#table-of-contents)
 ## --  creates a completely independent copy, including nested objects.
 ```javascript
 const user2 = JSON.parse(JSON.stringify(user1));
@@ -4256,9 +4645,16 @@ address:{ // we are assigning  a new  object   to address properties (reassign/r
 }})
 ```
 
-# ES6 + Modern javascript
 
-# Arrow function 
+## ES6+ Features
+
+### 87. ES6 + Modern JavaScript
+
+[↑ Back to top](#table-of-contents)
+
+### 88. Arrow function
+
+[↑ Back to top](#table-of-contents)
 Arrow functions do not create their own this, arguments, or prototype, and they cannot be used as constructors.
 
 Arrow functions were introduced in ES6. They provide concise function syntax, support implicit returns for expression bodies, and most importantly they have lexical this rather than their own dynamically determined this. They also don't have their own arguments, don't have a prototype, and cannot be called with new. They're especially useful for callbacks and nested functions where I want to preserve the surrounding this, but I generally avoid them for object methods when the method needs the object's this
@@ -4374,10 +4770,16 @@ const p = new Person("Priti");
 
 // Because new expects a constructor function.
 ```
-# What is the difference between normal functions and arrow functions?
+
+### 89. What is the difference between normal functions and arrow functions?
+
+[↑ Back to top](#table-of-contents)
 The biggest difference is how this works. Normal functions have their own this, and its value is determined by how the function is called. Arrow functions don't have their own this; they lexically capture this from the surrounding scope.
 
-# Spread vs Rest
+
+### 90. Spread vs Rest
+
+[↑ Back to top](#table-of-contents)
 
 ```Spread and Rest both use the ... syntax, but   their purpose is opposite .Spread expands or unpacks elements from an array or properties from an object, while Rest collects multiple values or remaining properties into a single array or object.```
 ```javascript
@@ -4443,7 +4845,11 @@ const result = addBonus(10, 20, 30);
 
 console.log(result);
 ```
-# Destructuring
+
+
+### 91. Destructuring
+
+[↑ Back to top](#table-of-contents)
 ```Destructuring is an ES6 feature that allows us to extract values from arrays or properties from objects and assign them to variables using a concise syntax. Array destructuring works based on position, while object destructuring works based on property names..```
 ```javascript
 // without destructuring
@@ -4617,7 +5023,9 @@ const newUser = {
 };
 ```
 
-# What is the difference between array and object destructuring?
+### 92. What is the difference between array and object destructuring?
+
+[↑ Back to top](#table-of-contents)
 Array destructuring is positional, while object destructuring is property-name based.
 
 In array destructuring, variables receive values according to their position in the iterable:
@@ -4635,7 +5043,9 @@ const { name: username, age = 18 } = user;
 
 Destructuring can also be used in function parameters, loops, and other ES6+ syntax.
 
-#  computed property names [ ]
+### 93. Computed property names [ ]
+
+[↑ Back to top](#table-of-contents)
 Computed property names let you create object keys dynamically inside an object literal. You wrap a variable, function call, or string math expression in square brackets []. JavaScript evaluates this code at runtime to set the final property name
 
 ```js
@@ -4650,7 +5060,9 @@ const cart = { [`${prefix}_id`]: 101 };
 ```
 
 
-# Optional Chaining ?.
+### 94. Optional Chaining ?.
+
+[↑ Back to top](#table-of-contents)
 Optional chaining ?. is a modern JavaScript operator that safely accesses properties, methods, or computed properties by short-circuiting to undefined when the value being accessed is null or undefined, instead of throwing a TypeError.
 
 ?. lets you safely access a property, method, or array element when the value before it might be null or undefined.
@@ -4765,8 +5177,11 @@ processData();
 Optional chaining does not protect against every kind of error. It only short-circuits when the value being optionally accessed is null or undefined. It can be used for property access, method calls, and computed property access such as obj?.[key].
 
 
-# Nullish Coalescing (??) vs OR (||)
-# What is the difference between || and ?? in JavaScript? When would you use one over the other?
+
+### 95. Nullish Coalescing (??) vs OR (||)
+
+[↑ Back to top](#table-of-contents)
+### 96. What is the difference between || and ?? in JavaScript? When would you use one over the other?
 "|| uses JavaScript truthiness and returns the right-hand value when the left-hand value is falsy, such as 0, false, an empty string, NaN, null, or undefined.
 
 ?? is the nullish coalescing operator. It returns the right-hand value only when the left-hand value is null or undefined.
@@ -4886,8 +5301,11 @@ const username = value ?? "Guest";
 ```
 
 
-# Template Literal 
-# What are tagged template literals, and what arguments does the tag function receive?
+
+### 97. Template Literal
+
+[↑ Back to top](#table-of-contents)
+### 98. What are tagged template literals, and what arguments does the tag function receive?
 A tagged template literal allows a function to process a template literal before the final string is created. The tag function receives the static string portions as its first argument and the evaluated interpolation values as the remaining arguments, commonly captured using ...values.
 
 For example, tag\Hello ${name}!`gives the tag something conceptually equivalent tostrings = ["Hello ", "!"]andvalues = [name]`. The tag can then transform, validate, escape, format, or combine those pieces to produce a final result.
@@ -4911,7 +5329,9 @@ const Button = styled.button`
 `;
 
 ```
-# What is the difference between ||=, &&=, and ??=?
+### 99. What is the difference between ||=, &&=, and ??=?
+
+[↑ Back to top](#table-of-contents)
 Logical assignment operators combine logical short-circuiting with assignment. ||= assigns the right-hand value when the left-hand value is falsy, &&= assigns when the left-hand value is truthy, and ??= assigns only when the left-hand value is null or undefined. The important distinction is that ||= treats values like 0, false, and "" as needing a default, while ??= preserves those valid values and only replaces missing values.
 
 ```js
@@ -4989,12 +5409,18 @@ console.log(d);
 console.log(e);
 ```
 
-# What's the difference between property shorthand and computed property names?
+### 100. What's the difference between property shorthand and computed property names?
+
+[↑ Back to top](#table-of-contents)
+
 Property shorthand is used when the variable name and object property name are the same. For example, { name } is equivalent to { name: name }.
 
 Computed property names allow us to dynamically determine an object's property name using an expression inside square brackets, such as { [key]: value }. The expression is evaluated at runtime and its result becomes the property key.
 
-# What are Object Shorthand & Computed Keys?
+
+### 101. What are Object Shorthand & Computed Keys?
+
+[↑ Back to top](#table-of-contents)
 
 ```js
 // befor ES6
@@ -5117,7 +5543,11 @@ console.log(config);
 
 
 
-#  Higher-Order Functions
+## Functions & Async: HOFs, Callbacks, Promises
+
+### 102. Higher-Order Functions
+
+[↑ Back to top](#table-of-contents)
 ```A Higher-Order Function is a function that takes one or more functions as arguments or returns a function. Common examples in JavaScript are map, filter, and reduce. Higher-order functions are useful for abstraction, code reuse, and functional programming.```
 
 ```javascript 
@@ -5147,7 +5577,9 @@ const result = numbers.map(function (num) {
 console.log(result);
 // [2, 4, 6]
 ```
-# Callback
+### 103. Callback
+
+[↑ Back to top](#table-of-contents)
 
 ```A callback is a function that is passed as an argument to another function and is called by that function at a later time or when a specific operation is completed```
 ```javascript 
@@ -5171,7 +5603,11 @@ function showUser(user) {
 getUser(showUser);
 
 ```
-#  Callback Hell
+
+
+### 104. Callback Hell
+
+[↑ Back to top](#table-of-contents)
 ```Callback Hell occurs when multiple asynchronous operations are (nested inside each other) handled through deeply nested callbacks. It makes code difficult to read, maintain, debug, and handle errors. Promises and async/await help flatten this structure and make asynchronous code easier to manage.```
 
 ```javascript
@@ -5261,7 +5697,10 @@ loginUser((user) => {
 ````Here each asynchronous operation depends on the result of the previous operation. Because each callback is nested inside the previous callback, the code becomes deeply nested and difficult to maintain. This is called callback hell.```
 
 
-# Promises
+
+### 105. Promises
+
+[↑ Back to top](#table-of-contents)
 ```A Promise represent future result```
 A Promise is an object representing the eventual completion or failure of an asynchronous operation. It has three
 states: pending, fulfilled, and rejected. resolve() fulfills the Promise, reject() rejects it, and .then(), .catch(),
@@ -5313,7 +5752,11 @@ loginUser()
     console.log("Error:", error);
   });
 ```
-# Pomise Chain
+
+
+### 106. Promise Chain
+
+[↑ Back to top](#table-of-contents)
 ```Promise chaining is the process of connecting multiple .then() handlers so that the result of one asynchronous operation is passed to the next operation in sequence.```
 
 ```javascript
@@ -5429,11 +5872,15 @@ Promise.reject("Something went wrong")
   .catch((error) => console.log(error));
 ```
 
-# Can a Promise change its state after it is fulfilled or rejected?"
+### 107. Can a Promise change its state after it is fulfilled or rejected?
+
+[↑ Back to top](#table-of-contents)
 No. A Promise starts in the pending state and can transition only once to either fulfilled or rejected. Once it becomes fulfilled or rejected, it is settled and its state is immutable. Any subsequent calls to resolve() or reject() are ignored.
 
 
-# What happens when you return a value, return a Promise, or throw an error inside .then()?
+### 108. What happens when you return a value, return a Promise, or throw an error inside .then()?
+
+[↑ Back to top](#table-of-contents)
 .then() always returns a new Promise. If the callback returns a normal value, the new Promise fulfills with that value, conceptually through Promise.resolve(). If the callback returns a Promise, the new Promise adopts the state of that returned Promise and waits for it to settle. If the callback throws an error, the new Promise becomes rejected with that error. This behavior allows us to build Promise chains where values flow forward and errors propagate down to .catch().
 ```js
 Promise.resolve("Start")
@@ -5450,7 +5897,10 @@ Promise.resolve("Start")
     });
 ```
 
-# What is the difference between sequential await and Promise.all()? When would you use each?
+
+### 109. What is the difference between sequential await and Promise.all()? When would you use each?
+
+[↑ Back to top](#table-of-contents)
 In sequential execution, each await waits for the previous asynchronous operation to complete before starting the next one. For example, await a(); await b(); means b() isn't called until a() has resolved.
 
 With Promise.all(), the asynchronous operations are started before we await their combined result. For example, await Promise.all([a(), b()]) starts both operations without waiting for the first one to finish, so independent operations can overlap and usually complete faster.
@@ -5467,7 +5917,9 @@ const [user, posts] = await Promise.all([
 ```
 
 
-# What's the difference between .catch() and try/catch with async/await, and what happens if you forget to await a Promise inside a try block?
+### 110. What's the difference between .catch() and try/catch with async/await, and what happens if you forget to await a Promise inside a try block?
+
+[↑ Back to top](#table-of-contents)
 .catch() handles rejected Promises in a Promise chain. With async/await, a rejected Promise can be caught using try/catch when the Promise is awaited inside the try block.
 
 A key difference is that try/catch doesn't automatically catch an asynchronous Promise rejection just because the Promise was created inside the try block. If I forget to use await, the Promise can reject later after the try block has already completed, so the local catch won't handle that rejection.
@@ -5475,7 +5927,9 @@ A key difference is that try/catch doesn't automatically catch an asynchronous P
 Therefore, for an awaited asynchronous operation, I would write try { await operation(); } catch (error) { ... }, or explicitly attach .catch() to the Promise.
 
 
-# What actually happens with async/await?
+### 111. What actually happens with async/await?
+
+[↑ Back to top](#table-of-contents)
 async/await looks synchronous, but it does not block JavaScript's main thread. It is essentially a cleaner syntax built on top of Promises + the Event Loop + Microtask Queue.
 ```js
 async function getData() {
@@ -5511,10 +5965,15 @@ async function resumes
       ↓
 console.log()
 
-# s async/await synchronous or asynchronous?
+### 112. Is async/await synchronous or asynchronous?
+
+[↑ Back to top](#table-of-contents)
 async/await is asynchronous. An async function always returns a Promise. When execution reaches an await, the async function is suspended until the awaited Promise settles. The rest of the function is then scheduled as a microtask, while the JavaScript thread continues executing other synchronous code. Therefore, await pauses only the async function, not the entire JavaScript runtime.
 
-# async/await
+
+### 113. async/await
+
+[↑ Back to top](#table-of-contents)
 ```async/await is Promise-based syntax that makes asynchronous code easier to read. An async function always returns a Promise, and await pauses that async function until the Promise settles and gives access to its fulfilled value. Errors are commonly handled using try/catch.```
 
 ```javascript
@@ -5561,7 +6020,9 @@ main();
 ```
 
 
-# Asynchronous JavaScript
+### 114. Asynchronous JavaScript
+
+[↑ Back to top](#table-of-contents)
 ```javascript is single threaded what does it mean? ```
 Javascript can execute only One Piece of Code at a time .
 
@@ -5582,11 +6043,18 @@ There are 6 important parts
          -MicroTask Queue - (Microtask vs Macrotask)
          -Event Loop
 
+## Event Loop & Concurrency Model
 
-# JavaScript is single-threaded. Then how does it handle asynchronous operations without blocking?"
+### 115. JavaScript is single-threaded. Then how does it handle asynchronous operations without blocking?
+
+[↑ Back to top](#table-of-contents)
 JavaScript has a single call stack, so synchronous JavaScript executes one thing at a time. Asynchronous operations are handled by the browser or Node.js runtime APIs. Once they complete, their callbacks are queued, and the Event Loop schedules them when the call stack is free. Promise microtasks are processed before the next task. That's how JavaScript achieves non-blocking asynchronous behavior despite having a single main JavaScript thread."
 
-# Call Stack
+
+
+### 116. Call Stack
+
+[↑ Back to top](#table-of-contents)
 ```The Call Stack is a LIFO data structure used by JavaScript to manage function execution. Whenever a function is called, its execution context is pushed onto the stack, and when it finishes, it is popped from the stack. JavaScript executes the function at the top of the stack```
 
 
@@ -5648,6 +6116,9 @@ await
  Every function call creates an execution context/frame containing information needed while that function executes.
 '
 
+
+
+
 # What are Web APIs / Node APIs?
 The JS engine executes JavaScript, but the environment provides capabilities around it.
 setTimeout() is not implemented by the core JavaScript language itself.
@@ -5683,7 +6154,9 @@ Web APIs / Node APIs are host-environment capabilities that extend JavaScript be
 └──────────────────────────────────────┘
 ```
 
-# Are Web APIs part of the JavaScript engine?
+### 117. Are Web APIs part of the JavaScript engine?
+
+[↑ Back to top](#table-of-contents)
 No. Web APIs are not part of the JavaScript engine. The JavaScript engine, such as V8, is responsible for executing JavaScript code using components like the call stack and heap. APIs such as setTimeout, fetch, and DOM event handling are provided by the host environment, such as the browser. In Node.js, Node provides its own runtime APIs such as fs, HTTP, streams, and timers. These APIs handle asynchronous operations and, when the operation is ready, make callbacks or promise reactions eligible for execution through the event-loop mechanism.
 
 For example, when setTimeout() is called, the timer is handled by the host environment rather than blocking the JavaScript call stack. Once the timer is ready, its callback is queued. The event loop eventually schedules that callback when the JavaScript execution context is ready.
@@ -5710,7 +6183,9 @@ DOM APIs
 ```
 
 
-#  Event Loop
+### 118. Event Loop
+
+[↑ Back to top](#table-of-contents)
 ```The Event Loop is the mechanism that allows JavaScript to handle asynchronous operations while JavaScript itself executes code on a single main thread. It continuously checks whether the Call Stack is empty and then moves eligible callbacks from queues to the Call Stack for execution.```
 
 ```Microtask Queue and Macrotask Queue are queues used by the JavaScript runtime to schedule asynchronous callbacks. After the Call Stack becomes empty, the Event Loop prioritizes microtasks before moving to the next macrotask.```
@@ -5719,7 +6194,9 @@ JavaScript executes synchronous code on the call stack. Once the current synchro
 
 setTimeout(fn, 0) schedules fn as a future task; the callback runs only after the timer is eligible, the current JavaScript execution finishes, and the relevant microtask checkpoint has been processed.
 
-#  Microtask vs Macrotask(task)
+### 119. Microtask vs Macrotask (task)
+
+[↑ Back to top](#table-of-contents)
 The task or macrotask queue contains callbacks from asynchronous task sources such as timers, I/O, and user events. The microtask queue contains things such as Promise reactions and queueMicrotask() callbacks. After the current synchronous JavaScript execution finishes, the runtime performs a microtask checkpoint and processes pending microtasks before moving on to the next task. Therefore, in the common browser model, microtasks have priority over the next task. This is why a resolved Promise callback usually runs before a setTimeout(..., 0) callback."
 
 Typical macrotask/task sources include:
@@ -5740,7 +6217,9 @@ Microtask Queue
 
 
 
-# Why is Microtask Queue higher priority?
+### 120. Why is Microtask Queue higher priority?
+
+[↑ Back to top](#table-of-contents)
 Because microtasks are designed for work that should happen as soon as the current JavaScript execution and current task complete, before the event loop moves on to another task.
 ```js
 Promise.resolve().then(() => {
@@ -5772,7 +6251,9 @@ console.log("End");
 JavaScript first executes all synchronous code on the call stack, so "Start" and "End" are printed first. The Promise.then() callback is placed into the microtask queue, while the setTimeout() callback is placed into the task/macrotask queue. Once the synchronous code finishes, the event loop drains the microtask queue before processing the next macrotask. Therefore "Promise" is printed before "Timeout"
 
 
-# Why doesn't setTimeout(fn, 0) execute immediately?
+### 121. Why doesn't setTimeout(fn, 0) execute immediately?
+
+[↑ Back to top](#table-of-contents)
 setTimeout(fn, 0) schedules the callback as a task after the timer becomes eligible. It cannot interrupt currently executing synchronous JavaScript. Once the current task finishes, the runtime drains pending microtasks, and only then can the timer callback execute as a subsequent task
 
 
@@ -5827,7 +6308,9 @@ This is microtask starvation.
 A microtask is allowed to enqueue another microtask, and that newly created microtask must also be processed before the queue is considered drained.
 
 
-# Can a Promise or microtask block a setTimeout(..., 0)?"
+### 122. Can a Promise or microtask block a setTimeout(..., 0)?
+
+[↑ Back to top](#table-of-contents)
 Yes.
 
 Promise.then(), queueMicrotask(), and other microtask-producing mechanisms are processed in the microtask checkpoint before the event loop proceeds to another macrotask/task.
@@ -5837,7 +6320,13 @@ If a microtask continuously schedules another microtask, the microtask queue may
 sort :👇
 Yes. setTimeout(fn, 0) only makes the callback eligible to run in a future task; it doesn't give it priority. The event loop processes the current task and then drains the microtask queue. If microtasks keep adding more microtasks, the queue never becomes empty, so the event loop can starve subsequent tasks and, in a browser, delay rendering and user events.
 
-# What problem does Map solve?
+
+## Map, Set, WeakMap, WeakSet
+
+### 123. What problem does Map solve?
+
+[↑ Back to top](#table-of-contents)
+
 Normal JavaScript objects can store key-value pairs:
 ```js
 const user = {
@@ -5876,8 +6365,9 @@ map.set(user, "Developer");
 console.log(map.get(user));//Developer
 ```
 
-# Map() Data Structure
+### 124. Map() Data Structure
 
+[↑ Back to top](#table-of-contents)
 Map is a built-in JavaScript data structure used to store key-value pairs.    Unlike regular objects, Map allows keys of any data type and provides methods such as set, get, has, delete, and clear. It is commonly used for frequency counting, caching, lookup tables, and DSA problems such as Two Sum."
 ```JS
 // map accept any value as key 
@@ -5949,7 +6439,10 @@ console.log(metadata.get(button));
 }
 ```
 
-# What does "Strong Reference" mean?
+### 125. What does "Strong Reference" mean?
+
+[↑ Back to top](#table-of-contents)
+
 ```js
 const map = new Map();
 
@@ -6014,7 +6507,10 @@ user=null;
 // The WeakMap entry effectively disappears along with the key.
 ```
 
-#  Map vs Object
+
+### 126. Map vs Object
+
+[↑ Back to top](#table-of-contents)
 Both Map and Object can store key-value pairs, but Map is specifically designed as a key-value collection, while Object is primarily used to represent structured data.
 A Map can use any value as a key:
 
@@ -6076,7 +6572,9 @@ console.log(map.get(objKey)); //User Data
 
 ```
 
-#  Set
+### 127. Set
+
+[↑ Back to top](#table-of-contents)
 Set is a built-in JavaScript collection that stores unique values. It is useful when we need uniqueness, such as removing duplicate IDs, checking whether a value already exists, or tracking unique users. Common methods are add(), has(), delete(), and clear()."
 ```javascript
 const productIds = [
@@ -6146,8 +6644,9 @@ console.log(iterator.next());
 // { value: undefined, done: true }
 ```
 
-# What is the difference between Set and WeakSet?"
+### 128. What is the difference between Set and WeakSet?
 
+[↑ Back to top](#table-of-contents)
 Set is a collection of unique values and can contain both primitive values and objects. It is iterable, has a size property, and strongly references its objects.
 
 WeakSet is designed to store objects only. It holds those objects weakly, so if an object has no other strong references, it can become eligible for garbage collection. WeakSet is not iterable and doesn't have a size property.
@@ -6200,7 +6699,9 @@ weakSet.add(user);
 console.log(weakSet.has(user));
 ```
 
-# What is the difference between Map and WeakMap?
+### 129. What is the difference between Map and WeakMap?
+
+[↑ Back to top](#table-of-contents)
 Map can use any JavaScript value as a key, including primitives and objects. It is iterable, provides a size property, and maintains strong references to its object keys. Therefore, if a key is stored in a Map, that Map can prevent the key object from being garbage collected.
 
 WeakMap only accepts objects as keys. It does not support iteration or size, and its references to keys are weak. If an object has no other strong references, it becomes eligible for garbage collection even if it is a key in a WeakMap.
@@ -6246,7 +6747,9 @@ for (const [key, value] of map) {
 }
 ```
 # 
-# Which object can be garbage collected?
+### 130. Which object can be garbage collected?
+
+[↑ Back to top](#table-of-contents)
 ```js
 const map = new Map();
 const weakMap = new WeakMap();
@@ -6267,7 +6770,11 @@ user = null;
 // WeakMap's object can be GC'd.
 ```
 
-# Generator Functions
+## Generators & Iterators
+
+### 131. Generator Functions
+
+[↑ Back to top](#table-of-contents)
 A Generator Function is a special JavaScript function that can pause its execution using yield and resume later. It is declared using function* and returns a Generator object when called.
 //
 
@@ -6309,7 +6816,9 @@ console.log(generator.next().value);
 console.log(generator.next().value);
 console.log(generator.next().value);
 ```
-# What is a Generator Function, and how is it different from a normal function?
+### 132. What is a Generator Function, and how is it different from a normal function?
+
+[↑ Back to top](#table-of-contents)
 A generator function is declared using function* and returns a Generator object when called. Unlike a normal function, calling a generator function does not immediately execute its body.
 
 The generator starts executing when .next() is called and pauses whenever it reaches a yield. Each .next() resumes execution from where the previous yield paused and returns an object containing { value, done }.
@@ -6336,7 +6845,10 @@ console.log(gen.next());
 They are useful for producing values lazily, creating custom iterators, handling potentially large or infinite sequences, and controlling execution by pausing and resuming a function.
 
 
-# What is an async generator, and how is it different from a normal generator?
+
+### 133. What is an async generator, and how is it different from a normal generator?
+
+[↑ Back to top](#table-of-contents)
 An async generator is declared using async function*. It combines generator semantics with asynchronous iteration. Calling it returns an async iterator, and its next() method returns a Promise that resolves to an iteration result { value, done }. Values can be produced using yield, and asynchronous operations can be handled with await. Consumers typically use for await...of to consume the values. Unlike a normal generator, which implements synchronous iteration and whose next() returns an iteration result directly, an async generator implements the async iteration protocol through Symbol.asyncIterator and returns Promises from next(). It's especially useful for paginated APIs, streams, and large datasets because values can be produced lazily rather than loading everything into memory.
 
 
@@ -6386,8 +6898,10 @@ An object implementing Symbol.asyncIterator, where next() returns a Promise reso
 
 
 
+### 134. Iterators
 
-# Iterators
+[↑ Back to top](#table-of-contents)
+
 An iterator is an object that follows the iterator protocol by providing a next() method. Each call to next() returns an object containing value and done. Iterators are used by constructs such as for...of to consume iterable data one value at a time.
 
 An iterable is an object that implements [Symbol.iterator]() and returns an iterator. An iterator is an object with a next() method that returns an object containing value and done.
@@ -6462,19 +6976,27 @@ Iterable tells JavaScript "how to get an iterator"; iterator tells JavaScript "h
 
 
 
-# What is the difference between an Iterable and an Iterator?
+### 135. What is the difference between an Iterable and an Iterator?
+
+[↑ Back to top](#table-of-contents)
 An iterable is an object that implements the [Symbol.iterator]() method. Calling this method returns an iterator.
 
 An iterator is an object that implements a next() method. Each call to next() returns an object like { value, done }.
 
 Arrays, strings, Maps and Sets are examples of built-in iterables. for...of, spread syntax, and destructuring consume iterables using this protocol.
 
-# What is the difference between yield and yield*?
+### 136. What is the difference between yield and yield*?
+
+[↑ Back to top](#table-of-contents)
 yield pauses the current generator and produces a single value to the caller. yield*, on the other hand, delegates iteration to another iterable. It forwards each value from that iterable until the iterable is exhausted, after which the original generator continues.
 
 yield* can delegate to another generator, an array, string, Set, or any other iterable.
 
-# yield & yield*
+
+
+### 137. yield & yield*
+
+[↑ Back to top](#table-of-contents)
 ```js
 
 // yield pauses a generator and produces one value; yield* pauses the current generator and delegates iteration to another iterable, forwarding its values until it is exhausted.
@@ -6539,13 +7061,18 @@ console.log([...fullStack()]);
 
 
 
-# What happens after the delegated iterable finishes?"
+
+### 138. What happens after the delegated iterable finishes?
+
+[↑ Back to top](#table-of-contents)
 
 Execution resumes immediately after the yield* expression. If the delegated iterator has a return value, the yield* expression evaluates to that return value.
 
 
 
-# Symbol is a primitive data type introduced in ES6.
+### 139. Symbol (primitive data type introduced in ES6)
+
+[↑ Back to top](#table-of-contents)
 
 A Symbol is a unique, immutable primitive value, commonly used as a property key to avoid naming collisions and to customize JavaScript's built-in behavior.
 
@@ -6594,7 +7121,12 @@ console.log(Number(user));
 ```
 
 
-#  Modules
+## Modules & Memory
+
+### 140. Modules
+
+[↑ Back to top](#table-of-contents)
+
 A module is a self-contained unit of JavaScript code that encapsulates related functionality. Modules allow us to organize applications into separate files and explicitly share functionality using mechanisms such as ES module export and import. This improves maintainability, reusability, and encapsulation.
 
 ```javascript
@@ -6621,13 +7153,18 @@ export async function register(req, res) {
 ```
 
 
-# How does the JavaScript engine manage memory?
+
+### 141. How does the JavaScript engine manage memory?
+
+[↑ Back to top](#table-of-contents)
 JavaScript uses automatic memory management. The engine allocates memory for variables, objects, and execution contexts, typically using stack and heap areas. A garbage collector periodically identifies objects that are no longer reachable from the program's roots and reclaims their memory. Memory leaks can still occur when unnecessary objects remain reachable through references such as globals, event listeners, timers, or closures."
 
 
 
 
-# What causes Stack Overflow?
+### 142. What causes Stack Overflow?
+
+[↑ Back to top](#table-of-contents)
 Stack Overflow occurs when the Call Stack exceeds its maximum capacity. The most common cause in JavaScript is infinite or excessively deep recursion, where new function calls keep being added to the stack without enough calls returning.
 ```javascript
 // Infinite Recursion
@@ -6664,7 +7201,10 @@ function countdown(n) {
 countdown(5);
 ```
 
- # Regular function vs arrow function?
+
+### 143. Regular function vs arrow function?
+
+[↑ Back to top](#table-of-contents)
 A regular function has its own this, arguments, and prototype, and it can be used as a constructor with new. An arrow function has a shorter syntax and does not have its own this, arguments, or prototype. Its this is lexically inherited from the surrounding scope. Arrow functions are especially useful for callbacks, while regular functions are often preferred when a function needs its own dynamic this.
 
 ```javascript
@@ -6686,13 +7226,22 @@ greet("Priti");
 
 
 
-# DOM 
+## DOM
+
+### 144. DOM
+
+[↑ Back to top](#table-of-contents)
 he DOM (Document Object Model) is a tree-like, in-memory object representation of the HTML document, built by the browser's parser. JavaScript reads/modifies this object model — not the original HTML file.
 
-# What is the DOM, and how is the DOM represented internally?
+
+### 145. What is the DOM, and how is the DOM represented internally?
+
+[↑ Back to top](#table-of-contents)
 The DOM, or Document Object Model, is a programming interface created by the browser from an HTML document. The browser parses the HTML and represents it as a hierarchical tree of nodes. The document object is the root, HTML elements become Element nodes, and text and comments are represented as separate nodes. JavaScript can traverse this tree using relationships such as parentElement, children, and nextElementSibling, and can manipulate the nodes using APIs such as createElement, appendChild, remove, and textContent. Events also use this tree structure for propagation through capturing and bubbling.
 
-# 1. What is DOM?
+### 146. What is DOM?
+
+[↑ Back to top](#table-of-contents)
 
 ## Definition
 
@@ -6734,7 +7283,9 @@ JavaScript uses the DOM to:
 
 ------------------------------------------------------------------------
 
-# 2. DOM Tree
+### 147. DOM Tree
+
+[↑ Back to top](#table-of-contents)
 
 ## Definition
 
@@ -6789,8 +7340,10 @@ Document
 
 ------------------------------------------------------------------------
 
-# What is the difference between querySelectorAll() and getElementsByClassName()?"
 
+### 148. What is the difference between querySelectorAll() and getElementsByClassName()?
+
+[↑ Back to top](#table-of-contents)
 
 querySelectorAll() accepts a CSS selector and returns a static NodeList containing all matching elements. getElementsByClassName() accepts class names and returns a live HTMLCollection. The important difference is that a static NodeList doesn't automatically reflect later DOM changes, while a live HTMLCollection does.
 
@@ -6801,8 +7354,11 @@ const staticList =
 const liveCollection =
   document.getElementsByClassName("item");
   ```
-# 3. querySelector vs querySelectorAll
 
+
+### 149. querySelector vs querySelectorAll
+
+[↑ Back to top](#table-of-contents)
 
 ## Definition
 
@@ -6867,7 +7423,9 @@ Card 2
 
 ------------------------------------------------------------------------
 
-# 4. getElementById
+### 150. getElementById
+
+[↑ Back to top](#table-of-contents)
 
 ## Definition
 
@@ -6907,7 +7465,9 @@ document.getElementById("#title");
 
 ------------------------------------------------------------------------
 
-# 5. textContent vs innerHTML
+### 151. textContent vs innerHTML
+
+[↑ Back to top](#table-of-contents)
 
 ## `textContent`
 
@@ -6969,7 +7529,9 @@ box.textContent = userInput;
 
 ------------------------------------------------------------------------
 
-# 6. createElement
+### 152. createElement
+
+[↑ Back to top](#table-of-contents)
 
 ## Definition
 
@@ -7003,7 +7565,9 @@ document.body.append(card);
 
 ------------------------------------------------------------------------
 
-# 7. append vs appendChild
+### 153. append vs appendChild
+
+[↑ Back to top](#table-of-contents)
 
 Both can insert nodes into the DOM.
 
@@ -7054,7 +7618,10 @@ It returns the appended node.
 
 ------------------------------------------------------------------------
 
-# 8. remove()
+
+### 154. remove()
+
+[↑ Back to top](#table-of-contents)
 
 ## Definition
 
@@ -7083,8 +7650,9 @@ After:
 > "`remove()` directly removes an element from the DOM."
 
 ------------------------------------------------------------------------
+### 155. setAttribute/getAttribute
 
-# 9. setAttribute/getAttribute
+[↑ Back to top](#table-of-contents)
 
 ## `setAttribute()`
 
@@ -7128,7 +7696,9 @@ console.log(href);
 
 ------------------------------------------------------------------------
 
-# 10. classList
+### 156. classList
+
+[↑ Back to top](#table-of-contents)
 
 ## Definition
 
@@ -7182,7 +7752,9 @@ button.addEventListener("click", () => {
 
 ------------------------------------------------------------------------
 
-# 11. addEventListener
+### 157. addEventListener
+
+[↑ Back to top](#table-of-contents)
 
 ## Definition
 
@@ -7240,7 +7812,10 @@ button.removeEventListener("click", handleClick);
 
 ------------------------------------------------------------------------
 
-# Event Object
+
+### 158. Event Object (target vs currentTarget, preventDefault)
+
+[↑ Back to top](#table-of-contents)
 
 ## Definition
 
@@ -7393,8 +7968,10 @@ Which element's listener is running?
 
 ------------------------------------------------------------------------
 
+### 159. DOM Traversal
 
-# 19. DOM Traversal
+[↑ Back to top](#table-of-contents)
+
 
 ## Definition
 
@@ -7466,7 +8043,10 @@ console.log(button.closest(".card"));
 
 ------------------------------------------------------------------------
 
-# Event Propagation
+
+### 160. Event Propagation
+
+[↑ Back to top](#table-of-contents)
 
 Event propagation is the process by which an event travels through the DOM from the target element to other elements in the DOM hierarchy.
 Event propagation has 3 phases:
@@ -7477,7 +8057,9 @@ Event propagation has 3 phases:
             3. Bubbling Phase
 ```Event propagation is the mechanism through which an event travels through the DOM. It has three phases: capturing, where the event travels from the root toward the target; target phase, where it reaches the target element; and bubbling, where it travels back from the target toward the root. By default, most event listeners handle events during the bubbling phase.```
 
-# Event Bubbling/Capturing
+### 161. Event Bubbling/Capturing
+
+[↑ Back to top](#table-of-contents)
 
 Event Bubbling is the process in which an event starts from the target element and propagates upward through its parent elements.
 ```javascript
@@ -7531,7 +8113,9 @@ parent.addEventListener(
 //Parent
 //Button
 ```
-# stopPropagation() vs stopImmediatePropagation()
+### 162. stopPropagation() vs stopImmediatePropagation()
+
+[↑ Back to top](#table-of-contents)
 stopPropagation() stops the event from propagating to other elements in the capturing or bubbling phase, but it does not stop other event listeners on the same element.
 
 ```javascript
@@ -7578,7 +8162,10 @@ button
 ```
 
 
-#  Event Delegation
+
+### 163. Event Delegation
+
+[↑ Back to top](#table-of-contents)
  
  Event Delegation is a technique where we attach a single event listener to a parent element instead of attaching separate listeners to each child element, and use event bubbling to determine which child triggered the event.
 
@@ -7631,8 +8218,9 @@ parent listener
 
  ```
 
-# DOMContentLoaded vs load
+### 164. DOMContentLoaded vs load
 
+[↑ Back to top](#table-of-contents)
 ## `DOMContentLoaded`
 
 Fires when the HTML document has been completely parsed and the DOM has
@@ -7677,7 +8265,10 @@ DOM + images + CSS + other resources loaded
 
 ------------------------------------------------------------------------
 
-# Reflow vs Repaint
+
+### 165. Reflow vs Repaint
+
+[↑ Back to top](#table-of-contents)
 
 These are important browser performance concepts.
 
@@ -7747,7 +8338,9 @@ up-to-date layout.
 
 ------------------------------------------------------------------------
 
-# DocumentFragment
+### 166. DocumentFragment
+
+[↑ Back to top](#table-of-contents)
 
 ## Definition
 
@@ -7807,7 +8400,9 @@ DOM. The fragment itself does not become a visible DOM element.
 
 ------------------------------------------------------------------------
 
-# Real DOM vs Virtual DOM
+### 167. Real DOM vs Virtual DOM
+
+[↑ Back to top](#table-of-contents)
 
 ## Real DOM
 
@@ -7902,7 +8497,9 @@ manage UI updates.
 
 
 
-# What is MutationObserver and why is it asynchronous?
+### 168. What is MutationObserver and why is it asynchronous?
+
+[↑ Back to top](#table-of-contents)
 
 MutationObserver is a browser API that asynchronously watches the DOM for mutations such as added or removed nodes, attribute changes, and text changes. When a matching mutation occurs, the browser creates MutationRecords and delivers them to the observer callback during microtask processing. Unlike deprecated MutationEvents, it allows DOM changes to be handled asynchronously and efficiently.
 
@@ -7910,7 +8507,10 @@ When a matching DOM mutation occurs, the browser creates a MutationRecord and qu
 
 This makes it much more efficient than the old MutationEvent approach and allows multiple DOM changes to be collected and delivered together.
 
-# What is MutationObserver?
+
+### 169. What is MutationObserver?
+
+[↑ Back to top](#table-of-contents)
 
 MutationObserver is a browser API that lets JavaScript watch for changes made to the DOM.
 
@@ -7947,7 +8547,10 @@ Step 3 — Stop observing when necessary
 observer.disconnect();
 ```
 
-# What is IntersectionObserver?
+
+### 170. What is IntersectionObserver?
+
+[↑ Back to top](#table-of-contents)
 IntersectionObserver is a browser Web API that lets JavaScript observe whether one element is intersecting with another element, most commonly:
 
 When the element enters or leaves the viewport, the browser tells your JavaScript.
@@ -7989,7 +8592,10 @@ images.forEach((image) => {
 </script>
 ```
 
-# Why use IntersectionObserver instead of a scroll event with getBoundingClientRect()?"
+
+### 171. Why use IntersectionObserver instead of a scroll event with getBoundingClientRect()?
+
+[↑ Back to top](#table-of-contents)
 
 IntersectionObserver is designed specifically for detecting intersection between an element and a root such as the viewport. Instead of manually handling frequent scroll events and repeatedly calculating element positions with APIs such as getBoundingClientRect(), we let the browser perform the intersection tracking and notify our callback when the relevant intersection thresholds are crossed. This generally produces cleaner and more efficient code and avoids having to build our own visibility-detection logic. It's commonly used for lazy loading, infinite scrolling, animations, and impression tracking.
 
@@ -7998,7 +8604,10 @@ Short version for a fast interview:
 "IntersectionObserver lets the browser track element visibility for us, instead of manually listening to scroll and calculating positions. It's cleaner, usually more efficient, and supports thresholds, root margins, and custom scroll containers."
 
 
-# What is DocumentFragment, and why is it useful?
+
+### 172. What is DocumentFragment, and why is it useful?
+
+[↑ Back to top](#table-of-contents)
 
 DocumentFragment is a lightweight DOM container that is not attached to the document. We can create and modify multiple DOM nodes inside the fragment and then append the fragment to the live DOM. When the fragment is appended, its children are moved into the target element and the fragment becomes empty. This is useful for batching DOM construction and reducing unnecessary interaction with the live DOM. For performance, we should also avoid repeatedly alternating DOM writes with layout-triggering reads because that can cause layout thrashing.
 
@@ -8033,13 +8642,17 @@ If something outside the function still references it.
 The object survives because user references it.
 
 
-# Does const mean the object cannot change?
+### 175. Does const mean the object cannot change?
 No.
 This is allowed.
 const prevents reassignment of the binding:
 It does not make the object immutable.
 
-#  Stack vs Heap?'
+## Stack, Heap, Garbage Collection
+
+### 173. What happens when a function returns?
+
+[↑ Back to top](#table-of-contents)
 The Stack stores fixed-size primitive values and execution frames, while the Heap stores dynamic, complex reference types (objects, arrays, functions).
 
 ```javascript
@@ -8055,7 +8668,9 @@ Heap:
 ```
 
 
-#  How are objects stored in memory?
+
+[↑ Back to top](#table-of-contents)
+### 177. How are objects stored in memory?
  a hybrid approach: the actual object contents are stored dynamically in the Heap, while a fixed-size pointer (memory reference) to that data is stored on the Stack.
 
  Because objects can grow, shrink, or change shape at runtime, the JavaScript engine cannot allocate a fixed chunk of stack memory for them
@@ -8074,8 +8689,9 @@ Address Generation: The engine generates a unique memory address (e.g., 0x7fff5f
 
 Stack Push: The variable name player and its assigned memory address pointer are pushed onto the active frame of the execution Stack.
 
+[↑ Back to top](#table-of-contents)
 
-# What is Garbage Collection?
+### 178. What is Garbage Collection?
 Garbage Collection (GC) is an automated memory management process in JavaScript that frees up memory by deleting objects that are no longer needed.
 
 Suppose you create an object:
@@ -8112,7 +8728,9 @@ activeUser = null;
 ```
 
 
-# Why Does JavaScript Need Garbage Collection?
+### 179. Why Does JavaScript Need Garbage Collection?
+
+[↑ Back to top](#table-of-contents)
 
 JavaScript constantly creates objects.
 
@@ -8123,15 +8741,22 @@ Without garbage collection, memory would continuously increase:
 GC automatically identifies memory that can no longer be reached and reclaims it.
 
 
-# Does obj = null Cause GC?
+### 180. Does obj = null Cause GC?
+
+[↑ Back to top](#table-of-contents)
 No, assigning null does not directly trigger garbage collection. It removes that particular reference. If no other references remain, the object becomes unreachable and eligible for collection. The engine decides when to actually perform GC.
 
 
-# Explain Stack vs Heap in JavaScript in 30 seconds
+### 176. Stack vs Heap?
+
+[↑ Back to top](#table-of-contents)
+
 
 "The call stack manages currently executing JavaScript code by maintaining function execution frames, and frames are automatically removed when functions return. The heap is used for dynamically allocated data such as objects and arrays, whose lifetime can extend beyond a function call. Garbage collection manages unreachable heap objects. The stack is limited, so deep recursion can cause a stack overflow, while excessive retained heap objects can cause memory problems. Also, stack-versus-heap placement is an implementation detail rather than a strict JavaScript rule.
 
-# Heap + Memory Leaks
+### 182. Heap + Memory Leaks
+
+[↑ Back to top](#table-of-contents)
 Garbage collection doesn't mean memory leaks are impossible.
 
 For example:
@@ -8144,8 +8769,10 @@ The garbage collector cannot remove those objects because they are still reachab
 
 So memory keeps increasing.
 
+### 183. Closures Make This More Interesting
 
-# Closures Make This More Interesting
+[↑ Back to top](#table-of-contents)
+
 
 Consider:
 
@@ -8164,13 +8791,18 @@ This is one reason closures are closely related to memory management.
 The stack frame of outer() can disappear, while the captured lexical environment remains alive as long as the returned function can reach it.
 
 
-# What is the difference between Stack and Heap memory in JavaScript?
+### 184. What is the difference between Stack and Heap memory in JavaScript?
+
+[↑ Back to top](#table-of-contents)
 The stack is primarily used to manage the execution of JavaScript code, including function call frames, local execution state, and references. It follows a last-in-first-out model and is automatically cleaned up when functions return. The heap is used for dynamically allocated data such as objects, arrays, and other values whose lifetime can extend beyond a particular function call. The garbage collector manages heap memory and reclaims objects that are no longer reachable.
 
 The stack is generally fast and has limited space, so excessive recursion can cause a stack overflow. Heap allocation is more flexible, but garbage collection introduces some memory-management overhead.
 
 
-# Memory Leaks
+
+### 185. Memory Leaks
+
+[↑ Back to top](#table-of-contents)
 A memory leak is not simply “using a lot of memory.”
 It is memory that is no longer logically needed but remains reachable, so the garbage collector cannot reclaim it.
 
@@ -8292,22 +8924,40 @@ TTL expiration
 LRU cache
 WeakMap where appropriate
 
-# What is a memory leak in JavaScript, and how does garbage collection relate to it?"
+
+### 186. What is a memory leak in JavaScript, and how does garbage collection relate to it?
+
+[↑ Back to top](#table-of-contents)
 
 A memory leak occurs when an application keeps references to objects that are no longer needed, preventing the garbage collector from reclaiming their memory. JavaScript garbage collection is primarily based on reachability: objects that are reachable from GC roots, such as global references and active execution contexts, are considered live. Common causes include accidental global variables, forgotten event listeners, uncleared timers, closures retaining unnecessary data, detached DOM nodes that are still referenced, and caches that grow indefinitely. To prevent leaks, we should properly clean up event listeners and timers, avoid accidental globals, release unnecessary references, and use bounded or expiring caches.
 
 
-# What is the difference between Map and WeakMap, and why would you use WeakMap for caching?
+### 187. What is the difference between Map and WeakMap, and why would you use WeakMap for caching?
+
+[↑ Back to top](#table-of-contents)
 Map and WeakMap both store key-value pairs, but their reference behavior is different. A normal Map strongly references its keys, so even if the rest of the application no longer references a key object, the Map can keep that object alive. WeakMap holds object keys weakly, so if there are no other strong references to a key, the garbage collector can reclaim that object and the corresponding entry no longer remains accessible. This makes WeakMap useful for object metadata, private data, and caches where the cached data should have the same lifetime as the object. WeakMap keys must be objects, and WeakMap is intentionally not iterable because exposing all keys would conflict with its garbage-collection semantics.`
 
 ````WeakMap does not prevent garbage collection of its object keys. If an object has no other strong references, it can be collected, making WeakMap ideal for caches and metadata that should not extend an object's lifetime.````
 
-# What is Reflect?
+
+
+
+## Reflect & Type Conversion Internals
+
+### 188. What is Reflect?
+
+[↑ Back to top](#table-of-contents)
 Reflect is a built-in global object in JavaScript that provides static methods for intercepting, inspecting, and manipulating object operations at runtime.
 
 
 These four concepts are part of JavaScript's abstract type-conversion operations.
-# What is ToPrimitive?
+
+
+
+
+### 189. What is ToPrimitive?
+
+[↑ Back to top](#table-of-contents)
   ToPrimitive is an internal JavaScript operation that converts an object into a primitive value such as a string, number, bigint, boolean, symbol, or undefined.
 ```JS
 const obj = {
@@ -8318,7 +8968,11 @@ const obj = {
 
 console.log(obj + 5);
 ```
-# What is ToString?
+
+
+### 190. What is ToString?
+
+[↑ Back to top](#table-of-contents)
 ToString is an internal JavaScript operation that converts a value into a string.
 ```JS
 String(123);       // "123"
@@ -8326,7 +8980,12 @@ String(true);      // "true"
 String(null);      // "null"
 String(undefined); // "undefined"
 ```
-#  What is ToNumber?
+
+
+
+### 191. What is ToNumber?
+
+[↑ Back to top](#table-of-contents)
 ToNumber is an internal JavaScript operation that converts a value into a Number.
 ```JS
 Number("123");   // 123
@@ -8337,7 +8996,13 @@ Number(null);    // 0
 Number("");      // 0
 Number("hello"); // NaN
 ```
-# What is Symbol.toPrimitive?
+
+
+
+
+### 192. What is Symbol.toPrimitive?
+
+[↑ Back to top](#table-of-contents)
 Symbol.toPrimitive is a special well-known symbol that allows an object to customize how it is converted to a primitive value.
 
 ```JS
@@ -8362,8 +9027,12 @@ console.log(Number(user)); // 100
 console.log(user + "");     // "User"
 ```
 
+## Functional Programming
 
-# What is Function Composition?
+### 193. What is Function Composition?
+
+[↑ Back to top](#table-of-contents)
+
 Function composition means taking several small functions and combining them into one larger function.
 
 Function composition is a functional programming concept where you combine two or more functions to create a new function.
@@ -8384,8 +9053,10 @@ console.log(composed(2)); // 36
 
 ```
 
-# What is pipe()?
 
+### 194. What is pipe()?
+
+[↑ Back to top](#table-of-contents)
 pipe() does the same general job, but functions execute LEFT → RIGHT.
 pipe and compose are higher-order functions because they accept functions as arguments and return a new function. pipe executes those functions from left to right, while compose executes them from right to left. I can implement pipe using reduce() and compose using reduceRight(). The returned function closes over the functions array."
 
@@ -8428,15 +9099,20 @@ const pipeline = pipe(
 console.log(pipeline(10));
 ```
 
-# Why Use It?
+
+### 195. Why Use It? (composition/pipe)
+
+[↑ Back to top](#table-of-contents)
+
 Instead of creating monolithic, complex functions, function composition allows you to build small, reusable, single-responsibility functions and glue them together. This results in cleaner, more testable, and declarative code.
 
 
 
 
 
-# Pure Function Connection
+### 196. Pure Function Connection
 
+[↑ Back to top](#table-of-contents)
 A pure function is a function that always produces the same output for the same input and has no side effects. It doesn't modify external state, mutate its arguments, perform I/O, or depend on changing external values such as time or random numbers.
 
 Same input
@@ -8559,7 +9235,10 @@ console.log(user);
 
 ```
 
-# What is Pure Function?
+
+### 197. What is a Pure Function?
+
+[↑ Back to top](#table-of-contents)
 "A pure function is a function that always produces the same output for the same input and has no side effects. It doesn't modify external state or depend on external mutable data. Because of this, pure functions are predictable, reusable, and easy to test."
 
 ```JS
@@ -8578,7 +9257,10 @@ function increment() {
 }
 ```
 
-# What is Immutability?
+
+### 198. What is Immutability?
+
+[↑ Back to top](#table-of-contents)
 Immutability means that once a value or data is created, we do not directly modify the original data. Instead, we create a new value or object with the required changes.
 
 
@@ -8605,7 +9287,9 @@ user.name = "Vipin"; //Because const prevents reassignment of the variable, not 
 // Immutability means not modifying existing data directly. Instead, when we need to make a change, we create a new object or array containing the updated data.
 ```
 
-# First-Class Function in JavaScript
+### 199. First-Class Function in JavaScript
+
+[↑ Back to top](#table-of-contents)
 In JavaScript, functions are first-class citizens, which means a function can be treated like any other value.
 
 So a function can be:
@@ -8617,7 +9301,9 @@ Stored inside an object or array
 
 JavaScript treats functions as first-class citizens, meaning functions can be assigned to variables, passed as arguments, returned from other functions, and stored in objects or arrays, just like other values."
 
-# 1. Function Stored in a Variable
+### 200. Function Stored in a Variable
+
+[↑ Back to top](#table-of-contents)
 A function can be assigned to a variable.
 ```JS
 const greet = function () {
@@ -8630,7 +9316,11 @@ const greet = () => {
   console.log("Hello");
 };
 ```
-# 2. Function Passed as an Argument
+
+
+### 201. Function Passed as an Argument
+
+[↑ Back to top](#table-of-contents)
 A function can be passed to another function.
 ```JS
 function greet() {
@@ -8644,7 +9334,12 @@ function execute(fn) {
 execute(greet);
 ```
 
-# 3. Function Returned from Another Function
+
+
+
+### 202. Function Returned from Another Function
+
+[↑ Back to top](#table-of-contents)
 A function can also return another function.
  ```JS
 function outer() {
@@ -8658,7 +9353,10 @@ const result = outer();
 result();
  ```
 
- # 4. Function Stored in an Array
+
+### 203. Function Stored in an Array
+
+[↑ Back to top](#table-of-contents)
 Functions can be stored inside arrays
  ```JS
 const operations = [
@@ -8670,7 +9368,9 @@ operations[0]();
 operations[1]();
  ```
 
- # 5. Function Stored in an Object
+### 204. Function Stored in an Object
+
+[↑ Back to top](#table-of-contents)
  ```JS
 const user = {
   name: "Priti",
@@ -8681,19 +9381,31 @@ const user = {
 user.greet();
  ```
 
-# Implement an Event Emitter.
+
+
+
+### 205. Implement an Event Emitter
+
+[↑ Back to top](#table-of-contents)
 An EventEmitter is a design pattern (and a built-in module in Node.js) that allows objects to communicate with each other by emitting named events and registering listener functions to handle them
 
 
 
 
-# localStorage vs sessionStorage
+## Browser Storage
+
+### 206. localStorage vs sessionStorage
+
+[↑ Back to top](#table-of-contents)
 
 Both are browser-provided Web Storage APIs that let JavaScript persist string key-value data. The biggest difference is lifetime and scope.
 
 
 
-# What is the difference between localStorage and sessionStorage?
+
+### 207. What is the difference between localStorage and sessionStorage?
+
+[↑ Back to top](#table-of-contents)
 Both localStorage and sessionStorage are browser Web Storage APIs that store key-value data as strings. The main difference is their lifetime and scope. localStorage persists after the tab and browser are closed and is shared across pages and tabs of the same origin. sessionStorage is associated with a particular page session/tab, so it is isolated between tabs and is normally cleared when that tab is closed. Both APIs are synchronous and have browser-dependent storage limits, typically around a few megabytes.
 
 Then give an example:
@@ -8701,8 +9413,9 @@ Then give an example:
 I would use localStorage for things like theme preferences or non-sensitive persisted UI settings, while I would use sessionStorage for temporary tab-specific state, such as a multi-step form state that shouldn't be shared with another tab.
 
 
+### 208. What does "same-origin" mean?
 
-# What does "same-origin" mean?
+[↑ Back to top](#table-of-contents)
 
 An origin is roughly:
 
@@ -8834,15 +9547,18 @@ console.log(storedUser.name);
 
 ```
 
+### 209. Cookies in JavaScript
 
-# Cookies in JavaScript
+[↑ Back to top](#table-of-contents)
 
 A cookie is a small piece of data stored by the browser and associated with a website/domain. Unlike localStorage, cookies can be automatically attached to matching HTTP requests to the server.
 
 
 Cookie = Browser storage + HTTP request metadata + security rules
 
-# How Cookies Work Internally
+### 210. How Cookies Work Internally
+
+[↑ Back to top](#table-of-contents)
 There are two major ways cookies get created.
 
 A. Server creates cookie
@@ -8957,7 +9673,10 @@ document.cookie =
   "theme=; expires=Thu, 01 Jan 1970 00:00:00 GMT";
 ```
 
-# Cookies vs localStorage — What's the difference
+
+### 211. Cookies vs localStorage — what's the difference
+
+[↑ Back to top](#table-of-contents)
 Cookies and localStorage are both browser-side storage mechanisms, but they serve different purposes. Cookies are primarily designed to participate in HTTP communication and can be automatically sent with matching requests to the server. localStorage is client-side storage that JavaScript must explicitly read and send to the server. Cookies also support security and lifecycle attributes such as HttpOnly, Secure, SameSite, Expires, and Max-Age, while localStorage does not provide equivalent cookie attributes.
 
 
@@ -8982,7 +9701,9 @@ Then the server must also be configured appropriately for credentialed CORS.
 This connects cookies directly with:
 
 
-# What is IndexedDB?
+### 212. What is IndexedDB?
+
+[↑ Back to top](#table-of-contents)
 IndexedDB is a browser-provided asynchronous, transactional, NoSQL database. It lets a web application store large amounts of structured data locally, including objects, arrays, and Blob/binary data.
 Browser
 │
@@ -9013,7 +9734,9 @@ Storing files/images/blobs
 Applications that need data persistence without a server connection
 
 
-# Why is IndexedDB asynchronous?
+### 213. Why is IndexedDB asynchronous?
+
+[↑ Back to top](#table-of-contents)
 
 Suppose you had:
 
@@ -9180,7 +9903,10 @@ If 1 exists:
 
 Update
 
-# What is IndexedDB, and how is it different from localStorage?
+
+### 214. What is IndexedDB, and how is it different from localStorage?
+
+[↑ Back to top](#table-of-contents)
 IndexedDB is an asynchronous, transactional, NoSQL database built into the browser. It is designed for storing larger amounts of structured data, including objects and binary data such as Blobs. It supports object stores, indexes, keys, cursors, and transactions.
 
 localStorage, on the other hand, is a much simpler synchronous key-value storage API that stores strings. It doesn't provide database-style transactions, indexes, or querying capabilities.
@@ -9195,8 +9921,11 @@ Because IndexedDB is asynchronous and supports structured data and transactions,
 
 
 
+## Networking, CORS, Workers
 
-# Fetch apis 
+### 215. Fetch API
+
+[↑ Back to top](#table-of-contents)
 fetch() is the modern browser API for making HTTP requests. It returns a Promise, and the returned Response contains a ReadableStream body that you explicitly consume with .json(), .text(), .blob(), etc.
 
 fetch("https://api.example.com/users");
@@ -9260,13 +9989,19 @@ const response = await fetch("/api/users", {
   ```
 
 
-  # What is the difference between fetch() rejecting and receiving an HTTP error such as 404?"
+
+### 216. What is the difference between fetch() rejecting and receiving an HTTP error such as 404?
+
+[↑ Back to top](#table-of-contents)
 fetch() returns a Promise that resolves to a Response once the browser receives a response from the server. HTTP status codes like 404 or 500 normally do not cause the Promise to reject. Instead, the Promise resolves with a Response where response.ok is false. The Promise rejects for failures such as network errors or an aborted request. Therefore, in production code I explicitly check response.ok or response.status before processing the response body.
 
 
 
 
-# What is CORS?
+
+### 217. What is CORS?
+
+[↑ Back to top](#table-of-contents)
 CORS = Cross-Origin Resource Sharing.
 
 It is a browser security mechanism that controls whether JavaScript running on one origin can access resources from another origin.
@@ -9307,7 +10042,10 @@ https://api.example.com
 are different origins because the hosts differ.
 
 
-# Why does CORS exist?
+
+### 218. Why does CORS exist?
+
+[↑ Back to top](#table-of-contents)
 
 Imagine you're logged into:
 
@@ -9402,17 +10140,28 @@ app.use(cors({
 ```
 
 
-# Explain Web Workers
+### 219. Explain Web Workers
+
+[↑ Back to top](#table-of-contents)
 Web Workers are a browser API that executes JavaScript in a separate thread and communicates with the main thread through messages, allowing CPU-intensive work to happen without blocking UI responsiveness.
 
-# What is a Web Worker, and how is it different from the JavaScript event loop?
+
+
+
+### 220. What is a Web Worker, and how is it different from the JavaScript event loop?
+
+[↑ Back to top](#table-of-contents)
 A Web Worker allows JavaScript to execute in a separate browser thread, independently of the main UI thread. It is useful for CPU-intensive tasks such as parsing large data, image processing, encryption, or complex calculations because those tasks can otherwise block the main thread and make the UI unresponsive.
 
 Workers cannot directly access the DOM or window. The main thread and worker communicate through postMessage() and message events. Data is generally transferred using the structured clone algorithm, with transferable objects available when ownership transfer is preferable.
 
 The JavaScript event loop, on the other hand, coordinates asynchronous callbacks and tasks within an execution environment. It doesn't automatically move CPU-heavy JavaScript to another thread. A Web Worker provides the separate execution context/thread that can perform that work without blocking the main UI thread.
 
-# Does JavaScript become multithreaded?
+
+
+### 221. Does JavaScript become multithreaded?
+
+[↑ Back to top](#table-of-contents)
 JavaScript execution in the browser is traditionally single-threaded per execution context, but browsers provide Web Workers that allow JavaScript code to run in separate worker threads. These contexts don't normally share ordinary JavaScript objects and communicate through messages.
 
 
@@ -9499,7 +10248,9 @@ self.close()//Worker can also terminate itself:
 ```
 
 
-# What is a Service Worker, and how does its lifecycle work?
+### 222. What is a Service Worker, and how does its lifecycle work?
+
+[↑ Back to top](#table-of-contents)
 A Service Worker is a browser-managed JavaScript worker that acts as a programmable network proxy between a web application and the network. It can intercept requests, serve cached responses, provide offline functionality, and support features such as push notifications and background processing.
 
 Its lifecycle primarily consists of installation, activation, and fetch handling. During install, we commonly pre-cache application resources. During activate, we can clean up old caches and take control of clients. Once active and controlling a page, the Service Worker can intercept requests through the fetch event and decide whether to respond from cache or fetch from the network.
@@ -9518,7 +10269,12 @@ caches.match(...)
 cache.put(...)
 cache.delete(...)
 
-# What exactly is a Service Worker?
+
+
+
+### 223. What exactly is a Service Worker?
+
+[↑ Back to top](#table-of-contents)
 
 the Service Worker sits between the browser/page and network requests.
 
@@ -9655,8 +10411,9 @@ self.addEventListener("fetch", event => {
 
 ```
 
+### 224. What is AbortController?
 
-# What is AbortController?
+[↑ Back to top](#table-of-contents)
 AbortController is a Web API that lets you cancel certain asynchronous browser operations.
 For fetch(), the pattern is:
 ```js
@@ -9674,7 +10431,9 @@ controller.abort();
 AbortController doesn't directly cancel fetch().
 You give the fetch request the controller's signal, and then calling abort() tells that signal to become aborted.
 
-# How does it work internally?
+### 225. How does it work internally? (AbortController)
+
+[↑ Back to top](#table-of-contents)
 ```js
 // Create controller
 const controller= new AbortController();
@@ -9832,7 +10591,9 @@ useEffect(() => {
 
 
 
-# How do you cancel a fetch request in JavaScript?
+### 226. How do you cancel a fetch request in JavaScript?
+
+[↑ Back to top](#table-of-contents)
 
 We can cancel an in-flight fetch() request using the browser's AbortController API. We create an AbortController, pass its signal to the fetch options, and call controller.abort() when we want to cancel the request. The fetch promise then rejects, typically with an AbortError, which we can handle separately from genuine network or server errors. In React, this is commonly used inside useEffect, where the controller is created inside the effect and controller.abort() is called from the cleanup function when the component unmounts or the effect needs to be replaced
 
@@ -9876,8 +10637,12 @@ useEffect(() => {
 
 JavaScript treats functions as first-class values. This means functions can be assigned to variables, passed as arguments, returned from other functions, and stored in objects or arrays. Because of this, JavaScript can implement callbacks and Higher-Order Functions. Methods like map, filter, and reduce rely heavily on this behavior. First-class functions, together with closures and lexical scope, are also fundamental to Functional Programming in JavaScript.
 
-# What are First-Class Functions?
 
+## First-Class Functions (revisited)
+
+### 227. What does it mean that functions are first-class citizens in JavaScript?
+
+[↑ Back to top](#table-of-contents)
 
 functions are values, we can:
 
@@ -9891,7 +10656,10 @@ These capabilities are what we mean when we say:
 
 JavaScript has first-class functions.
 
-# How Does It Work Internally?
+
+### 229. How Does It Work Internally?
+
+[↑ Back to top](#table-of-contents)
 
 ```js
 function greet() {
@@ -9930,7 +10698,9 @@ console.log(greet === fn);// true
 // Both variables refer to the same function object.
 ```
 
-#  First-Class Function vs Calling a Function
+### 230. First-Class Function vs Calling a Function
+
+[↑ Back to top](#table-of-contents)
 
 
 ```js
@@ -10107,9 +10877,18 @@ JavaScript is a multi-paradigm language that supports functional programming bec
 
 
 
-# Array Methods
-# map, filter, reduce
- # map()
+## Array Methods
+
+### 231. Array Methods
+
+
+### 232. map, filter, reduce
+
+[↑ Back to top](#table-of-contents)
+
+### 233. map()
+
+[↑ Back to top](#table-of-contents)
  map() is an array method used to transform each element of an array and return a new array of the transformed
 values. Internally, JavaScript creates a new array, iterates over the original array once, calls the provided callback
 for every element (passing the current value, index, and original array), stores the callback's return value in the new
@@ -10123,7 +10902,9 @@ const result=arr.map((val,index,arr)=>{
 console.log(result)
 ```
 
-# map() — Transform Every Element
+### 234. map() — Transform Every Element
+
+[↑ Back to top](#table-of-contents)
 Definition
 
 map():
@@ -10154,7 +10935,9 @@ const result = numbers.map(x => x * 2);
 
 
 
-# What is the difference between map(), filter(), and reduce()?
+### 235. What is the difference between map(), filter(), and reduce()?
+
+[↑ Back to top](#table-of-contents)
 
 map() is used when I want to transform every element of an array. It returns a new array with the same number of elements.
 
@@ -10190,7 +10973,10 @@ return acc;
 console.log(result)
 ```
 
-# Can map() / filter() Mutate Objects?
+
+### 236. Can map() / filter() Mutate Objects?
+
+[↑ Back to top](#table-of-contents)
 The methods themselves don't mutate the array.
 
 But your callback can mutate objects inside the array.
@@ -10216,7 +11002,9 @@ console.log(users)
 // map() creates a new array, but the objects can still be the same references.
 // map() never mutates anything
 ```
-# filter()
+### 237. filter()
+
+[↑ Back to top](#table-of-contents)
 filter() iterates through every element of an array and calls the callback function with the current value, index, and
 original array. If the callback returns a truthy value, the original element is added to a new array. If it returns a falsy
 value, the element is skipped. After processing all elements, filter() returns the new filtered array without modifying
@@ -10233,8 +11021,9 @@ const result = users.filter((user)=>{
 })
 console.log(result)
 ```
+### 238. filter() — Select Elements
 
-# filter() — Select Elements
+[↑ Back to top](#table-of-contents)
 
 filter() answers:
 
@@ -10274,7 +11063,9 @@ const adultNames= users.filter(user=>user.age>=18).map(user=>user.name)
 console.log(adultNames)// ["b","c"]
 ```
 
-# reduce() — Fold Everything Into a Result
+### 239. reduce() — Fold Everything Into a Result
+
+[↑ Back to top](#table-of-contents)
 combine all these elements into one result?
 It can be:
 
@@ -10315,7 +11106,9 @@ const sum = numbers.reduce(
 
 console.log(sum);
 ```
-# reduce()
+### 240. reduce()
+
+[↑ Back to top](#table-of-contents)
 Unlike map() or filter(), reduce() returns ONE final value.
 It could be:
 ✅Number 
@@ -10337,16 +11130,25 @@ return accumulator + current;
 ```
 
 
-# slice()
+
+### 241. slice()
+
+[↑ Back to top](#table-of-contents)
 slice(start, end) creates and returns a new array containing elements from the start index up to, but not including,
 the end index. It does not modify the original array. Internally, it copies references or values into a new array. 
 
-# splice()
+
+### 242. splice()
+
+[↑ Back to top](#table-of-contents)
 splice(start, deleteCount, ...items) modifies the original array. It can remove, insert, or replace elements. Internally,
 JavaScript removes the specified elements, shifts the remaining elements as needed, inserts any new items, and
 returns an array of the removed elements
 
-# find()
+
+### 243. find()
+
+[↑ Back to top](#table-of-contents)
 find() iterates over an array and calls the callback function for each element. As soon as the callback returns a
 truthy value, find() immediately returns that original element and stops iterating. If no element satisfies the
 condition, it returns undefined. Unlike filter(), it does not create a new array and only returns the first matching
@@ -10375,7 +11177,9 @@ const result= users.find((user)=>{
 console.log(result)
 ```
 
-# lastIndexOf()
+### 244. lastIndexOf()
+
+[↑ Back to top](#table-of-contents)
 lastIndexOf() searches an array or string from the end and returns the index of the last occurrence of the specified value. If the value is not found, it returns -1
 ```javascript
 let sentence = ["JS", "React", "Node", "React", "MongoDB"];
@@ -10384,7 +11188,10 @@ console.log(sentence.lastIndexOf("React"));//3
 ```
 
 
-# indexOf()
+
+### 245. indexOf()
+
+[↑ Back to top](#table-of-contents)
 indexOf() is an Array/String method that searches for a specified value and returns the index of its first occurrence. If the value is not found, it returns -1
 
 indexOf() searches for an exact value.
@@ -10407,7 +11214,10 @@ const find_user= usersList.indexOf({id:2,name:"vipin"})
 console.log(find_user)//-1 Won't work because objects are compared by reference
 ```
 
-# findIndex() 
+
+### 246. findIndex()
+
+[↑ Back to top](#table-of-contents)
 findIndex() iterates through the array and executes the callback for each element. As soon as the callback returns
 true, it immediately returns that element's index and stops iterating. If no element satisfies the condition, it returns -1.
 Unlike indexOf(), it searches using a callback condition instead of exact value comparison.
@@ -10426,7 +11236,9 @@ console.log(find_user)//Vipin
 ```
 
 
-# some() 
+### 247. some()
+
+[↑ Back to top](#table-of-contents)
  At least one condition satisfies the conditon ,return true otherwise false
 
 ```javascript 
@@ -10435,7 +11247,11 @@ const result = arr.some((num)=>num>25)//true
 console.log(result);
 ```
 
-# every()
+
+### 248. every()
+
+[↑ Back to top](#table-of-contents)
+
 It Check if All Matches return ture Oterwise false
 
 ```javascript 
@@ -10445,7 +11261,9 @@ const result = users1.every((user)=>user.verified)//true
 console.log(result);
 
 ```
-# What's the difference between find, findIndex, some, and every?
+### 249. What's the difference between find, findIndex, some, and every?
+
+[↑ Back to top](#table-of-contents)
 
 find() returns the first element that satisfies the predicate, or undefined if no element matches.
 
@@ -10482,7 +11300,9 @@ console.log(result);//[2, empty, 6]
 // Array iteration methods such as map() generally skip holes rather than treating them as an explicit undefined element.
 ```
 
-# sort()
+### 250. sort()
+
+[↑ Back to top](#table-of-contents)
 
 ```javascript 
 const number = [1,2,10,5];
@@ -10522,7 +11342,10 @@ users.sort((a,b)=>a.age-b.age)
 
 ```
 
-# includes()
+
+### 251. includes()
+
+[↑ Back to top](#table-of-contents)
 includes() checks whether an array or string contains a specified value. It iterates through the elements and returns
 true as soon as it finds a match; otherwise it returns false. Unlike indexOf(), it returns a boolean instead of an index. 
 
@@ -10535,7 +11358,9 @@ console.log(users.includes({ id: 1 })); // object are compare by refrence not va
 ```
 
 
-# flat()
+### 252. flat()
+
+[↑ Back to top](#table-of-contents)
 flat() creates a new array by removing nested array levels. By default, it flattens one level (depth = 1). You can pass
 a depth such as flat(2) or flat(Infinity) to flatten deeper nested arrays. It does not modify the original array.
 
@@ -10563,7 +11388,9 @@ const flatUsers= users.flat()
 console.log(flatUsers)
 ```
 
-# flatMap()
+### 253. flatMap()
+
+[↑ Back to top](#table-of-contents)
 flatMap() combines the behavior of map() and flat(1). It applies a callback to every element, expects the callback to
 return an array or value, and then automatically flattens the result by one level. It returns a new array and does not
 modify the original array.
@@ -10601,8 +11428,9 @@ console.log(skills);//
 const skills = users.flatMap((user) => user.skills);
 console.log(skills);
 ```
+### 254. What is the difference between map(), flat(), and flatMap()?
 
-# What is the difference between map(), flat(), and flatMap()?
+[↑ Back to top](#table-of-contents)
 map() transforms every element and returns an array with the same number of elements. flat() removes nested array levels up to the specified depth and returns a new array. flatMap() combines mapping with flattening by one level, so it is useful when each input element can produce zero, one, or multiple output elements. Conceptually, arr.flatMap(fn) is equivalent to arr.map(fn).flat(1).
 
 
@@ -10623,7 +11451,9 @@ console.log(b);
 //     5
 // ]
 ```
-# Objects Are Not Flattened
+### 255. Objects Are Not Flattened
+
+[↑ Back to top](#table-of-contents)
 
 flat() only knows about arrays
 ```js
@@ -10699,7 +11529,10 @@ console.log(words);
     "awesome"
 ]
 ```
-# What is the difference between map() and forEach()?
+
+### 256. What is the difference between map() and forEach()?
+
+[↑ Back to top](#table-of-contents)
 
 forEach() is primarily used when I want to execute a function for every element, especially when I'm performing side effects. It returns undefined, so it isn't intended for chaining.
 
@@ -10723,7 +11556,10 @@ names.push(user.name)
 })
 ```
 
-# Array.from()
+
+### 257. Array.from()
+
+[↑ Back to top](#table-of-contents)
 Array.from(iterable, mapFunction)
 
 imagine you have something that looks like an array but isn't actually an array.
@@ -10778,7 +11614,9 @@ Array.from([1, 2, 3]).map((num) => num * 2);
 
 
 
-# Array.isArray()
+### 258. Array.isArray()
+
+[↑ Back to top](#table-of-contents)
 Array.isArray() is a static method used to check whether a value is actually an Array. It returns true for arrays and false for other values.
 
 ```javascript
@@ -10808,7 +11646,11 @@ add10(20, 30); // 60
 // Here 10 is fixed in advance. The new function only needs b and c.
 
 ```
-# How Partial Application Works Internally
+## Partial Application, Currying, Debounce, Throttle, Memoization
+
+### 259. How Partial Application Works Internally
+
+[↑ Back to top](#table-of-contents)
 
 JavaScript doesn't have a special partial keyword.
 
@@ -10861,8 +11703,9 @@ console.log(
   createIndianUser("Priti", 25)
 );
 ```
+### 260. What is the difference between partial application and currying?
 
-# What is the difference between partial application and currying?"
+[↑ Back to top](#table-of-contents)
 
 Partial application is the technique of pre-filling some arguments of a function and returning a new function that requires the remaining arguments.
 
@@ -10877,12 +11720,17 @@ So the key difference is: partial application fixes arguments, while currying tr
 
 
 
-# Currying
+
+### 261. Currying
+
+[↑ Back to top](#table-of-contents)
 
 Currying is a technique of transforming a function that takes multiple arguments into a sequence of functions, where each function takes one argument.
 
 
-# What is currying in JavaScript, and how would you implement it?"
+### 262. What is currying in JavaScript, and how would you implement it?
+
+[↑ Back to top](#table-of-contents)
 
 Currying is a functional programming technique where a function that accepts multiple arguments is transformed into a sequence of functions, with each function accepting one argument and returning another function until all required arguments have been collected.
 
@@ -10985,8 +11833,9 @@ apiRequest("/api/products");
 ```
 
 
+### 263. Debouncing
 
-# Debouncing
+[↑ Back to top](#table-of-contents)
 Debounce = "Keep resetting the timer; execute only when the calls stop.
 
 Both are performance optimization techniques used when an event fires many times, such as:
@@ -11064,7 +11913,9 @@ search("react");
 
 // All calls share the same timer.
 ```
-# What is debounce and how would you implement it?"
+### 264. What is debounce and how would you implement it?
+
+[↑ Back to top](#table-of-contents)
 Debouncing is a technique used to ensure a function executes only after a certain period of inactivity. Every time the debounced function is called, we clear the previous timer and create a new one. The timer is stored in a closure, so all calls to the same debounced function share that timer. It's commonly used for search inputs, autocomplete, validation, and resize events. The key difference from throttling is that debounce waits until activity stops, whereas throttle limits execution to a fixed frequency
 ```js
 
@@ -11114,8 +11965,10 @@ input.addEventListener("input", function (event) {
 ```
 The function returns a new function that closes over a timer variable. Every time the returned function is called, it clears the previous timeout and creates a new one. Therefore, the original function executes only when there has been no invocation for the specified delay.
 
-# Throttling
 
+### 265. Throttling
+
+[↑ Back to top](#table-of-contents)
 Throttle guarantees that a function executes at most once during every N milliseconds, even if the function is called hundreds of times.
 
 We build it using:
@@ -11201,7 +12054,10 @@ Memoization
 Memoization caches function results based on inputs so repeated calls can avoid recomputation.
 
 
-# Implement debounce and explain how leading and trailing execution works.
+
+### 266. Implement debounce and explain how leading and trailing execution works
+
+[↑ Back to top](#table-of-contents)
 Debouncing ensures that a function executes only after calls to it have stopped for a specified amount of time. Internally, I keep a timer in a closure. Every invocation clears the previous timer and creates a new setTimeout. This gives us trailing-edge debounce because the function executes only after the final call has been followed by the delay. For leading-edge debounce, I execute immediately when there is no active timer, then suppress calls until the timer expires. The leading option is useful when I want immediate responsiveness, while trailing is useful when I care about the final value, such as search input.
 
 ```js
@@ -11279,7 +12135,10 @@ save();
 ```
 
 
-# Memoization
+
+### 267. Memoization
+
+[↑ Back to top](#table-of-contents)
 
 Memoization is an optimization technique where we cache the result of a function based on its input arguments. When the function is called again with the same arguments, we return the cached result instead of recalculating it.
 
@@ -11325,7 +12184,11 @@ console.log(memoizedSquare(10));
 console.log(memoizedSquare(5));
 ```
 
-# Memoize with WeakMap
+
+### 268. Memoize with WeakMap
+
+[↑ Back to top](#table-of-contents)
+
 If a function receives an object as an argument, you can use that object itself as the cache key in a WeakMap. When that object is no longer referenced anywhere else, JavaScript can garbage-collect it along with the cached entry.
 
 ```js
@@ -11495,7 +12358,10 @@ cache.set({}, 200);
 console.log(cache.size);//undefined
 ```
 
-# Why would you use WeakMap instead of Map when memoizing functions that accept objects as arguments?
+### 269. Why would you use WeakMap instead of Map when memoizing functions that accept objects as arguments?
+
+[↑ Back to top](#table-of-contents)
+
 When memoizing a function that accepts objects, WeakMap allows us to use the object itself as the cache key. Unlike Map, WeakMap does not keep a strong reference to its object keys. Therefore, when an object is no longer referenced elsewhere in the application, it can be garbage-collected along with its cached entry. This helps prevent the cache from unnecessarily retaining objects and causing memory growth.
 ```js
 const cache = new WeakMap();
@@ -11513,7 +12379,9 @@ function memoizedFunction(obj) {
 }
 ```
 
-# WeakMap Does NOT Automatically Make Every Memoization Safe
+### 270. WeakMap Does NOT Automatically Make Every Memoization Safe
+
+[↑ Back to top](#table-of-contents)
 ```js
 function memoizeWeak(fn) {
     const cache = new WeakMap();
@@ -11556,7 +12424,10 @@ function memoizeWeak(fn){
 ```
 
 
-# Implement a once() function in JavaScript
+### 271. Implement a once() function in JavaScript
+
+[↑ Back to top](#table-of-contents)
+
 Execute only one time
 once is a higher-order function that accepts a function and returns a wrapper function. The wrapper creates a closure over called and result. On the first invocation, called is false, so the original function executes and its return value is stored in result. Then called becomes true. On subsequent invocations, the original function isn't executed; the cached result is returned. I use a separate boolean flag instead of checking result, because the original function may legitimately return falsy values such as 0, false, null, or undefined. apply preserves the caller's this and forwards the arguments.
 
@@ -11601,7 +12472,11 @@ console.log(user.greetOnce("Delhi"));
 V8 is a JavaScript engine used by Chrome and Node.js. When JavaScript source code is executed, V8 first parses the source and builds an AST representing its structure. It then uses Ignition, V8's bytecode interpreter, to execute the code and collect runtime feedback. Frequently executed or "hot" code can become a candidate for optimization. TurboFan, V8's optimizing compiler, uses runtime feedback and assumptions about the code to generate optimized machine code. If those assumptions later become invalid, for example because the runtime behavior changes, V8 can deoptimize the optimized code and fall back to a safer execution path. This combination of interpretation, profiling, JIT optimization, and deoptimization allows JavaScript to remain dynamic while achieving high performance.
 
 
-# What is the V8 Pipeline?
+## V8, JIT, Performance
+
+### 272. Explain the V8 JavaScript engine pipeline
+
+[↑ Back to top](#table-of-contents)
 
 V8 is Google's JavaScript engine used primarily by Chrome and Node.js.
 
@@ -11690,7 +12565,10 @@ will happen.
 JavaScript allows both.
 
 
-# Why not compile everything directly to machine code?
+
+### 274. Why not compile everything directly to machine code?
+
+[↑ Back to top](#table-of-contents)
 JavaScript is highly dynamic, so many useful optimization decisions depend on actual runtime behavior. V8 can first execute code and gather type and shape feedback, then optimize hot code based on what it observes. Optimizing everything upfront would also waste compilation effort on code that may never execute or execute only once.
 
 
@@ -11698,8 +12576,9 @@ JIT compilation runtime par frequently executed JavaScript code ko analyze karke
 
 
 
-# What is JIT compilation in JavaScript, and how does it improve performance?
+### 275. What is JIT compilation in JavaScript, and how does it improve performance?
 
+[↑ Back to top](#table-of-contents)
 JIT stands for Just-In-Time compilation. Modern JavaScript engines initially execute JavaScript using an intermediate representation such as bytecode, while profiling the code at runtime. When the engine identifies frequently executed or "hot" code, it can use an optimizing compiler to generate optimized native machine code for that code path.
 
 The optimizer can use runtime information, such as observed value types, to make speculative assumptions. For example, if a function repeatedly receives numbers, the engine may optimize the numeric path. If those assumptions later become invalid, the engine can deoptimize and fall back to a more general execution path.
@@ -11707,10 +12586,16 @@ The optimizer can use runtime information, such as observed value types, to make
 This allows JavaScript to retain its dynamic nature while achieving much better performance for frequently executed code.
 
 
-# What is performance profiling in JavaScript?"
+### 276. What is performance profiling in JavaScript?
+
+[↑ Back to top](#table-of-contents)
 Performance profiling is the process of measuring a JavaScript application's CPU, execution, rendering, and memory behavior to identify bottlenecks. In Chrome DevTools, I can use the Performance tab to inspect timelines, flame charts, and call trees to find expensive functions or long tasks. For memory issues, I can use heap snapshots and allocation profiling. I can also use the Performance API, such as performance.mark() and performance.measure(), to create custom application-level metrics. The important workflow is to measure a baseline, identify the bottleneck, optimize that specific area, and profile again to verify the improvement.
 
-# How would you identify and fix a performance problem in a JavaScript application?
+
+
+### 277. How would you identify and fix a performance problem in a JavaScript application?
+
+[↑ Back to top](#table-of-contents)
 First, I reproduce the performance problem consistently and measure it instead of guessing. I would open Chrome DevTools Performance, record the problematic interaction, and inspect the timeline and flame chart to identify long-running JavaScript functions or expensive rendering work. I would then use the Call Tree to find which functions consume the most execution time.
 
 If the problem appears to be memory-related, I would use the Memory tab and take heap snapshots or use allocation profiling to identify objects that are being unnecessarily retained or repeatedly allocated.
@@ -11720,9 +12605,12 @@ For application-specific measurements, I can use performance.mark() and performa
 After identifying the bottleneck, I would optimize that specific area—for example by reducing unnecessary computation, avoiding repeated work, memoizing expensive calculations, batching operations, virtualizing large lists, or moving suitable CPU-heavy work off the main thread. Finally, I would profile again to verify that the optimization actually improved performance.
 
 
+## Errors & Exception Handling
 
+### 278. What is the difference between TypeError, ReferenceError and SyntaxError?
 
-# What is the difference between TypeError, ReferenceError and SyntaxError?
+[↑ Back to top](#table-of-contents)
+
 A TypeError occurs when a value exists but an operation is not valid for that value or its type. For example, trying to access a property on null or calling a non-function.
 
 A ReferenceError occurs when JavaScript cannot resolve an identifier, such as accessing a variable that has not been declared.
@@ -11735,7 +12623,9 @@ The key difference is that SyntaxError is related to parsing, ReferenceError is 
 JavaScript's built-in error types classify different failure conditions: SyntaxError indicates invalid syntax, ReferenceError indicates an unresolved identifier, TypeError indicates an invalid operation on a value, RangeError indicates an out-of-range value, URIError indicates invalid URI encoding/decoding, and Error is the general base error type.
 
 
-# What is try / catch / finally?
+### 279. What is try / catch / finally?
+
+[↑ Back to top](#table-of-contents)
 JavaScript uses it for exception handling.
 try contains risky code, catch handles or propagates the error, and finally performs cleanup before control leaves the construct—even when try/catch returns or rethrows; however, a return or throw in finally can override the previous control flow.
 
@@ -11783,9 +12673,15 @@ try {
 ```
 
 
-# What is the error object?
 
-# Does finally always execute in JavaScript? What happens if try contains a return?
+### 280. What is the error object?
+
+[↑ Back to top](#table-of-contents)
+
+### 281. Does finally always execute in JavaScript? What happens if try contains a return?
+
+[↑ Back to top](#table-of-contents)
+
 Normally, yes. The finally block executes when control leaves the try/catch, including when there is a return or a thrown exception. If try has a return, JavaScript preserves the return result while executing finally, and then completes the return afterward. If finally itself has a return, however, it overrides the previous return or thrown exception.
 what is finally actually usefull for ?
 close files
@@ -11795,7 +12691,9 @@ remove temporary resources
 cleanup subscriptions
 reset temporary state
 
-# Custom Error Classes in JavaScript
+### 282. Custom Error Classes in JavaScript
+
+[↑ Back to top](#table-of-contents)
 A custom error class is a normal JavaScript class that extends the built-in Error class, allowing you to create meaningful error types and attach structured information to them.
 ```js
 class ValidationError extends Error {
@@ -11861,14 +12759,18 @@ try {
   }
 }
 ```
+### 283. Why would you create a custom Error class instead of just using new Error()?
 
-# Why would you create a custom Error class instead of just using new Error()?
+[↑ Back to top](#table-of-contents)
 Custom Error classes allow us to create specific error types that inherit from the built-in Error class. This gives us normal Error behavior such as message and stack, while also allowing us to distinguish errors using instanceof. We can additionally attach structured properties such as statusCode, field, or an error code. This makes error handling more reliable and maintainable, especially in backend applications where different errors need different responses.
 
 Custom errors give errors a type, not just a message.
 
 
-# How do you handle errors with async/await, and what happens when an awaited Promise rejects?"
+
+### 284. How do you handle errors with async/await, and what happens when an awaited Promise rejects?
+
+[↑ Back to top](#table-of-contents)
 In Promise-based code, handle rejections with .catch(). With async/await, an awaited rejection can be handled using try/catch; if it isn't handled, the async function returns a rejected Promise, and if that rejection has no handler, it becomes an unhandled rejection.
 
 With async/await, I normally use try/catch around the awaited operation. If the Promise passed to await rejects, the rejection is propagated as an exception at the await expression, so control moves to the nearest matching catch block. If the rejection isn't handled inside the function, the async function itself returns a rejected Promise, which must be handled by its caller using another await inside try/catch or .catch(). If nobody handles the rejection, it can become an unhandled Promise rejection.
@@ -11900,7 +12802,9 @@ main();
 ```
 
 
-# Explain Custom Error Classes
+### 285. Explain Custom Error Classes
+
+[↑ Back to top](#table-of-contents)
 "Custom Error Classes are classes that extend JavaScript's built-in Error class. We call super(message) to initialize the parent Error, and we can set a custom name and add fields such as statusCode, field, or an error code. The major advantage is that we can use instanceof to reliably distinguish different error types and handle them differently. They're especially useful for centralized error handling in Node.js and Express applications."
 ```js
 // Custom Errors + async/await
@@ -12059,7 +12963,9 @@ try {
 }
 ```
 
-# What's the difference between window.onerror and window.onunhandledrejection?
+### 286. What's the difference between window.onerror and window.onunhandledrejection?
+
+[↑ Back to top](#table-of-contents)
 onerror handles uncaught exceptions; onunhandledrejection handles unhandled Promise rejections.
 
 window.onerror is used to handle uncaught JavaScript exceptions, primarily synchronous errors. window.onunhandledrejection is used to detect Promise rejections for which no rejection handler has been attached. They represent two different error paths in JavaScript. In production applications, both can be used as a last-resort error-monitoring layer to report unexpected failures to systems such as Sentry or Datadog.
@@ -12155,7 +13061,9 @@ testAsyncError();
 ```
 
 
-# Why would you catch an error only to re-throw it?"
+### 287. Why would you catch an error only to re-throw it?
+
+[↑ Back to top](#table-of-contents)
 Catch when you can add value; otherwise let the error propagate.
 
 We catch and re-throw an error when we need to add context, perform logging, cleanup, transform the error into a more meaningful application-specific error, or attach additional information. We should preserve the original error using cause when creating a new error. If the current layer cannot meaningfully handle the error, it should let the error propagate rather than swallowing it.
@@ -12218,7 +13126,9 @@ try {
 }
 ```
 
-# What is Error Propagation?
+### 288. What is Error Propagation?
+
+[↑ Back to top](#table-of-contents)
 Error propagation means:
 
 When an error happens in one function and that function doesn't handle it, the error moves upward to the caller until some catch block handles it.
@@ -12250,8 +13160,9 @@ async function main() {
 main();
 
 ```
+### 289. finally vs return Interaction
 
-# finally vs return Interaction
+[↑ Back to top](#table-of-contents)
 If try returns a value and finally also returns a value, finally wins.
 ```js
 function test() {
@@ -12363,8 +13274,15 @@ finally always gets a chance to execute before a try/catch return, throw, or nor
 
 
 
-# TypeScript 
-# What are type and interface?
+## TypeScript
+
+### 290. TypeScript (overview)
+
+
+### 291. What are type and interface?
+
+[↑ Back to top](#table-of-contents)
+
 Both are TypeScript features used to describe types.
 
 ```js
@@ -12683,14 +13601,18 @@ type Handler = (event: Event) => void;
 ```
 
 
-# # What is the difference between type and interface in TypeScript, and when would you use each?
+### 292. What is the difference between type and interface in TypeScript, and when would you use each?
+
+[↑ Back to top](#table-of-contents)
 interface and type can both describe object shapes, but they have different capabilities. I generally prefer interface when defining object-oriented or extendable object shapes because interfaces support extends and declaration merging. I use type when I need more flexibility, such as union types, intersection types, primitive aliases, tuples, or function types. Both are compile-time TypeScript constructs and are erased when the code is compiled to JavaScript. So for a normal object model I would usually choose interface, while for unions or more complex type composition I would choose type
 
 
 I prefer interface for extensible object contracts and type when I need unions, intersections, tuples, primitives, or other complex type composition.
 
 
-# What are generics in TypeScript, and why would you use them instead of any?
+### 293. What are generics in TypeScript, and why would you use them instead of any?
+
+[↑ Back to top](#table-of-contents)
 Generics allow us to write reusable and type-safe code that works with different types. Instead of fixing a function to one specific type or using any, we introduce a type parameter such as T. TypeScript can then infer or receive the actual type when the function is used.
 
 For example, function identity<T>(arg: T): T accepts any type but preserves the relationship between the argument and return value. If we pass a string, TypeScript knows the return value is a string; if we pass a number, it knows the return value is a number.
@@ -12700,7 +13622,9 @@ Generics can also have constraints, such as <T extends object> or <K extends key
 At runtime, the generic type parameter doesn't exist because TypeScript erases type information when compiling to JavaScript.
 
 
-# What are Generics?
+### 294. What are Generics?
+
+[↑ Back to top](#table-of-contents)
 Generics = type parameters.
 They let you write code once and make it work safely with many different types.
 
@@ -12967,7 +13891,9 @@ Generics do not create runtime type information. They help TypeScript perform co
 
 
 
-# What is the difference between Union and Intersection types in TypeScript?
+### 295. What is the difference between Union and Intersection types in TypeScript?
+
+[↑ Back to top](#table-of-contents)
 Union types use | and represent an OR relationship. A value of a union type can be one of several possible types, such as string | number. Because TypeScript doesn't know which member of the union it has at a particular point, we often need type narrowing using typeof, in, instanceof, or discriminated unions.
 
 Intersection types use & and represent an AND relationship. The resulting value must satisfy all the combined types. For example, Admin & User requires all properties from both Admin and User.
@@ -12975,7 +13901,9 @@ Intersection types use & and represent an AND relationship. The resulting value 
 Both are primarily compile-time TypeScript constructs and are erased when TypeScript is compiled to JavaScript.
 
 
-# TypeScript Union (|) & Intersection (&) Types
+### 296. TypeScript Union (|) & Intersection (&) Types
+
+[↑ Back to top](#table-of-contents)
 Union means the value must be valid as at least one type.
 
 Intersection means the value must satisfy all combined types.
@@ -13196,8 +14124,9 @@ function Button(props:ButtonProps){
 
 // | asks "which type could this be?", while & asks "what requirements must this satisfy?"
 ```
+### 297. What is a Type Guard in TypeScript, and what is the difference between built-in and user-defined Type Guards?
 
-# What is a Type Guard in TypeScript, and what is the difference between built-in and user-defined Type Guards?
+[↑ Back to top](#table-of-contents)
 
 A Type Guard is a runtime check that allows TypeScript to narrow a value from a broader type, such as a union, into a more specific type. Type Guards are based on JavaScript runtime mechanisms like typeof, instanceof, and in.
 
@@ -13223,7 +14152,10 @@ function process(value: unknown) {
 }
 ```
 
-# What is a Type Guard?
+### 298. What is a Type Guard?
+
+[↑ Back to top](#table-of-contents)
+
 A Type Guard is a runtime check that TypeScript uses to narrow a variable from a broader type into a more specific type.
 
 ```js
@@ -13474,7 +14406,8 @@ function assertIsUser(
 
 ```
 
-# What are TypeScript Utility Types, and can you explain Partial, Pick, Omit, Record, ReturnType, and Awaited?
+
+### 299. What are TypeScript Utility Types (Partial, Pick, Omit, Record, ReturnType, Awaited)?
 Utility Types are built-in TypeScript type transformations that allow us to derive new types from existing types without manually rewriting them. They work primarily at compile time and don't add runtime behavior to JavaScript.
 
 Partial<T> makes all properties optional, which is useful for update objects.
@@ -13493,8 +14426,10 @@ Awaited<T> unwraps Promise-like types. A common pattern is Awaited<ReturnType<ty
 
 
 
-# What are Utility Types?
+### 300. What are Utility Types?
 
+[↑ Back to top](#table-of-contents)
+[↑ Back to top](#table-of-contents)
 Utility Types are built-in TypeScript helpers that let you transform existing types into new types.
 
 TypeScript Utility Types operate at compile time. They transform or derive types for static type checking, and generally have no runtime JavaScript behavior.
@@ -13769,7 +14704,9 @@ type User = Awaited<ReturnType<typeof getUser>>;
 ```
 
 
-# What are Conditional Types in TypeScript, and what is distributive behavior?
+### 301. What are Conditional Types in TypeScript, and what is distributive behavior?
+
+[↑ Back to top](#table-of-contents)
 Conditional Types allow TypeScript to choose one type or another based on whether a type satisfies a constraint. Their syntax is T extends U ? X : Y, which is similar to a ternary operator but operates at the type level rather than runtime.
 
 When the checked type is a naked generic type parameter and receives a union, the conditional type becomes distributive. For example, T extends U ? X : Y applied to A | B is evaluated separately for A and B, and the results are combined into a union.
@@ -13872,7 +14809,9 @@ type A Message<
 
 ```
 
-# What are mapped types in TypeScript, and how are they different from JavaScript's map()?
+### 302. What are mapped types in TypeScript, and how are they different from JavaScript's map()?
+
+[↑ Back to top](#table-of-contents)
 
 Mapped types are a TypeScript type-system feature that allows us to create a new type by iterating over the keys of an existing type and transforming their properties.
 
@@ -13896,7 +14835,10 @@ type Partial<T> = {
 This is different from JavaScript's Array.prototype.map(), which operates on actual runtime array values. Mapped types operate on TypeScript types at compile time
 
 
-# TypeScript Mapped Types
+
+### 303. TypeScript Mapped Types
+
+[↑ Back to top](#table-of-contents)
 A Mapped Type takes an existing type and transforms each property according to a rule.
 
 ```js
@@ -14089,10 +15031,15 @@ user.name="vipin"
 ```
 
 
-# What are Template Literal Types in TypeScript, and how do they work with union types?
+### 304. What are Template Literal Types in TypeScript, and how do they work with union types?
+
+[↑ Back to top](#table-of-contents)
 Template Literal Types allow TypeScript to construct string literal types using template-string syntax at the type level. They are similar in syntax to JavaScript template literals, but they operate during type checking rather than runtime execution.
 
-# Template Literal
+
+### 305. Template Literal (TS)
+
+[↑ Back to top](#table-of-contents)
 
 ```js
 type EventName = `on${string}`;
@@ -14154,10 +15101,14 @@ type EventHandler = `on${Capitalize<Event>}`;
 
 
 
-# enum vs const enum vs Union Types
+### 306. enum vs const enum vs Union Types
+
+[↑ Back to top](#table-of-contents)
 enum exists at runtime. const enum is usually erased and inlined. Union types exist only at compile time.
 
-# What's the difference between enum, const enum, and union types in TypeScript?
+### 307. What's the difference between enum, const enum, and union types in TypeScript?
+
+[↑ Back to top](#table-of-contents)
 
 A regular enum generates a JavaScript object at runtime, so it has runtime overhead but can be useful when I need an actual runtime value or namespace.
 
@@ -14408,7 +15359,9 @@ const enum
 
 
 
-# What is the difference between any, unknown, and never in TypeScript?
+### 308. What is the difference between any, unknown, and never in TypeScript?
+
+[↑ Back to top](#table-of-contents)
 
 any disables TypeScript's type checking for a value, so I can access properties and call methods without narrowing, but it sacrifices type safety.
 
@@ -14478,7 +15431,5 @@ function printUser(value: unknown) {
     }
 }
 
-
-
-
 ```
+
